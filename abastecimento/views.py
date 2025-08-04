@@ -27,6 +27,21 @@ class ListaTanqueView(ListView):
     context_object_name = 'tanques'
     template_name = 'abastecimento/tanque_lista.html'
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get("q")
+        data_inicio = self.request.GET.get('data_inicio')
+        data_fim = self.request.GET.get('data_fim')
+
+
+        if q:
+            queryset = queryset.filter(tipo_combustivel__icontains=q)
+        if data_inicio:
+            queryset = queryset.filter(criado__gte=data_inicio)
+        if data_fim:
+            queryset = queryset.filter(criado__lte=data_fim)    
+        
+        return queryset
 
 class AtualizarTanqueView(UpdateView):
     model = Tanque
@@ -61,6 +76,20 @@ class ListaBombaView(ListView):
     context_object_name = 'bombas'
     template_name = 'abastecimento/bomba_lista.html'
 
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        data_inicio = self.request.GET.get('data_inicio')
+        data_fim = self.request.GET.get('data_fim')
+
+        if q:
+            queryset = queryset.filter(nome_bomba__icontains=q)
+        if data_inicio:
+            queryset = queryset.filter(criado__gte=data_inicio)
+        if data_fim:
+            queryset = queryset.filter(criado__lte=data_fim)
+        return queryset
 
 class AtualizarBombaView(UpdateView):
     model = Bomba
@@ -99,6 +128,21 @@ class ListaRegitroAbastecimentoView(ListView):
     context_object_name = 'abastecimentos'
     template_name = 'abastecimento/abastecimento_lista.html'
 
+    def get_queryset(self):
+        q = self.request.GET.get('q')
+        data_inicio = self.request.GET.get('data_inicio')
+        data_fim = self.request.GET.get('data_fim')
+
+        queryset = super().get_queryset()
+
+        if q:
+            queryset = queryset.filter(bomba__nome_bomba__icontains=q)
+        if data_inicio:
+            queryset = queryset.filter(criado__gte=data_inicio)
+        if data_fim:
+            queryset = queryset.filter(criado__lte=data_fim)
+        
+        return queryset
 
 class AtualizarRegistroAbastecimentoView(UpdateView):
     model = Abastecimento
