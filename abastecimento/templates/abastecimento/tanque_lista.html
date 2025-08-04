@@ -6,7 +6,6 @@
     {% if tanques %}
         {% for tanque in tanques %}
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
-                <h3><strong>Id: </strong> {{ tanque.pk }}</h3>
                 <p><strong>Tanque: </strong> {{ tanque.tipo_combustivel }}</p>
                 <p><strong>Tipo de combustível: </strong> {{ tanque.quantidade }}L</p>
                 <p><strong>Data de registro: </strong>{{ tanque.criado }}</p>
