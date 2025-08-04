@@ -82,3 +82,40 @@ class DeletarBombaView(DeleteView):
     success_url = reverse_lazy('listagem_bomba')
 
 
+class CriarRegistroAbastecimentoView(CreateView):
+    model = Abastecimento
+    form_class = AbastecimentoForm
+    template_name = 'abastecimento/abastecimento_form.html'
+    success_url = reverse_lazy('listagem_abastecimento')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['bombas'] = Bomba.objects.all()
+        return context
+
+class ListaRegitroAbastecimentoView(ListView):
+    model = Abastecimento
+    queryset = Abastecimento.objects.all()
+    context_object_name = 'abastecimentos'
+    template_name = 'abastecimento/abastecimento_lista.html'
+
+
+class AtualizarRegistroAbastecimentoView(UpdateView):
+    model = Abastecimento
+    form_class = AbastecimentoForm
+    context_object_name = 'abastecimento'
+    template_name = 'abastecimento/abastecimento_form.html'
+    success_url = reverse_lazy('listagem_abastecimento')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['bombas'] = Bomba.objects.all()
+        return context
+
+
+class DeletaRegistroAbastecimentoView(DeleteView):
+    model = Abastecimento
+    context_object_name = 'abastecimento'
+    template_name = 'abastecimento/abastecimento_form_delete.html'
+    success_url = reverse_lazy('listagem_abastecimento')
+
