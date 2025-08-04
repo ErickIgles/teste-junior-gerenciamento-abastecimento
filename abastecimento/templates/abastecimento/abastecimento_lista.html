@@ -16,9 +16,40 @@
             </div>
             <button style="padding: 8px;" type="submit">🔍 Filtrar</button>
         </form>
+
+
+        <div style="margin: 20px 0; background-color: #ffffff; width: 200px; height: 40px; padding: 10px 0; text-align: center;">
+            <span>
+                {% if page_obj.has_previous %}
+                    <a style="text-decoration: none; color: #000000;
+                    border: 2px solid rgba(34, 133, 255, 0.667); 
+                    padding: 3px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    
+                    " href="?page=1">&laquo; voltar</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a style="
+                    text-decoration: none; 
+                    color: #000000; 
+                    border: 2px solid rgba(34, 133, 255, 0.667); 
+                    padding: 3px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    " 
+                    href="?page={{ page_obj.next_page_number }}">próxima</a>
+                {% endif %}
+            </span>
+        </div>
     </nav>
     {% if abastecimentos %}
-        {% for abastecimento in abastecimentos %}
+        {% for abastecimento in page_obj %}
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
                 <p><strong>Nome da bomba: </strong> {{ abastecimento.bomba.nome_bomba }}</p>
                 <p><strong>Litros Abastecidos: </strong> {{ abastecimento.litros_abastecidos }}</p>
