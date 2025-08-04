@@ -4,7 +4,13 @@ from .views import (
     CriarTanqueView,
     ListaTanqueView,
     AtualizarTanqueView,
-    DeletarTanqueView
+    DeletarTanqueView,
+
+    CriarBombaView,
+    ListaBombaView,
+    AtualizarBombaView,
+    DeletarBombaView,
+
 )
 
 urlpatterns = [
@@ -13,4 +19,10 @@ urlpatterns = [
     path('listagem/tanque/', ListaTanqueView.as_view(), name='listagem_tanque'),
     path('atualizar/tanque/<int:pk>/', AtualizarTanqueView.as_view(), name='atualizar_tanque'),
     path('deletar/tanque/<int:pk>/', DeletarTanqueView.as_view(), name='deletar_tanque'),
+
+    path('criar/bomba/', CriarBombaView.as_view(), name='criar_bomba'),
+    path('listagem/bomba/', ListaBombaView.as_view(), name='listagem_bomba'),
+    path('atualizar/bomba/<int:pk>/', AtualizarBombaView.as_view(), name='atualizar_bomba'),
+    path('deletar/bomba/<int:pk>/', DeletarBombaView.as_view(), name='deletar_bomba'),
+
 ]
