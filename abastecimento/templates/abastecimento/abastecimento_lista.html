@@ -1,0 +1,23 @@
+{% extends 'abastecimento/base.html' %}
+
+
+
+{% block main %}
+    {% if abastecimentos %}
+        {% for abastecimento in abastecimentos %}
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
+                <p><strong>Nome da bomba: </strong> {{ abastecimento.bomba.nome_bomba }}</p>
+                <p><strong>Litros Abastecidos: </strong> {{ abastecimento.litros_abastecidos }}</p>
+                <p><strong>Valor total: R$</strong>{{ abastecimento.valor}} reais</p>
+                <p><strong>Data de criação: </strong>{{ abastecimento.criado }}</p>
+                <hr>
+                <div class="form__actions">
+                    <a href="{% url 'atualizar_abastecimento' abastecimento.pk %}"><button type="button" class="form__button form__button__enviar">Atualizar</button></a>
+                    <a href="{% url 'deletar_abastecimento' abastecimento.pk %}" class="form__button form__button__deletar">Deletar</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h2>Ainda não há registros no sistema</h2>
+    {% endif %}
+{% endblock %}j
