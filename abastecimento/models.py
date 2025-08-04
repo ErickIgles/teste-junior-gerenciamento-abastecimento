@@ -14,7 +14,7 @@ class Base(models.Model):
 class Tanque(Base):
     TIPO_COMBUSTIVEL_CHOICES = [
         ('GASOLINA', 'Gasolina'),
-        ('DIESEL', 'Oléo Diesel')
+        ('DIESEL', 'Óleo Diesel')
     ]
 
     tipo_combustivel = models.CharField(verbose_name='Combustivel', max_length=10, choices=TIPO_COMBUSTIVEL_CHOICES)
