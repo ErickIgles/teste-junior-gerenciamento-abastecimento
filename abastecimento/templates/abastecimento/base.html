@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/forms.css' %}">
 </head>
 <body>
-    <header>Cabeçalho</header>
+    <header>Sistema de Gestão de Abastecimento</header>
     <div class="container">
         <aside class="menu-lateral">
             <nav class="menu-navegacao">
@@ -34,8 +34,8 @@
                     <li class="menu-navegacao-lista-item">
                         <button type="button" class="menu-alternativo">Abastecimentos</button>
                         <ul class="submenu-lista">
-                            <li><a href="#">Listagem de Abastecimentos</a></li>
-                            <li><a href="#">Cadastar Abastecimento</a></li>
+                            <li><a href="{% url 'listagem_abastecimento' %}">Listagem de Abastecimentos</a></li>
+                            <li><a href="{% url 'criar_abastecimento' %}">Cadastar Abastecimento</a></li>
                         </ul>
                     </li>
                     <li class="menu-navegacao-lista-item">
@@ -44,7 +44,7 @@
                             <li>
                                 <button type="button" class="menu-alternativo" >Abastecimentos</button>
                                 <ul class="submenu-lista">
-                                    <li><a href="#">visualizar abastecimentos</a></li>
+                                    <li><a href="#">Visualizar Relatório</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -59,7 +59,7 @@
         </main>
 
     </div>
-    <footer>Rodapé</footer>
+    <footer>Feito por Erick Almeida</footer>
     <script src="{% static 'js/script.js' %}"></script>
 
 </body>
