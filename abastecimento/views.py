@@ -1,8 +1,6 @@
 from django.shortcuts import render
 
-
-from django.shortcuts import render
-
+from django.core.paginator import Paginator
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView, ListView, UpdateView, DeleteView
 
@@ -23,7 +21,6 @@ class CriarTanqueView(CreateView):
 
 class ListaTanqueView(ListView):
     model = Tanque
-    queryset = Tanque.objects.all()
     context_object_name = 'tanques'
     template_name = 'abastecimento/tanque_lista.html'
 
@@ -33,7 +30,6 @@ class ListaTanqueView(ListView):
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
 
-
         if q:
             queryset = queryset.filter(tipo_combustivel__icontains=q)
         if data_inicio:
@@ -42,6 +38,17 @@ class ListaTanqueView(ListView):
             queryset = queryset.filter(criado__lte=data_fim)    
         
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        lista_objetos = context.get('object_list')
+        paginator = Paginator(lista_objetos, 2)
+
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['page_obj'] = page_obj
+        return context
+
 
 class AtualizarTanqueView(UpdateView):
     model = Tanque
@@ -72,7 +79,6 @@ class CriarBombaView(CreateView):
 
 class ListaBombaView(ListView):
     model = Bomba
-    queryset = Bomba.objects.all()
     context_object_name = 'bombas'
     template_name = 'abastecimento/bomba_lista.html'
 
@@ -90,6 +96,16 @@ class ListaBombaView(ListView):
         if data_fim:
             queryset = queryset.filter(criado__lte=data_fim)
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        lista_objetos = context.get('object_list')
+        pagination = Paginator(lista_objetos, 1)
+        
+        page_number = self.request.GET.get('page')
+        page_obj = pagination.get_page(page_number)
+        context['page_obj'] = page_obj
+        return context
 
 class AtualizarBombaView(UpdateView):
     model = Bomba
@@ -124,7 +140,6 @@ class CriarRegistroAbastecimentoView(CreateView):
 
 class ListaRegitroAbastecimentoView(ListView):
     model = Abastecimento
-    queryset = Abastecimento.objects.all()
     context_object_name = 'abastecimentos'
     template_name = 'abastecimento/abastecimento_lista.html'
 
@@ -143,6 +158,18 @@ class ListaRegitroAbastecimentoView(ListView):
             queryset = queryset.filter(criado__lte=data_fim)
         
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        lista_objetos = context.get('object_list')
+        pagination = Paginator(lista_objetos, 1)
+
+        page_number = self.request.GET.get('page')
+        page_obj = pagination.get_page(page_number)
+        context['page_obj'] = page_obj
+        return context
+
+
 
 class AtualizarRegistroAbastecimentoView(UpdateView):
     model = Abastecimento
