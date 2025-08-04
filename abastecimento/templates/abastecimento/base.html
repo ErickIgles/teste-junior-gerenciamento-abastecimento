@@ -19,9 +19,16 @@
                     <li class="menu-navegacao-lista-item">
                         <button type="button" class="menu-alternativo">Cadastros</button>
                         <ul class="submenu-lista">
-                            <li><a href="#">Cadastrar Tanque</a></li>
-
-                            <li><a href="#">Cadastrar Bomba</a></li>
+                            <button type="button" class="menu-alternativo" >Tanque</button>
+                            <ul class="submenu-lista">
+                                <li><a href="{% url 'criar_tanque' %}">Cadastrar Tanque</a></li>
+                                <li><a href="{% url 'listagem_tanque' %}">Listagem Tanque</a></li>
+                            </ul>
+                            <button type="button" class="menu-alternativo">Bomba</button>
+                            <ul class="submenu-lista">
+                                <li><a href="#">Cadastrar Bomba</a></li>
+                                <li><a href="#">Listagem Bomba</a></li>
+                            </ul>
                         </ul>
                     </li>
                     <li class="menu-navegacao-lista-item">
@@ -38,7 +45,6 @@
                                 <button type="button" class="menu-alternativo" >Abastecimentos</button>
                                 <ul class="submenu-lista">
                                     <li><a href="#">visualizar abastecimentos</a></li>
-                                    <li><a href="#">Visualizar tanques</a></li>
                                 </ul>
                             </li>
                         </ul>
