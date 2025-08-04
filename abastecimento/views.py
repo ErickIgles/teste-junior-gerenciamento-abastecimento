@@ -14,7 +14,7 @@ class IndexTemplateView(TemplateView):
     template_name = 'abastecimento/base.html'
 
 
-class CreateTanqueView(CreateView):
+class CriarTanqueView(CreateView):
     model = Tanque
     form_class = TanqueForm
     template_name = 'abastecimento/tanque_form.html'
@@ -41,4 +41,5 @@ class DeletarTanqueView(DeleteView):
     context_object_name = 'tanque'
     template_name = 'abastecimento/tanque_form_delete.html'
     success_url = reverse_lazy('listagem_tanque')
+
 
