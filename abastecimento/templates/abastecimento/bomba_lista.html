@@ -3,6 +3,20 @@
 
 
 {% block main %}
+    <nav>
+        <form method="get" style="display: flex; margin: 20px 20px 20px 0px; flex-direction: row; gap: 20px;">
+            <input style="padding: 8px;" type="text" placeholder="pesquisar..." name="q" value="{{ request.GET.q }}">
+            <div>
+                <label for="data_inicio">De:</label>
+                <input style="padding: 8px;" type="date" name="data_inicio" value="{{ request.GET.data_inicio }}">
+            </div>
+            <div>
+                <label for="data_fim">Até:</label>
+                <input style="padding: 8px;" type="date" name="data_fim" value="{{ request.GET.data_fim }}">
+            </div>
+            <button style="padding: 8px;" type="submit">🔍 Filtrar</button>
+        </form>
+    </nav>
     {% if bombas %}
         {% for bomba in bombas %}
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
