@@ -142,14 +142,13 @@ class ListaRegitroAbastecimentoView(ListView):
     model = Abastecimento
     context_object_name = 'abastecimentos'
     template_name = 'abastecimento/abastecimento_lista.html'
-    paginate_by = 2
 
     def get_queryset(self):
+        queryset = super().get_queryset()
         q = self.request.GET.get('q')
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
 
-        queryset = super().get_queryset()
 
         if q:
             queryset = queryset.filter(bomba__nome_bomba__icontains=q)
@@ -162,9 +161,9 @@ class ListaRegitroAbastecimentoView(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        abastecimentos = self.get_queryset()
+        lista_objetos = context.get('object_list')
         
-        pagination = Paginator(abastecimentos, 1)
+        pagination = Paginator(lista_objetos, 1)
 
         page_number = self.request.GET.get('page')
         page_obj = pagination.get_page(page_number)
