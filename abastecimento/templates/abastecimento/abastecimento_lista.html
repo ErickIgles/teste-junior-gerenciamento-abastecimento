@@ -1,7 +1,5 @@
 {% extends 'abastecimento/base.html' %}
 
-
-
 {% block main %}
     <nav>
         <form method="get" style="display: flex; margin: 20px 20px 20px 0px; flex-direction: row; gap: 20px;">
@@ -17,7 +15,6 @@
             <button style="padding: 8px;" type="submit">🔍 Filtrar</button>
         </form>
 
-
         <div style="margin: 20px 0; background-color: #ffffff; width: 200px; height: 40px; padding: 10px 0; text-align: center;">
             <span>
                 {% if page_obj.has_previous %}
@@ -26,7 +23,6 @@
                     padding: 3px;
                     border-radius: 4px;
                     cursor: pointer;
-                    
                     " href="?page=1">&laquo; voltar</a>
                 {% endif %}
 
@@ -48,12 +44,16 @@
             </span>
         </div>
     </nav>
+
     {% if abastecimentos %}
         {% for abastecimento in page_obj %}
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
                 <p><strong>Nome da bomba: </strong> {{ abastecimento.bomba.nome_bomba }}</p>
                 <p><strong>Litros Abastecidos: </strong> {{ abastecimento.litros_abastecidos }}</p>
-                <p><strong>Valor total: R$</strong>{{ abastecimento.valor}} reais</p>
+                
+                <p><strong>Falta abastecer: </strong> {{ abastecimento.falta_abastecer }} litros</p>
+
+                <p><strong>Valor total: R$</strong>{{ abastecimento.valor }} reais</p>
                 <p><strong>Data de criação: </strong>{{ abastecimento.criado }}</p>
                 <hr>
                 <div class="form__actions">
@@ -65,4 +65,4 @@
     {% else %}
         <h2>Ainda não há registros no sistema</h2>
     {% endif %}
-{% endblock %}j
+{% endblock %}
