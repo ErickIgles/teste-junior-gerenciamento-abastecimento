@@ -10,7 +10,7 @@
     <div class="form__group">
         <label for="id_nome_bomba" class="form__label">Nome da Bomba</label>
         <select class="form__select" name="bomba" id="id_bomba" required>
-            <option value="" {% if abastecimeto.bomba.nome_bomba == "" %}selected{% endif %}>------------</option>
+            <option value="" {% if abastecimento.bomba.nome_bomba == "" %}selected{% endif %}>------------</option>
             {% for bomba in bombas %}
                 <option value="{{ bomba.id }}" {% if bomba.id == abastecimento.bomba.id %}selected{% endif %}>{{ bomba.nome_bomba }}</option>
             {% endfor %}
@@ -19,11 +19,11 @@
 
     <div class="form__group">
         <label for="id_abastecimento" class="form__label">Litros abastecido</label>
-        <input class="form__input" type="number" name="litros_abastecidos" required id="id_litros_abastecidos" value="{{ abastecimento.bomba.nome_bomba }}">
+        <input class="form__input" type="number" name="litros_abastecidos" required id="id_litros_abastecidos" value="{{abastecimento.litros_abastecidos}}">
     </div>
     <div class="form__group">
         <label for="id_valor">Valor do abastecimento R$</label>
-        <input class="form__input" type="number" name="valor" id="id_valor" required valur="{{ abastecimento.valor }}">
+        <input class="form__input" type="text"  name="valor" id="id_valor" required value="{{ abastecimento.valor }}">
     </div>
 
     <div class="form__actions">
