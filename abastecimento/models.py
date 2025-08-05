@@ -54,6 +54,11 @@ class Abastecimento(Base):
         self.valor = self.valor + ((self.valor * 13)/100)
         return super().save(*args, **kwargs)
     
+    @property
+    def falta_abastecer(self):
+        return self.bomba.tanque.quantidade - self.litros_abastecidos
+    
     def __str__(self):
-        return f'{self.bomba} {self.litros_abastecidos} {self.valor}'
+        return f'Abastecimento na {self.bomba.nome_bomba}: {self.litros_abastecidos}L - R${self.valor}'
+    
 
