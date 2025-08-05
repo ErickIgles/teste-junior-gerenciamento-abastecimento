@@ -142,6 +142,7 @@ class ListaRegitroAbastecimentoView(ListView):
     model = Abastecimento
     context_object_name = 'abastecimentos'
     template_name = 'abastecimento/abastecimento_lista.html'
+    paginate_by = 2
 
     def get_queryset(self):
         q = self.request.GET.get('q')
@@ -161,8 +162,9 @@ class ListaRegitroAbastecimentoView(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        lista_objetos = context.get('object_list')
-        pagination = Paginator(lista_objetos, 1)
+        abastecimentos = self.get_queryset()
+        
+        pagination = Paginator(abastecimentos, 1)
 
         page_number = self.request.GET.get('page')
         page_obj = pagination.get_page(page_number)
@@ -182,8 +184,7 @@ class AtualizarRegistroAbastecimentoView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['bombas'] = Bomba.objects.all()
         return context
-
-
+    
 class DeletaRegistroAbastecimentoView(DeleteView):
     model = Abastecimento
     context_object_name = 'abastecimento'
