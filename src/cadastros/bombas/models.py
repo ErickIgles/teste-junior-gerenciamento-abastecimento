@@ -6,7 +6,7 @@ from ..tanques.models import Tanque
 
 class Bomba(Base):
     nome_bomba = models.CharField(verbose_name='Nome', max_length=144)
-    tanque = models.ForeignKey(Tanque, verbose_name='Tanque', on_delete=models.CASCADE)
+    tanque = models.OneToOneField(Tanque, verbose_name='Tanque', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Bomba'
