@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+{% block main %}
+    <h2 class="form__titulo">Cadastro de Tanque</h2>
+
+    <form method="POST" class="form">
+        {% csrf_token %}
+
+        <div class="form__group">
+            <label for="id_tipo_combustivel" class="form__label">Tipo de Combustível</label>
+            <select class="form__select" name="tipo_combustivel" id="id_tipo_combustivel" required>
+                <option value="" {% if tanque.tipo_combustivel == "" %}selected{% endif %}>------------</option>
+                <option value="GASOLINA" {% if tanque.tipo_combustivel == "GASOLINA" %}selected{% endif %}>Gasolina</option>
+                <option value="DIESEL" {% if tanque.tipo_combustivel == "DIESEL" %}selected{% endif %}>Oléo Diesel</option>
+            </select>
+        </div>
+
+        <div class="form__group">
+            <label for="id_quantidade" class="form__label">Capacidade do tanque</label>
+            <input class="form__input" type="number" name="quantidade" required id="id_quantidade" value="{{tanque.quantidade}}">
+        </div>
+
+        <div class="form__actions">
+            <button class="form__button form__button__enviar" type="submit">Cadastrar</button>
+            <a href="{% url 'cadastros:tanques:listar' %}" class="form__button form__button__voltar">Voltar</a>
+        </div>
+    </form>
+{% endblock %}
