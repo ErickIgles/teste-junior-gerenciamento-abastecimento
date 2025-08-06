@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+
+
+{% block main %}
+    <nav>
+
+        <div>
+            <form method="get" style="display: flex; margin: 20px 20px 20px 0px; flex-direction: row; gap: 20px;">
+                <input style="padding: 8px;" type="text" placeholder="pesquisar..." name="q" value="{{ request.GET.q }}">
+                <div>
+                    <label for="data_inicio">De:</label>
+                    <input style="padding: 8px;" type="date" name="data_inicio" value="{{ request.GET.data_inicio }}">
+                </div>
+                <div>
+                    <label for="data_fim">Até:</label>
+                    <input style="padding: 8px;" type="date" name="data_fim" value="{{ request.GET.data_fim }}">
+                </div>
+                <button style="padding: 8px;" type="submit">🔍 Filtrar</button>
+            </form>
+        </div>
+        <div style="margin: 20px 0; background-color: #ffffff; width: 200px; height: 40px; padding: 10px 0; text-align: center;">
+            <span>
+                {% if page_obj.has_previous %}
+                    <a style="text-decoration: none; color: #000000;
+                    border: 2px solid rgba(34, 133, 255, 0.667); 
+                    padding: 3px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    
+                    " href="?page=1">&laquo; voltar</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a style="
+                    text-decoration: none; 
+                    color: #000000; 
+                    border: 2px solid rgba(34, 133, 255, 0.667); 
+                    padding: 3px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    " 
+                    href="?page={{ page_obj.next_page_number }}">próxima</a>
+                {% endif %}
+            </span>
+        </div>
+        
+    </nav>
+    {% if tanques %}
+        {% for tanque in page_obj %}
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
+                <p><strong>Tipo de combustivel: </strong> {{ tanque.tipo_combustivel }}</p>
+                <p><strong>Capacidade do tanque: </strong> {{ tanque.quantidade }} L</p>
+                <p><strong>Data de registro: </strong>{{ tanque.criado }}</p>
+                <hr>
+                <div class="form__actions">
+                    <a href="{% url 'cadastros:tanques:atualizar' tanque.pk %}"><button type="button" class="form__button form__button__enviar">Atualizar</button></a>
+                    <a href="{% url 'cadastros:tanques:deletar' tanque.pk %}" class="form__button form__button__deletar">Deletar</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h2>Ainda não há registros no sistema</h2>
+    {% endif %}
+{% endblock %}j
