@@ -31,7 +31,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'abastecimento.apps.AbastecimentoConfig',
-    'cadastros.bombas.apps.BombasConfig'
+    'cadastros.bombas.apps.BombasConfig',
+    'cadastros.tanques.apps.TanquesConfig',
 ]
 
 MIDDLEWARE = [
