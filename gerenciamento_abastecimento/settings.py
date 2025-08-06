@@ -49,7 +49,7 @@ ROOT_URLCONF = 'gerenciamento_abastecimento.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [Path(BASE_DIR, 'templates')],
+        'DIRS': [Path(BASE_DIR, 'src', 'home', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
