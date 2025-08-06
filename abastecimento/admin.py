@@ -1,12 +1,7 @@
 from django.contrib import admin
 
-from .models import Tanque, Bomba, Abastecimento
+from .models import Bomba, Abastecimento
 
-
-@admin.register(Tanque)
-class TanqueAdmin(admin.ModelAdmin):
-    list_display = ['id', 'tipo_combustivel', 'quantidade']
-    list_display_links = ['id', 'tipo_combustivel', 'quantidade']
 
 
 @admin.register(Bomba)
