@@ -55,7 +55,8 @@
 
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
                 <p><strong>Tipo de combustivel: </strong> {{ tanque.tipo_combustivel }}</p>
-                <p><strong>Capacidade do tanque: </strong> {{ tanque.quantidade }} L</p>
+                <p><strong>Capacidade do tanque: </strong> {{ tanque.capacidade_maxima }} L</p>
+                <p><strong>Capacidade disponivel: </strong> {{ tanque.quantidade_disponivel }} L</p>
                 <p><strong>Data de registro: </strong>{{ tanque.criado }}</p>
                 <hr>
                 <div class="form__actions">
