@@ -14,14 +14,14 @@ from .forms import TanqueForm
 class TanqueCadastroView(CreateView):
     model = Tanque
     form_class = TanqueForm
-    template_name = 'tanque/tanque_form.html'
+    template_name = 'tanques/tanque_form.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
 
 
 class TanqueListarView(ListView):
     model = Tanque
     context_object_name = 'tanques'
-    template_name = 'tanque/tanque_lista.html'
+    template_name = 'tanques/tanque_lista.html'
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -53,12 +53,12 @@ class TanqueAtualizarView(UpdateView):
     model = Tanque
     form_class = TanqueForm
     context_object_name = 'tanque'
-    template_name = 'tanque/tanque_form.html'
+    template_name = 'tanques/tanque_form.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
 
 
 class TanqueDeletarView(DeleteView):
     model = Tanque
     context_object_name = 'tanque'
-    template_name = 'tanque/tanque_form_delete.html'
+    template_name = 'tanques/tanque_form_delete.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
