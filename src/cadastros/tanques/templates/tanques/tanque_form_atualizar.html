@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+{% block main %}
+    <h2 class="form__titulo">Atualização de Tanque</h2>
+
+    <form method="POST" class="form" action="{% url 'cadastros:tanques:atualizar' tanque.pk %}">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form__group">
+                <label for="{{ field.id_for_label }}" class="form__label">{{ field.label }}</label>
+                {{ field }}
+            </div>
+            {% endfor %}
+        
+        <div class="form__actions">
+            <button class="form__button form__button__enviar" type="submit">Atualizar</button>
+            <a href="{% url 'cadastros:tanques:listar' %}" class="form__button form__button__voltar">Voltar</a>
+        </div>
+    </form>
+
+{% endblock %}
+
