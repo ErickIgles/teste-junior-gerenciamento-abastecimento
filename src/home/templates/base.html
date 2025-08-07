@@ -55,15 +55,20 @@
                 </ul>
             </nav>
         </aside>
+
         <main>
+            <h2 class="form__titulo">
+                {% block title_main %}
+                {% endblock %}
+            </h2>
+
             {% block main %}
-        
             {% endblock %}
         </main>
-
     </div>
-    <footer>Feito por Erick Almeida</footer>
-    <script src="{% static 'js/script.js' %}"></script>
 
+    <footer>Feito por Erick Almeida</footer>
+
+    <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
