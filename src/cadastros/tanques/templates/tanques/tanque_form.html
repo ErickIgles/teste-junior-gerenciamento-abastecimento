@@ -12,22 +12,26 @@
         <div class="form__group">
             <label for="id_tipo_combustivel" class="form__label">Tipo de Combustível</label>
             <select class="form__select" name="tipo_combustivel" id="id_tipo_combustivel" required>
-                <option value="" {% if tanque.tipo_combustivel == "" %}selected{% endif %}>------------</option>
-                <option value="GASOLINA" {% if tanque.tipo_combustivel == "GASOLINA" %}selected{% endif %}>Gasolina</option>
-                <option value="DIESEL" {% if tanque.tipo_combustivel == "DIESEL" %}selected{% endif %}>Oléo Diesel</option>
+                <option value="">------------</option>
+                <option value="GASOLINA">Gasolina</option>
+                <option value="DIESEL">Oléo Diesel</option>
             </select>
         </div>
 
         <div class="form__group">
-            <label for="id_quantidade" class="form__label">Capacidade do tanque</label>
-            <input class="form__input" type="text" name="capacidade_maxima" required id="id_capacidade_maxima" value="{{tanque.capacidade_maxima}}">
+            <label for="id_identificador_tanque" class="form__label">Identificador:</label>
+            <input class="form__input" type="text" name="identificador_tanque" maxlength="7" required  id="id_identificador_tanque">
         </div>
 
         <div class="form__group">
-            <label for="id_quantidade" class="form__label">Quantidade disponivel</label>
-            <input class="form__input" type="text" name="quantidade_disponivel" required id="id_quantidade_disponivel" value="{{tanque.quantidade_disponivel}}">
+            <label for="id_capacidade_maxima" class="form__label">Capacidade do tanque</label>
+            <input class="form__input" type="text" name="capacidade_maxima" required id="id_capacidade_maxima">
         </div>
 
+        <div class="form__group">
+            <label for="id_quantidade_disponivel" class="form__label">Quantidade disponivel</label>
+            <input class="form__input" type="text" name="quantidade_disponivel" required id="id_quantidade_disponivel">
+        </div>
 
         <div class="form__actions">
             <button class="form__button form__button__enviar" type="submit">Cadastrar</button>
@@ -35,3 +39,4 @@
         </div>
     </form>
 {% endblock %}
+
