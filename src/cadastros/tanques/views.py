@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404
 
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -53,9 +54,9 @@ class TanqueAtualizarView(UpdateView):
     model = Tanque
     form_class = TanqueForm
     context_object_name = 'tanque'
-    template_name = 'tanques/tanque_form.html'
+    template_name = 'tanques/tanque_form_atualizar.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
-
+    
 
 class TanqueDeletarView(DeleteView):
     model = Tanque
