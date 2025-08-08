@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+    <h2 class="form__titulo">Atualizar Bomba</h2>
+
+    <form method="POST" class="form" action="{% url 'cadastros:bombas:atualizar' bomba.pk %}">
+        {% csrf_token %}
+
+        <div class="form__group">
+            <label for="id_nome_bomba" class="form__label">Nome da Bomba</label>
+            <input class="form__input" type="text" name="nome_bomba" required id="id_nome_bomba" value="{{ bomba.nome_bomba }}">
+        </div>
+
+        <div class="form__group">
+            <label for="id_tanque" class="form__label">Identificador Tanque</label>
+            <select class="form__select" name="tanque" id="id_tanque" required>
+                <option value="" {% if bomba.tanque.identificador_tanque == "" %}selected{% endif %}>------------</option>
+                {% for tanque in tanques %}
+                    <option 
+                    value="{{ tanque.id }}" 
+                    {% if tanque.id == bomba.tanque.id %}
+                    selected
+                    {% endif %}
+                    data-combustivel="{{tanque.tipo_combustivel}}"
+                    >{{ tanque.identificador_tanque }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form__group">
+            <p id="id_info_combustivel" class="form__info"></p>
+        </div>
+
+        <div class="form__actions">
+            <button class="form__button form__button__enviar" type="submit">Atualizar</button>
+            <a href="{% url 'cadastros:bombas:listar' %}" class="form__button form__button__voltar">Voltar</a>
+        </div>
+    </form>
+{% endblock %}
