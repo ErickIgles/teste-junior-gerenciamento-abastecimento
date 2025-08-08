@@ -12,7 +12,7 @@
 <body>
     <header>
         <div>
-            <a style="text-decoration: none; color: #ffffff; font-size: 22px;" href="{% url 'index' %}">Sistema de Gestão de Abastecimento</a></header>
+            <a style="text-decoration: none; color: #ffffff; font-size: 22px;" href="{% url 'home:index' %}">Sistema de Gestão de Abastecimento</a></header>
         </div>
     <div class="container">
         <aside class="menu-lateral">
@@ -37,8 +37,8 @@
                     <li class="menu-navegacao-lista-item">
                         <button type="button" class="menu-alternativo">Abastecimentos</button>
                         <ul class="submenu-lista">
-                            <li><a href="#">Listagem de Abastecimentos</a></li>
-                            <li><a href="#">Cadastar Abastecimento</a></li>
+                            <li><a href="{% url 'cadastros:abastecimento:cadastrar' %}">Cadastar Abastecimento</a></li>
+                            <li><a href="{% url 'cadastros:abastecimento:listar' %}">Listagem de Abastecimentos</a></li>
                         </ul>
                     </li>
                     <li class="menu-navegacao-lista-item">
