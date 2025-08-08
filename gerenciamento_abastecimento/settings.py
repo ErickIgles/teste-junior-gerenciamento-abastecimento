@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'abastecimento.apps.AbastecimentoConfig',
+    'cadastros.abastecimento.apps.AbastecimentoConfig',
     'cadastros.bombas.apps.BombasConfig',
     'cadastros.tanques.apps.TanquesConfig',
 ]
