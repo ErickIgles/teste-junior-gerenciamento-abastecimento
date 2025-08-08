@@ -1,4 +1,4 @@
-{% extends 'abastecimento/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
 
@@ -11,7 +11,7 @@
     <P style="margin-top: 20px;">Deseja apagar esse registro Abastecimento?</P>
     <div style="margin-top: 10px;" class="form__actions">
         <button class="form__button form__button__deletar" type="submit">Deletar</button>
-        <a href="{% url 'listagem_bomba' %}" class="form__button form__button__voltar">Cancelar</a>
+        <a href="{% url 'cadastros:abastecimento:listar' %}" class="form__button form__button__voltar">Cancelar</a>
     </div>
 </form>
 {% endblock %}
