@@ -16,7 +16,7 @@ class BombaCadastroView(CreateView):
     model = Bomba
     form_class = BombaForm
     template_name = 'bombas/bomba_form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('cadastros:bombas:listar')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,7 +58,7 @@ class BombaAtualizarView(UpdateView):
     model = Bomba
     form_class = BombaForm
     context_object_name = 'bomba'
-    template_name = 'bombas/bomba_form.html'
+    template_name = 'bombas/bomba_form_atualizar.html'
     success_url = reverse_lazy('cadastros:bombas:listar')
 
     def get_context_data(self, **kwargs):
