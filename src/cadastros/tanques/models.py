@@ -22,5 +22,5 @@ class Tanque(Base):
         verbose_name_plural = 'Tanques'
     
     def __str__(self):
-        return f'{self.tipo_combustivel}'
+        return f'{self.identificador_tanque}'
 
