@@ -47,7 +47,7 @@ class BombaListarView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         lista_objetos = context.get('object_list')
-        pagination = Paginator(lista_objetos, 1)
+        pagination = Paginator(lista_objetos, 2)
         
         page_number = self.request.GET.get('page')
         page_obj = pagination.get_page(page_number)
@@ -71,5 +71,5 @@ class BombaDeletarView(DeleteView):
     model = Bomba
     context_object_name = 'bomba'
     template_name = 'bombas/bomba_form_delete.html'
-    success_url = reverse_lazy('listagem_bomba')
+    success_url = reverse_lazy('cadastros:bombas:listar')
 
