@@ -18,7 +18,7 @@
         </form>
 
 
-        <div style="margin: 20px 0; background-color: #ffffff; width: 200px; height: 40px; padding: 10px 0; text-align: center;">
+        <div style="margin: 20px 0; background-color: #ffffff; width: 320px; height: px; padding: 10px 0; text-align: center;">
             <span>
                 {% if page_obj.has_previous %}
                     <a style="text-decoration: none; color: #000000;
@@ -53,6 +53,7 @@
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
                 <p><strong>Nome da bomba: </strong> {{ bomba.nome_bomba }}</p>
                 <p><strong>Tipo de Tanque: </strong> {{ bomba.tanque.tipo_combustivel }}</p>
+                <p><strong>Identificador do tanque: </strong> {{ bomba.tanque.identificador_tanque }}</p>
                 <p><strong>Data de registro: </strong>{{ bomba.criado }}</p>
                 <hr>
                 <div class="form__actions">
