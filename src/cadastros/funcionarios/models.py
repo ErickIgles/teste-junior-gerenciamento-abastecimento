@@ -8,12 +8,20 @@ from core.models import Base
 class Setor(Base):
     setor = models.CharField(max_length=100, verbose_name='Setor')
 
+    class Meta:
+        verbose_name = 'Setor'
+        verbose_name_plural = 'Setores'
+
     def __str__(self):
         return f'{self.setor}'
 
 
 class Cargo(Base):
     cargo = models.CharField(max_length=100, verbose_name='Cargo')
+
+    class Meta:
+        verbose_name = 'Cargo'
+        verbose_name_plural = 'Cargos'
 
     def __str__(self):
         return f'{self.cargo}'
