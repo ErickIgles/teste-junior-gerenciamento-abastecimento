@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
-
+from django.contrib import messages
 from django.core.paginator import Paginator
 
 from django.urls import reverse_lazy
@@ -16,9 +16,11 @@ class FuncionarioCadastrarView(CreateView):
     success_url = reverse_lazy('cadastros:funcionarios:listar')
 
     def form_valid(self, form):
+        messages.success(self.request, f'Funcionário(a) {form.instance.username} cadastrado(a) com sucesso.')
         return super().form_valid(form)
     
     def form_invalid(self, form):
+        messages.error(self.request, 'Erro ao realizar o cadastro. Confira as informações fornecidas.')
         return super().form_invalid(form)
 
 
@@ -62,9 +64,24 @@ class FuncionarioAtualizarView(UpdateView):
     success_url = reverse_lazy('cadastros:funcionarios:listar')
 
 
+    def form_valid(self, form):
+        messages.success(self.request, f'Dados do(a) funcionário(a) {form.instance.username} atualizado com sucesso.')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, f'Erro ao tentar atualizar os dados. Confira as informações.')
+        return super().form_invalid(form)
+
 class FuncionarioDeletarView(DeleteView):
     template_name = 'funcionarios/form_delete.html'
     model = User
     context_object_name = 'funcionario'
     success_url = reverse_lazy('cadastros:funcionarios:listar')
 
+
+    def delete(self, request, *args, **kwargs):
+        funcionario = self.get_object()
+        messages.success(self.request, f'Funcionário(a) {funcionario.username} deletado(a) com sucesso')
+        return super().delete(request, *args, **kwargs)
+    
+    
