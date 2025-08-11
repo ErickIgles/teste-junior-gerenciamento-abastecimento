@@ -19,4 +19,10 @@ class TanqueForm(forms.ModelForm):
             'capacidade_maxima': 'Capacidade do Tanque',
             'quantidade_disponivel': 'Quantidade Disponível',
         }
-    
+
+    def clean_identificador_tanque(self):
+        identificador_tanque = self.cleaned_data.get('identificador_tanque')
+
+        if Tanque.objects.filter(identificador_tanque=identificador_tanque).exists():
+            raise forms.ValidationError('Identificador já cadastrado.')
+        return identificador_tanque
