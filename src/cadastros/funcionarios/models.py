@@ -12,7 +12,7 @@ class Setor(Base):
         return f'{self.setor}'
 
 
-class Cargos(Base):
+class Cargo(Base):
     cargo = models.CharField(max_length=100, verbose_name='Cargo')
 
     def __str__(self):
@@ -21,7 +21,7 @@ class Cargos(Base):
 
 class Funcionario(Base):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuário')
-    cargo = models.ForeignKey(Cargos, on_delete=models.CASCADE, verbose_name='Cargo')
+    cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE, verbose_name='Cargo')
     setor = models.ForeignKey(Setor, on_delete=models.CASCADE, verbose_name='Setor')
 
     class Meta:
