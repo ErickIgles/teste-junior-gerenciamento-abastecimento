@@ -105,3 +105,26 @@ main{
     padding: 20px;
     background-color: #ecf0f1;
 }
+
+.messages {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.messages li {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
