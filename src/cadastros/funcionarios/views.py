@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.views.generic import CreateView, ListView, UpdateView
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
 
 from django.core.paginator import Paginator
@@ -59,5 +59,12 @@ class FuncionarioAtualizarView(UpdateView):
     model = User
     context_object_name = 'funcionario'
     form_class = UserUpdateForm
+    success_url = reverse_lazy('cadastros:funcionarios:listar')
+
+
+class FuncionarioDeletarView(DeleteView):
+    template_name = 'funcionarios/form_delete.html'
+    model = User
+    context_object_name = 'funcionario'
     success_url = reverse_lazy('cadastros:funcionarios:listar')
 
