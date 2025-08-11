@@ -13,7 +13,7 @@ class FuncionarioCadastrarView(CreateView):
     template_name = 'funcionarios/form_register.html'
     model = User
     form_class = UserForm
-    success_url = reverse_lazy('home:index')
+    success_url = reverse_lazy('cadastros:funcionarios:listar')
 
     def form_valid(self, form):
         return super().form_valid(form)
