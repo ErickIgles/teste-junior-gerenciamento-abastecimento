@@ -9,30 +9,18 @@
     <form method="POST" class="form">
         {% csrf_token %}
 
-        <div class="form__group">
-            <label for="id_tipo_combustivel" class="form__label">Tipo de Combustível</label>
-            <select class="form__select" name="tipo_combustivel" id="id_tipo_combustivel" required>
-                <option value="">------------</option>
-                <option value="GASOLINA">Gasolina</option>
-                <option value="DIESEL">Oléo Diesel</option>
-            </select>
-        </div>
-
-        <div class="form__group">
-            <label for="id_identificador_tanque" class="form__label">Identificador:</label>
-            <input class="form__input" type="text" name="identificador_tanque" maxlength="7" required  id="id_identificador_tanque">
-        </div>
-
-        <div class="form__group">
-            <label for="id_capacidade_maxima" class="form__label">Capacidade do tanque</label>
-            <input class="form__input" type="text" name="capacidade_maxima" required id="id_capacidade_maxima">
-        </div>
-
-        <div class="form__group">
-            <label for="id_quantidade_disponivel" class="form__label">Quantidade disponivel</label>
-            <input class="form__input" type="text" name="quantidade_disponivel" required id="id_quantidade_disponivel">
-        </div>
-
+        {% for field in form %}
+            <div class="form__group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    {% for erro in field.errors %}
+                        <p>{{ erro }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+            
         <div class="form__actions">
             <button class="form__button form__button__enviar" type="submit">Cadastrar</button>
             <a href="{% url 'cadastros:tanques:listar' %}" class="form__button form__button__voltar">Voltar</a>
