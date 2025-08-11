@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'cadastros.abastecimento.apps.AbastecimentoConfig',
     'cadastros.bombas.apps.BombasConfig',
     'cadastros.tanques.apps.TanquesConfig',
+    'cadastros.funcionarios.apps.FuncionariosConfig',
 ]
 
 MIDDLEWARE = [
