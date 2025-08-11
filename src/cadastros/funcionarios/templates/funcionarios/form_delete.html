@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 
-{% block main %}
+{% load static %}
 
+{% block main %}
     <form method="POST" action="{% url 'cadastros:funcionarios:deletar' funcionario.pk %}" class="form">
         {% csrf_token %}
 
