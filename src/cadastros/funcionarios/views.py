@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, UpdateView
 
 
 from django.core.paginator import Paginator
 
 from django.urls import reverse_lazy
-from .forms import UserForm
+from .forms import UserForm, UserUpdateForm
 
 
 
@@ -53,4 +53,11 @@ class FuncionarioListarView(ListView):
         context['page_obj'] = page_obj
         return context
     
+
+class FuncionarioAtualizarView(UpdateView):
+    template_name = 'funcionarios/form_update.html'
+    model = User
+    context_object_name = 'funcionario'
+    form_class = UserUpdateForm
+    success_url = reverse_lazy('cadastros:funcionarios:listar')
 
