@@ -20,26 +20,38 @@
                 <h3>Menu</h3>
                 <ul class="menu-navegacao-lista">
                     <li class="menu-navegacao-lista-item">
-                        <button type="button" class="menu-alternativo">Cadastros</button>
+                        <button type="button" class="menu-alternativo">Autencicação</button>
                         <ul class="submenu-lista">
-                            <button type="button" class="menu-alternativo" >Tanque</button>
-                            <ul class="submenu-lista">
-                                <li><a href="{% url 'cadastros:tanques:cadastrar'%}">Cadastrar Tanque</a></li>
-                                <li><a href="{% url 'cadastros:tanques:listar' %}">Listagem Tanque</a></li>
-                            </ul>
-                            <button type="button" class="menu-alternativo">Bomba</button>
-                            <ul class="submenu-lista">
-                                <li><a href="{% url 'cadastros:bombas:cadastrar' %}">Cadastrar Bomba</a></li>
-                                <li><a href="{% url 'cadastros:bombas:listar' %}">Listagem Bomba</a></li>
-                            </ul>
-                            
-                            <button type="button" class="menu-alternativo">Funcionários</button>
-                            <ul class="submenu-lista">
-                                <li><a href="{% url 'cadastros:funcionarios:cadastrar' %}">Cadastro de funcionários</a></li>
-                                <li><a href="{% url 'cadastros:funcionarios:listar' %}">Listagem de funcionários</a></li>
-                            </ul>
+                            {% if request.user.is_authenticated %}
+                                <li><a href="{% url 'autenticacao:logout' %}">Logout</a></li>
+                            {% else %}
+                                <li><a href="{% url 'autenticacao:login' %}">Login</a></li>
+                            {% endif %}
                         </ul>
                     </li>
+                    {% if request.user.is_staff %}
+                        <li class="menu-navegacao-lista-item">
+                            <button type="button" class="menu-alternativo">Cadastros</button>
+                            <ul class="submenu-lista">
+                                <button type="button" class="menu-alternativo" >Tanque</button>
+                                <ul class="submenu-lista">
+                                    <li><a href="{% url 'cadastros:tanques:cadastrar'%}">Cadastrar Tanque</a></li>
+                                    <li><a href="{% url 'cadastros:tanques:listar' %}">Listagem Tanque</a></li>
+                                </ul>
+                                <button type="button" class="menu-alternativo">Bomba</button>
+                                <ul class="submenu-lista">
+                                    <li><a href="{% url 'cadastros:bombas:cadastrar' %}">Cadastrar Bomba</a></li>
+                                    <li><a href="{% url 'cadastros:bombas:listar' %}">Listagem Bomba</a></li>
+                                </ul>
+                                
+                                <button type="button" class="menu-alternativo">Funcionários</button>
+                                <ul class="submenu-lista">
+                                    <li><a href="{% url 'cadastros:funcionarios:cadastrar' %}">Cadastro de funcionários</a></li>
+                                    <li><a href="{% url 'cadastros:funcionarios:listar' %}">Listagem de funcionários</a></li>
+                                </ul>
+                            </ul>
+                        </li>
+                    {% endif %}
                     <li class="menu-navegacao-lista-item">
                         <button type="button" class="menu-alternativo">Abastecimentos</button>
                         <ul class="submenu-lista">
@@ -71,6 +83,11 @@
                 </ul>
             {% endif %}
 
+            {% if request.user.is_authenticated %}
+                <h2>Seja Bem-Vindo(a), {{ user.username }}!</h2>
+            {% else %}
+                <h2>Seja Bem-Vindo(a)!</h2>
+            {% endif %}
             {% block main %}
             {% endblock %}
         </main>
