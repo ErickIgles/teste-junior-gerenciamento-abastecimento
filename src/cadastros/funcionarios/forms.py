@@ -57,3 +57,51 @@ class FuncionarioForm(forms.ModelForm):
             funcionario.save()
         return funcionario
 
+
+class FuncionarioUpdateForm(forms.ModelForm):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form__input', 'placeholder': 'E-mail'}), label='E-mail')
+
+    class Meta:
+        model = Funcionario
+        fields = ['nome_funcionario', 'cargo', 'setor', 'email']
+
+        widgets = {
+            'nome_funcionario': forms.TextInput(attrs={'class': 'form__input', 'placeholder': 'Nome do Funcionário'}),
+            'cargo': forms.Select(attrs={'class': 'form__input'}),
+            'setor': forms.Select(attrs={'class': 'form__input'})
+        }
+
+    def clean_nome_funcionario(self):
+        nome_funcionario = self.cleaned_data.get('nome_funcionario')
+
+        if User.objects.filter(username=nome_funcionario).exists():
+            raise forms.ValidationError('Este nome de usuário já está em uso.')
+        return nome_funcionario
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        user_id = self.instance.user.pk
+        if User.objects.filter(email=email).exclude(pk=user_id).exists():
+            raise forms.ValidationError('Este e-mail já está em uso.')
+        return email
+    
+
+    def save(self, commit=True):
+        nome_funcionario = self.cleaned_data.get('nome_funcionario')
+        email = self.cleaned_data.get('email')
+
+        user = self.instance.user
+        user.username = nome_funcionario
+        user.email = email
+
+        funcionario = self.instance
+        funcionario.nome_funcionario = nome_funcionario
+        funcionario.cargo = self.cleaned_data.get('cargo')
+        funcionario.setor = self.cleaned_data.get('setor')
+        funcionario.user = user
+
+        if commit:
+            user.save()
+            funcionario.save()
+        return funcionario
+
