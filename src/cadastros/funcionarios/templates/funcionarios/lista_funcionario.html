@@ -57,8 +57,8 @@
                 <hr>
                 <div class="form__actions">
                     <a href="{% url 'cadastros:funcionarios:atualizar' func.pk %}"><button type="button" class="form__button form__button__enviar">Atualizar</button></a> 
-                    <a href="#" class="form__button form__button__deletar">Deletar</a>
-                </div>
+                    <a href="{% url 'cadastros:funcionarios:deletar' func.pk %}" class="form__button form__button__deletar">Deletar</a>
+                </div> 
             </div>
         {% endfor %}
     {% else %}
