@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse_lazy
 
 from .models import Funcionario
-from .forms import FuncionarioForm
+from .forms import FuncionarioForm, FuncionarioUpdateForm
 
 
 
@@ -57,21 +57,25 @@ class FuncionarioListarView(ListView):
         return context
     
 
-#class FuncionarioAtualizarView(UpdateView):
-#     template_name = 'funcionarios/form_update.html'
-#     model = Funcionario
-#     context_object_name = 'funcionario'
-#     form_class = FuncionarioForm
-#     success_url = reverse_lazy('cadastros:funcionarios:listar')
+class FuncionarioAtualizarView(UpdateView):
+    template_name = 'funcionarios/form_update.html'
+    model = Funcionario
+    context_object_name = 'funcionario'
+    form_class = FuncionarioUpdateForm
+    success_url = reverse_lazy('cadastros:funcionarios:listar')
 
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['email'] = self.object.user.email
+        return initial
 
-#     def form_valid(self, form):
-#         messages.success(self.request, f'Dados do(a) funcionário(a) {form.instance.nome_funcionario} atualizado com sucesso.')
-#         return super().form_valid(form)
+    def form_valid(self, form):
+        messages.success(self.request, f'Dados do(a) funcionário(a) {form.instance.nome_funcionario} atualizado com sucesso.')
+        return super().form_valid(form)
     
-#     def form_invalid(self, form):
-#         messages.error(self.request, f'Erro ao tentar atualizar os dados. Confira as informações.')
-#         return super().form_invalid(form)
+    def form_invalid(self, form):
+        messages.error(self.request, f'Erro ao tentar atualizar os dados. Confira as informações.')
+        return super().form_invalid(form)
 
 # class FuncionarioDeletarView(DeleteView):
 #     template_name = 'funcionarios/form_delete.html'
