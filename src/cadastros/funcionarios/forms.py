@@ -42,7 +42,7 @@ class FuncionarioForm(forms.ModelForm):
         return email
 
     def save(self, commit=True):
-
+        
         nome_funcionario = self.cleaned_data.get('nome_funcionario')
         password1 = self.cleaned_data.get('password1')
         email = self.cleaned_data.get('email')
