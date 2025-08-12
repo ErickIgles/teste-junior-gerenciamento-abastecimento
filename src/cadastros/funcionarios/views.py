@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
@@ -77,16 +78,14 @@ class FuncionarioAtualizarView(UpdateView):
         messages.error(self.request, f'Erro ao tentar atualizar os dados. Confira as informações.')
         return super().form_invalid(form)
 
-# class FuncionarioDeletarView(DeleteView):
-#     template_name = 'funcionarios/form_delete.html'
-#     model = Funcionario
-#     context_object_name = 'funcionario'
-#     success_url = reverse_lazy('cadastros:funcionarios:listar')
+class FuncionarioDeletarView(DeleteView):
+    template_name = 'funcionarios/form_delete.html'
+    model = Funcionario
+    success_url = reverse_lazy('cadastros:funcionarios:listar')
 
 
-#     def delete(self, request, *args, **kwargs):
-#         funcionario = self.get_object()
-#         messages.success(self.request, f'Funcionário(a) {funcionario.nome_funcionario} deletado(a) com sucesso')
-#         return super().delete(request, *args, **kwargs)
-    
-    
+    def delete(self, request, *args, **kwargs):
+        funcionario = self.get_object()
+        nome_funcionario = funcionario.nome_funcionario
+        messages.success(request, f'Funcionário(a) {nome_funcionario} deletado(a) com sucesso.')
+        return super().delete(request, *args, **kwargs)
