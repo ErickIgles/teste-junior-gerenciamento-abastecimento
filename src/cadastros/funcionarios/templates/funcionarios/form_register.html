@@ -8,22 +8,33 @@
     <form method="POST" action="{% url 'cadastros:funcionarios:cadastrar' %}" class="form">
         {% csrf_token %}
 
-        {% for field in form %}
-            <div class="form__group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
+        <div class="form__group">
+            {{ form.nome_funcionario.label_tag }} {{ form.nome_funcionario }}
+        </div>
 
-                {% if field.errors %}
-                    {% for erro in field.errors %}
-                        <p>{{ erro }}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        {% endfor %}
+        <div class="form__group">
+            {{ form.email.label_tag }} {{ form.email }}
+        </div>
+
+
+        <div class="form__group">
+            {{ form.setor.label_tag }} {{ form.setor }}
+        </div>
+
+        <div class="form__group">
+            {{ form.cargo.label_tag }} {{ form.cargo }}
+        </div>
+
+        <div class="form__group">
+            {{ form.password1.label_tag }} {{ form.password1 }}
+        </div>
+
+        <div class="form__group">
+            {{ form.password2.label_tag }} {{ form.password2 }}
+        </div>
 
         <div class="form__actions">
             <button class="form__button form__button__enviar" type="submit">Cadastrar</button>
-            <a href="{% url 'cadastros:funcionarios:listar' %}" class="form__button form__button__voltar">Voltar</a>
         </div>
     </form>
 
