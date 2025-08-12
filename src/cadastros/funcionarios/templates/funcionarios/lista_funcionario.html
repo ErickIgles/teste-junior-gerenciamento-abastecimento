@@ -51,13 +51,13 @@
     {% if funcionarios %}
         {% for func in page_obj %}
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
-                <p><strong>Nome do funcionário: </strong> {{ func.username }}</p>
-                <p><strong>E-mail: </strong> {{ func.email }}</p>
-                <p><strong>Data de registro: </strong>{{ func.date_joined }}</p>
+                <p><strong>Nome do funcionário: </strong> {{ func.nome_funcionario }}</p>
+                <p><strong>E-mail: </strong> {{ func.user.email }}</p>
+                <p><strong>Data de registro: </strong>{{ func.user.date_joined }}</p>
                 <hr>
                 <div class="form__actions">
-                    <a href="{% url 'cadastros:funcionarios:atualizar' func.pk %}"><button type="button" class="form__button form__button__enviar">Atualizar</button></a> 
-                    <a href="{% url 'cadastros:funcionarios:deletar' func.pk %}" class="form__button form__button__deletar">Deletar</a>
+                    <a href="#"><button type="button" class="form__button form__button__enviar">Atualizar</button></a> 
+                    <a href="#" class="form__button form__button__deletar">Deletar</a>
                 </div>
             </div>
         {% endfor %}
