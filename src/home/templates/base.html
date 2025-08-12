@@ -20,7 +20,7 @@
                 <h3>Menu</h3>
                 <ul class="menu-navegacao-lista">
                     <li class="menu-navegacao-lista-item">
-                        <button type="button" class="menu-alternativo">Autencicação</button>
+                        <button type="button" class="menu-alternativo">Autenticação</button>
                         <ul class="submenu-lista">
                             {% if request.user.is_authenticated %}
                                 <li><a href="{% url 'autenticacao:logout' %}">Logout</a></li>
