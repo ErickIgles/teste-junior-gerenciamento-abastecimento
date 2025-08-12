@@ -5,7 +5,7 @@
 
 {% block main %}
 
-    <form method="POST" action="#" class="form">
+    <form method="POST" action="{% url 'cadastros:funcionarios:atualizar' funcionario.pk %}" class="form">
         {% csrf_token %}
 
         {% for field in form %}
