@@ -2,67 +2,58 @@ from django import forms
 
 from django.contrib.auth.models import User
 
-from django.contrib.auth.forms import UserCreationForm
+from .models import Funcionario
 
 
-class UserForm(UserCreationForm):
-    email = forms.EmailField(required=True, label='E-mail' ,widget=forms.EmailInput(attrs={'class': 'form__input', 'placeholder': 'E-mail'}))
-    
-    username = forms.CharField(label='Nome de usuário',
-        widget=forms.TextInput(attrs={'class': 'form__input', 'placeholder': 'Nome de usuário'})
-    )
-    password1 = forms.CharField(
-        label='Senha',
-        widget=forms.PasswordInput(attrs={'class': 'form__input', 'placeholder': 'Senha'})
-    )
-    password2 = forms.CharField(
-        label='Confirme a senha',
-        widget=forms.PasswordInput(attrs={'class': 'form__input', 'placeholder': 'Confirme a senha'})
-    )
+class FuncionarioForm(forms.ModelForm):
+
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form__input', 'placeholder': 'E-mail'}), label='E-mail')
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form__input', 'placeholder': 'Senha'}), label='Senha')
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form__input', 'placeholder': 'Confirmação de senha'}), label='Confirmação de Senha')
 
     class Meta:
-        model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        model = Funcionario
+        fields = ['nome_funcionario', 'cargo', 'setor']
 
+        widgets = {
+            'nome_funcionario': forms.TextInput(attrs={'class': 'form__input', 'placeholder': 'Nome do Funcionário'}),
+            'cargo': forms.Select(attrs={'class': 'form__input'}),
+            'setor': forms.Select(attrs={'class': 'form__input'})
+        }
+    
+    def clean(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
 
+        if password1 and password2 and password1 != password2:
+            self.add_error('password2', 'As senhas não coincidem.')
+        return self.cleaned_data
+    
+    def clean_nome_funcionario(self):
+        nome_funcionario = self.cleaned_data.get('nome_funcionario')
+        if User.objects.filter(username=nome_funcionario).exists():
+            raise forms.ValidationError('Este nome de usuário já está em uso.')
+        return nome_funcionario
+    
     def clean_email(self):
         email = self.cleaned_data.get('email')
-
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('E-mail já cadastrado.')
-        return email
-
-
-class UserUpdateForm(forms.ModelForm):
-    email = forms.EmailField(
-        required=True, 
-        label='E-mail', 
-        widget=forms.EmailInput(
-            attrs={'class': 'form__input', 'placehold':'E-mail'}
-            )
-        )
-    username = forms.CharField(
-        label='Nome de usuário',
-        widget=forms.TextInput(attrs={
-            'class': 'form__input', 'placehold':'Nome de usuário'
-        }))
-    
-    class Meta:
-        model = User
-        fields = ['username', 'email']
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        user_id = self.instance.id
-
-        if User.objects.filter(email=email).exclude(pk=user_id).exists():
             raise forms.ValidationError('Este e-mail já está em uso.')
         return email
-    
-    def clean_username(self):
-        username = self.cleaned_data.get('username')
-        user_id = self.instance.id
 
-        if User.objects.filter(username=username).exclude(pk=user_id).exists():
-            raise forms.ValidationError('Este nome de usuário já está em uso.')
-        return username
+    def save(self, commit=True):
+
+        nome_funcionario = self.cleaned_data.get('nome_funcionario')
+        password1 = self.cleaned_data.get('password1')
+        email = self.cleaned_data.get('email')
+
+        setor = self.cleaned_data.get('setor')
+        cargo = self.cleaned_data.get('cargo')
+
+        user = User.objects.create_user(username=nome_funcionario, email=email, password=password1)
+
+        funcionario = Funcionario(nome_funcionario=nome_funcionario, user=user, cargo=cargo, setor=setor)
+        if commit:
+            funcionario.save()
+        return funcionario
+
