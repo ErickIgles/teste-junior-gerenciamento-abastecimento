@@ -12,7 +12,7 @@ class CombustivelAdmin(admin.ModelAdmin):
 
 @admin.register(RegistroAbastecimento)
 class RegistroAbastecimentoAdmin(admin.ModelAdmin):
-    list_display = ['id', 'identificador_tanque', 'tipo_combustivel', 'litros_abastecer', 'valor_total_abastecimento']
+    list_display = ['id', 'funcionario', 'identificador_tanque', 'tipo_combustivel', 'litros_abastecido', 'valor_total_abastecimento']
     list_display_links = ['id', 'identificador_tanque']
 
     def identificador_tanque(self, obj):
