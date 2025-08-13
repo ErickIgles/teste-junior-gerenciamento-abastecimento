@@ -49,9 +49,7 @@
         {% for abastecimento in page_obj %}
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
                 <p><strong>Identificador do tanque: </strong> {{ abastecimento.tanque.identificador_tanque }}</p>
-                
-                <p><strong>Falta abastecer: </strong> {{ abastecimento.litros_abastecer }} litros</p>
-
+                <p><strong>Funcionário: </strong>{{ abastecimento.funcionario }}</p>
                 <p><strong>Valor total: R$</strong> {{ abastecimento.valor_total_abastecimento }} reais</p>
                 <p><strong>Data de criação: </strong>{{ abastecimento.criado }}</p>
                 <hr>
