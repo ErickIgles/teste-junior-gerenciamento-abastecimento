@@ -18,10 +18,20 @@ class RegistroAbastecimentoCadastroView(CreateView):
     template_name = 'abastecimento/abastecimento_form.html'
     success_url = reverse_lazy('cadastros:abastecimento:listar')
 
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['funcionario'] = self.request.user
+        return initial
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tanques'] = Tanque.objects.all()
         return context
+    
+    def form_valid(self, form):
+        form.instance.funcionario = self.request.user
+        return super().form_valid(form)
 
 
 class RegitroAbastecimentoListaView(ListView):
@@ -30,7 +40,13 @@ class RegitroAbastecimentoListaView(ListView):
     template_name = 'abastecimento/abastecimento_lista.html'
 
     def get_queryset(self):
+
         queryset = super().get_queryset()
+        usuario = self.request.user
+
+        if not usuario.is_staff:
+            queryset = queryset.filter(funcionario=self.request.user)
+        
         q = self.request.GET.get('q')
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
