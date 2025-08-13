@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block main %}
+    <h1 class="titulo">Detalhes do Tanque: {{ tanque.identificador_tanque }}</h1>
+
+    <table class="tabela-detalhes">
+        <thead>
+            <tr>
+                <th class="tabela-cabecalho">Data</th>
+                <th class="tabela-cabecalho">Combustível</th>
+                <th class="tabela-cabecalho">Quantidade (L)</th>
+                <th class="tabela-cabecalho">Valor Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registro in registros_tanque %}
+                <tr class="tabela-linha">
+                    <td class="tabela-celula">{{ registro.criado }}</td>
+                    <td class="tabela-celula">{{ registro.tipo_combustivel }}</td>
+                    <td class="tabela-celula">{{ registro.litros_abastecido }}</td>
+                    <td class="tabela-celula">R$ {{ registro.valor_total_abastecimento|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 class="total-abastecimento">Total de Abastecimento: R$ {{ soma_valores|floatformat:2 }}</h3>
+{% endblock %}
