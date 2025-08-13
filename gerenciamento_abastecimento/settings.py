@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'cadastros.funcionarios.apps.FuncionariosConfig',
     
     'autenticacao.apps.AutenticacaoConfig',
+    'relatorios.apps.RelatoriosConfig',
 ]
 
 MIDDLEWARE = [
