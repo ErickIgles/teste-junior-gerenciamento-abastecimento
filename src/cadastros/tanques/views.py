@@ -6,20 +6,21 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Tanque
 from .forms import TanqueForm
 
 
 
-class TanqueCadastroView(CreateView):
+class TanqueCadastroView(LoginRequiredMixin, CreateView):
     model = Tanque
     form_class = TanqueForm
     template_name = 'tanques/tanque_form.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
 
 
-class TanqueListarView(ListView):
+class TanqueListarView(LoginRequiredMixin, ListView):
     model = Tanque
     context_object_name = 'tanques'
     template_name = 'tanques/tanque_lista.html'
@@ -50,7 +51,7 @@ class TanqueListarView(ListView):
         return context
 
 
-class TanqueAtualizarView(UpdateView):
+class TanqueAtualizarView(LoginRequiredMixin, UpdateView):
     model = Tanque
     form_class = TanqueForm
     context_object_name = 'tanque'
@@ -58,7 +59,7 @@ class TanqueAtualizarView(UpdateView):
     success_url = reverse_lazy('cadastros:tanques:listar')
     
 
-class TanqueDeletarView(DeleteView):
+class TanqueDeletarView(LoginRequiredMixin, DeleteView):
     model = Tanque
     context_object_name = 'tanque'
     template_name = 'tanques/tanque_form_delete.html'
