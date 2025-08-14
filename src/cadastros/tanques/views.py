@@ -1,8 +1,6 @@
-from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404
 
-from django.contrib import messages
+from django.shortcuts import redirect
 from django.core.paginator import Paginator
 
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
@@ -19,11 +17,22 @@ class TanqueCadastroView(LoginRequiredMixin, CreateView):
     template_name = 'tanques/tanque_form.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
 
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
+
 
 class TanqueListarView(LoginRequiredMixin, ListView):
     model = Tanque
     context_object_name = 'tanques'
     template_name = 'tanques/tanque_lista.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
+
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -57,10 +66,25 @@ class TanqueAtualizarView(LoginRequiredMixin, UpdateView):
     context_object_name = 'tanque'
     template_name = 'tanques/tanque_form_atualizar.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
-    
+
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
+
+
+
 
 class TanqueDeletarView(LoginRequiredMixin, DeleteView):
     model = Tanque
     context_object_name = 'tanque'
     template_name = 'tanques/tanque_form_delete.html'
-    success_url = reverse_lazy('cadastros:tanques:listar')
+    success_url = reverse_lazy('cadastros:tanques:listar')    
+
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
+    
