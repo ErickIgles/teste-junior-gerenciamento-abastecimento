@@ -1,8 +1,8 @@
 from django import forms
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
-from .models import Funcionario
+from .models import Funcionario, Cargo
 
 
 class FuncionarioForm(forms.ModelForm):
@@ -10,14 +10,15 @@ class FuncionarioForm(forms.ModelForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form__input', 'placeholder': 'E-mail'}), label='E-mail')
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form__input', 'placeholder': 'Senha'}), label='Senha')
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form__input', 'placeholder': 'Confirmação de senha'}), label='Confirmação de Senha')
+    grupo = forms.ModelChoiceField(queryset=Group.objects.all(), widget=forms.Select(attrs={'class': 'form__input', 'placeholder': 'Grupo do funcionário'}), label='Grupo do funcionário')
+    cargo = forms.ModelChoiceField(queryset=Cargo.objects.all(), widget=forms.Select(attrs={'class': 'form__input', 'placeholder': 'Cargo'}), label='Cargo do funcionário')
 
     class Meta:
         model = Funcionario
-        fields = ['nome_funcionario', 'cargo', 'setor']
+        fields = ['nome_funcionario', 'grupo', 'cargo', 'setor']
 
         widgets = {
             'nome_funcionario': forms.TextInput(attrs={'class': 'form__input', 'placeholder': 'Nome do Funcionário'}),
-            'cargo': forms.Select(attrs={'class': 'form__input'}),
             'setor': forms.Select(attrs={'class': 'form__input'})
         }
     
@@ -48,21 +49,24 @@ class FuncionarioForm(forms.ModelForm):
 
         setor = self.cleaned_data.get('setor')
         cargo = self.cleaned_data.get('cargo')
+        grupo = self.cleaned_data.get('grupo')
 
         user = User.objects.create_user(username=nome_funcionario, email=email, password=password1)
 
-        funcionario = Funcionario(nome_funcionario=nome_funcionario, user=user, cargo=cargo, setor=setor)
+        funcionario = Funcionario(nome_funcionario=nome_funcionario, user=user, setor=setor, cargo=cargo ,grupo=grupo)
         if commit:
+            funcionario.grupo = grupo
             funcionario.save()
         return funcionario
 
 
 class FuncionarioUpdateForm(forms.ModelForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form__input', 'placeholder': 'E-mail'}), label='E-mail')
+    grupo = forms.ModelChoiceField(queryset=Group.objects.all(), widget=forms.Select(attrs={'class': 'form__input', 'placeholder': 'Grupo do funcionário'}), label='Grupo do funcionário')
 
     class Meta:
         model = Funcionario
-        fields = ['nome_funcionario', 'cargo', 'setor', 'email']
+        fields = ['nome_funcionario', 'grupo', 'cargo', 'setor', 'email']
 
         widgets = {
             'nome_funcionario': forms.TextInput(attrs={'class': 'form__input', 'placeholder': 'Nome do Funcionário'}),
@@ -72,8 +76,9 @@ class FuncionarioUpdateForm(forms.ModelForm):
 
     def clean_nome_funcionario(self):
         nome_funcionario = self.cleaned_data.get('nome_funcionario')
+        user_id = self.instance.user.pk
 
-        if User.objects.filter(username=nome_funcionario).exists():
+        if User.objects.filter(username=nome_funcionario).exclude(pk=user_id).exists():
             raise forms.ValidationError('Este nome de usuário já está em uso.')
         return nome_funcionario
     
