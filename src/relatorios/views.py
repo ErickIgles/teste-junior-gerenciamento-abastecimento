@@ -20,6 +20,9 @@ class RelatorioAbastecimento(LoginRequiredMixin, ListView):
     def dispatch(self, request, *args, **kwargs):
         usuario = self.request.user
 
+        if not usuario.is_authenticated:
+            return redirect('home:index')
+
         if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
         
@@ -59,6 +62,9 @@ class RelatorioAbastecimentoDetalhe(LoginRequiredMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         usuario = self.request.user
 
+        if not usuario.is_authenticated:
+            return redirect('home:index')
+        
         if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
         
