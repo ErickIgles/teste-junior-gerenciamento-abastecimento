@@ -1,6 +1,6 @@
 from django.db import models
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 from core.models import Base
 
@@ -32,6 +32,7 @@ class Funcionario(Base):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuário')
     cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE, verbose_name='Cargo')
     setor = models.ForeignKey(Setor, on_delete=models.CASCADE, verbose_name='Setor')
+    grupo = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Funcionário'
