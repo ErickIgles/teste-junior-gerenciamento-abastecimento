@@ -7,6 +7,8 @@ from django.urls import reverse_lazy
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from django.contrib.auth.models import Group
+
 from .models import Bomba
 from .forms import BombaForm
 from cadastros.funcionarios.models import Funcionario
@@ -30,7 +32,7 @@ class BombaCadastroView(LoginRequiredMixin, CreateView):
         try:
             funcionario = Funcionario.objects.get(user=usuario)
 
-            grupos = [grupo.name for grupo in Group.objects.all()]
+            grupos = Group.objects.exclude(name='funcionarios')
             
             if funcionario.grupo and funcionario.grupo.name in grupos:
                 return super().dispatch(request, *args, **kwargs)
@@ -58,7 +60,7 @@ class BombaListarView(LoginRequiredMixin, ListView):
         try:
             funcionario = Funcionario.objects.get(user=usuario)
 
-            grupos = [grupo.name for grupo in Group.objects.all()]
+            grupos = Group.objects.exclude(name='funcionarios')
             
             if funcionario.grupo and funcionario.grupo.name in grupos:
                 return super().dispatch(request, *args, **kwargs)
@@ -107,14 +109,14 @@ class BombaAtualizarView(LoginRequiredMixin, UpdateView):
         try:
             funcionario = Funcionario.objects.get(user=usuario)
 
-            grupos = [grupo.name for grupo in Group.objects.all()]
+            grupos = Group.objects.exclude(name='funcionarios')
             
             if funcionario.grupo and funcionario.grupo.name in grupos:
                 return super().dispatch(request, *args, **kwargs)
             return redirect('home:index')
         except Funcionario.DoesNotExist:
             return redirect('home:index')
-
+        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tanques'] = Tanque.objects.all()
@@ -136,7 +138,7 @@ class BombaDeletarView(LoginRequiredMixin, DeleteView):
         try:
             funcionario = Funcionario.objects.get(user=usuario)
 
-            grupos = [grupo.name for grupo in Group.objects.all()]
+            grupos = Group.objects.exclude(name='funcionarios')
             
             if funcionario.grupo and funcionario.grupo.name in grupos:
                 return super().dispatch(request, *args, **kwargs)
