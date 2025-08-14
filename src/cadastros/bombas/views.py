@@ -1,9 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import redirect
 
 from django.core.paginator import Paginator
 
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Bomba
 from .forms import BombaForm
@@ -12,7 +14,7 @@ from .forms import BombaForm
 from ..tanques.models import Tanque
 
 
-class BombaCadastroView(CreateView):
+class BombaCadastroView(LoginRequiredMixin, CreateView):
     model = Bomba
     form_class = BombaForm
     template_name = 'bombas/bomba_form.html'
@@ -24,7 +26,7 @@ class BombaCadastroView(CreateView):
         return context
 
 
-class BombaListarView(ListView):
+class BombaListarView(LoginRequiredMixin, ListView):
     model = Bomba
     context_object_name = 'bombas'
     template_name = 'bombas/bomba_lista.html'
@@ -54,7 +56,7 @@ class BombaListarView(ListView):
         context['page_obj'] = page_obj
         return context
 
-class BombaAtualizarView(UpdateView):
+class BombaAtualizarView(LoginRequiredMixin, UpdateView):
     model = Bomba
     form_class = BombaForm
     context_object_name = 'bomba'
@@ -67,7 +69,7 @@ class BombaAtualizarView(UpdateView):
         return context 
 
 
-class BombaDeletarView(DeleteView):
+class BombaDeletarView(LoginRequiredMixin, DeleteView):
     model = Bomba
     context_object_name = 'bomba'
     template_name = 'bombas/bomba_form_delete.html'
