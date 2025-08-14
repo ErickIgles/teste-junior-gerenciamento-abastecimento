@@ -23,6 +23,9 @@ class FuncionarioCadastrarView(LoginRequiredMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         usuario = self.request.user
 
+        if not usuario.is_authenticated:
+            return redirect('home:index')
+
         if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
         
@@ -53,6 +56,9 @@ class FuncionarioListarView(LoginRequiredMixin, ListView):
 
     def dispatch(self, request, *args, **kwargs):
         usuario = self.request.user
+
+        if not usuario.is_authenticated:
+            return redirect('home:index')
 
         if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
@@ -104,6 +110,9 @@ class FuncionarioAtualizarView(LoginRequiredMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         usuario = self.request.user
 
+        if not usuario.is_authenticated:
+            return redirect('home:index')
+
         if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
         
@@ -139,6 +148,9 @@ class FuncionarioDeletarView(LoginRequiredMixin, DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         usuario = self.request.user
+
+        if not usuario.is_authenticated:
+            return redirect('home:index')
 
         if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
