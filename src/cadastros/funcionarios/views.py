@@ -1,9 +1,10 @@
 from django.shortcuts import redirect
-from django.contrib.auth.models import User
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
 from django.contrib import messages
 from django.core.paginator import Paginator
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.urls import reverse_lazy
 
@@ -12,7 +13,7 @@ from .forms import FuncionarioForm, FuncionarioUpdateForm
 
 
 
-class FuncionarioCadastrarView(CreateView):
+class FuncionarioCadastrarView(LoginRequiredMixin, CreateView):
     template_name = 'funcionarios/form_register.html'
     model = Funcionario
     form_class = FuncionarioForm
@@ -27,7 +28,7 @@ class FuncionarioCadastrarView(CreateView):
         return super().form_invalid(form)
 
 
-class FuncionarioListarView(ListView):
+class FuncionarioListarView(LoginRequiredMixin, ListView):
     template_name = 'funcionarios/lista_funcionario.html'
     model = Funcionario
     context_object_name = 'funcionarios'
@@ -58,7 +59,7 @@ class FuncionarioListarView(ListView):
         return context
     
 
-class FuncionarioAtualizarView(UpdateView):
+class FuncionarioAtualizarView(LoginRequiredMixin, UpdateView):
     template_name = 'funcionarios/form_update.html'
     model = Funcionario
     context_object_name = 'funcionario'
@@ -78,7 +79,7 @@ class FuncionarioAtualizarView(UpdateView):
         messages.error(self.request, f'Erro ao tentar atualizar os dados. Confira as informações.')
         return super().form_invalid(form)
 
-class FuncionarioDeletarView(DeleteView):
+class FuncionarioDeletarView(LoginRequiredMixin, DeleteView):
     template_name = 'funcionarios/form_delete.html'
     model = Funcionario
     success_url = reverse_lazy('cadastros:funcionarios:listar')
@@ -89,3 +90,4 @@ class FuncionarioDeletarView(DeleteView):
         nome_funcionario = funcionario.nome_funcionario
         messages.success(request, f'Funcionário(a) {nome_funcionario} deletado(a) com sucesso.')
         return super().delete(request, *args, **kwargs)
+
