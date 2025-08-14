@@ -26,6 +26,9 @@ class BombaCadastroView(LoginRequiredMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         usuario = self.request.user
 
+        if not usuario.is_authenticated:
+            return redirect('home:index')
+
         if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
         
@@ -53,6 +56,9 @@ class BombaListarView(LoginRequiredMixin, ListView):
 
     def dispatch(self, request, *args, **kwargs):
         usuario = self.request.user
+
+        if not usuario.is_authenticated:
+            return redirect('home:index')
 
         if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
@@ -103,6 +109,9 @@ class BombaAtualizarView(LoginRequiredMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         usuario = self.request.user
 
+        if not usuario.is_authenticated:
+            return redirect('home:index')
+
         if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
         
@@ -131,6 +140,9 @@ class BombaDeletarView(LoginRequiredMixin, DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         usuario = self.request.user
+
+        if not usuario.is_authenticated:
+            return redirect('home:index')
 
         if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
