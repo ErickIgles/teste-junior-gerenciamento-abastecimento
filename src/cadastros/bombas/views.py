@@ -20,6 +20,12 @@ class BombaCadastroView(LoginRequiredMixin, CreateView):
     template_name = 'bombas/bomba_form.html'
     success_url = reverse_lazy('cadastros:bombas:listar')
 
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tanques'] = Tanque.objects.all()
@@ -31,6 +37,10 @@ class BombaListarView(LoginRequiredMixin, ListView):
     context_object_name = 'bombas'
     template_name = 'bombas/bomba_lista.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -63,6 +73,12 @@ class BombaAtualizarView(LoginRequiredMixin, UpdateView):
     template_name = 'bombas/bomba_form_atualizar.html'
     success_url = reverse_lazy('cadastros:bombas:listar')
 
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_gereal']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tanques'] = Tanque.objects.all()
@@ -74,4 +90,9 @@ class BombaDeletarView(LoginRequiredMixin, DeleteView):
     context_object_name = 'bomba'
     template_name = 'bombas/bomba_form_delete.html'
     success_url = reverse_lazy('cadastros:bombas:listar')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
 
