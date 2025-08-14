@@ -1,14 +1,13 @@
 
 from django.views.generic import ListView, DetailView
 
-from django.db.models import Sum
 from cadastros.tanques.models import Tanque
 from cadastros.abastecimento.models import RegistroAbastecimento
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-
-class RelatorioAbastecimento(ListView):
+class RelatorioAbastecimento(LoginRequiredMixin, ListView):
     template_name = 'abastecimentos/relatorio.html'
     model = RegistroAbastecimento
 
@@ -27,7 +26,7 @@ class RelatorioAbastecimento(ListView):
         return context
 
 
-class RelatorioAbastecimentoDetalhe(DetailView):
+class RelatorioAbastecimentoDetalhe(LoginRequiredMixin, DetailView):
     template_name = 'abastecimentos/detalhe.html'
     model = Tanque
     context_object_name = 'tanque'
@@ -52,3 +51,4 @@ class RelatorioAbastecimentoDetalhe(DetailView):
         })
 
         return context
+
