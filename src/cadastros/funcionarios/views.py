@@ -19,6 +19,11 @@ class FuncionarioCadastrarView(LoginRequiredMixin, CreateView):
     form_class = FuncionarioForm
     success_url = reverse_lazy('home:index')
 
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         messages.success(self.request, f'Funcionário(a) {form.instance.nome_funcionario} cadastrado(a) com sucesso.')
         return super().form_valid(form)
@@ -32,6 +37,11 @@ class FuncionarioListarView(LoginRequiredMixin, ListView):
     template_name = 'funcionarios/lista_funcionario.html'
     model = Funcionario
     context_object_name = 'funcionarios'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -66,6 +76,12 @@ class FuncionarioAtualizarView(LoginRequiredMixin, UpdateView):
     form_class = FuncionarioUpdateForm
     success_url = reverse_lazy('cadastros:funcionarios:listar')
 
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
+
+
     def get_initial(self):
         initial = super().get_initial()
         initial['email'] = self.object.user.email
@@ -84,6 +100,10 @@ class FuncionarioDeletarView(LoginRequiredMixin, DeleteView):
     model = Funcionario
     success_url = reverse_lazy('cadastros:funcionarios:listar')
 
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         funcionario = self.get_object()
