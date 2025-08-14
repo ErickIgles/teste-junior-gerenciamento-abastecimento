@@ -9,6 +9,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Tanque
 from .forms import TanqueForm
 
+from django.contrib.auth.models import Group
+from cadastros.funcionarios.models import Funcionario
 
 
 class TanqueCadastroView(LoginRequiredMixin, CreateView):
@@ -18,9 +20,23 @@ class TanqueCadastroView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('cadastros:tanques:listar')
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+        usuario = self.request.user
+
+        if not usuario.is_authenticated:
             return redirect('home:index')
-        return super().dispatch(request, *args, **kwargs)
+
+        if usuario.is_staff:
+            return super().dispatch(request, *args, **kwargs)
+        try:
+            funcionario = Funcionario.objects.get(user=usuario)
+
+            grupos = Group.objects.exclude(name='funcionarios')
+            
+            if funcionario.grupo and funcionario.grupo.name in grupos:
+                return super().dispatch(request, *args, **kwargs)
+            return redirect('home:index')
+        except Funcionario.DoesNotExist:
+            return redirect('home:index')
 
 
 class TanqueListarView(LoginRequiredMixin, ListView):
@@ -29,9 +45,23 @@ class TanqueListarView(LoginRequiredMixin, ListView):
     template_name = 'tanques/tanque_lista.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
-            return redirect('home:index')
-        return super().dispatch(request, *args, **kwargs)
+            usuario = self.request.user
+
+            if not usuario.is_authenticated:
+                return redirect('home:index')
+
+            if usuario.is_staff:
+                return super().dispatch(request, *args, **kwargs)
+            try:
+                funcionario = Funcionario.objects.get(user=usuario)
+
+                grupos = Group.objects.exclude(name='funcionarios')
+                
+                if funcionario.grupo and funcionario.grupo.name in grupos:
+                    return super().dispatch(request, *args, **kwargs)
+                return redirect('home:index')
+            except Funcionario.DoesNotExist:
+                return redirect('home:index')
 
 
     def get_queryset(self):
@@ -69,9 +99,23 @@ class TanqueAtualizarView(LoginRequiredMixin, UpdateView):
 
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+        usuario = self.request.user
+
+        if not usuario.is_authenticated:
             return redirect('home:index')
-        return super().dispatch(request, *args, **kwargs)
+
+        if usuario.is_staff:
+            return super().dispatch(request, *args, **kwargs)
+        try:
+            funcionario = Funcionario.objects.get(user=usuario)
+
+            grupos = Group.objects.exclude(name='funcionarios')
+            
+            if funcionario.grupo and funcionario.grupo.name in grupos:
+                return super().dispatch(request, *args, **kwargs)
+            return redirect('home:index')
+        except Funcionario.DoesNotExist:
+            return redirect('home:index')
 
 
 
@@ -84,7 +128,21 @@ class TanqueDeletarView(LoginRequiredMixin, DeleteView):
 
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
-            return redirect('home:index')
-        return super().dispatch(request, *args, **kwargs)
-    
+            usuario = self.request.user
+
+            if not usuario.is_authenticated:
+                return redirect('home:index')
+
+            if usuario.is_staff:
+                return super().dispatch(request, *args, **kwargs)
+            try:
+                funcionario = Funcionario.objects.get(user=usuario)
+
+                grupos = Group.objects.exclude(name='funcionarios')
+                
+                if funcionario.grupo and funcionario.grupo.name in grupos:
+                    return super().dispatch(request, *args, **kwargs)
+                return redirect('home:index')
+            except Funcionario.DoesNotExist:
+                return redirect('home:index')
+        
