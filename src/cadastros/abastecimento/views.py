@@ -2,6 +2,8 @@ from django.core.paginator import Paginator
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .models import RegistroAbastecimento
 from .forms import AbastecimentoForm
 from cadastros.tanques.models import Tanque
@@ -12,7 +14,8 @@ from cadastros.tanques.models import Tanque
 
 
 
-class RegistroAbastecimentoCadastroView(CreateView):
+
+class RegistroAbastecimentoCadastroView(LoginRequiredMixin, CreateView):
     model = RegistroAbastecimento
     form_class = AbastecimentoForm
     template_name = 'abastecimento/abastecimento_form.html'
@@ -73,7 +76,7 @@ class RegitroAbastecimentoListaView(ListView):
         return context
 
 
-class RegistroAbastecimentoAtualizarView(UpdateView):
+class RegistroAbastecimentoAtualizarView(LoginRequiredMixin, UpdateView):
     model = RegistroAbastecimento
     form_class = AbastecimentoForm
     context_object_name = 'abastecimento'
@@ -86,7 +89,7 @@ class RegistroAbastecimentoAtualizarView(UpdateView):
         return context
 
 
-class RegistroAbastecimentoDeletarView(DeleteView):
+class RegistroAbastecimentoDeletarView(LoginRequiredMixin, DeleteView):
     model = RegistroAbastecimento
     context_object_name = 'abastecimento'
     template_name = 'abastecimento/abastecimento_form_delete.html'
