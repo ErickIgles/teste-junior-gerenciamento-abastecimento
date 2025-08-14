@@ -19,7 +19,7 @@ class CargoAdmin(admin.ModelAdmin):
 
 @admin.register(Funcionario)
 class FuncionarioAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'cargo', 'setor', 'criado', 'modificado', 'ativo']
+    list_display = ['id', 'user', 'cargo', 'grupo', 'setor', 'criado', 'modificado', 'ativo']
     list_display_links = ['id', 'user']
     ordering = ['user', 'criado']
-    search_fields = ['user__username', 'cargo__cargo', 'setor__setor']
+    search_fields = ['user__username', 'cargo__cargo', 'grupo__grupo' ,'setor__setor']
