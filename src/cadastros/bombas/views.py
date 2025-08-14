@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Bomba
 from .forms import BombaForm
-
+from cadastros.funcionarios.models import Funcionario
 
 from ..tanques.models import Tanque
 
@@ -22,9 +22,21 @@ class BombaCadastroView(LoginRequiredMixin, CreateView):
 
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+        usuario = self.request.user
+
+        if usuario.is_staff:
+            return super().dispatch(request, *args, **kwargs)
+        
+        try:
+            funcionario = Funcionario.objects.get(user=usuario)
+
+            grupos = [grupo.name for grupo in Group.objects.all()]
+            
+            if funcionario.grupo and funcionario.grupo.name in grupos:
+                return super().dispatch(request, *args, **kwargs)
             return redirect('home:index')
-        return super().dispatch(request, *args, **kwargs)
+        except Funcionario.DoesNotExist:
+            return redirect('home:index')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -38,9 +50,21 @@ class BombaListarView(LoginRequiredMixin, ListView):
     template_name = 'bombas/bomba_lista.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+        usuario = self.request.user
+
+        if usuario.is_staff:
+            return super().dispatch(request, *args, **kwargs)
+        
+        try:
+            funcionario = Funcionario.objects.get(user=usuario)
+
+            grupos = [grupo.name for grupo in Group.objects.all()]
+            
+            if funcionario.grupo and funcionario.grupo.name in grupos:
+                return super().dispatch(request, *args, **kwargs)
             return redirect('home:index')
-        return super().dispatch(request, *args, **kwargs)
+        except Funcionario.DoesNotExist:
+            return redirect('home:index')
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -75,9 +99,21 @@ class BombaAtualizarView(LoginRequiredMixin, UpdateView):
 
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_gereal']).exists():
+        usuario = self.request.user
+
+        if usuario.is_staff:
+            return super().dispatch(request, *args, **kwargs)
+        
+        try:
+            funcionario = Funcionario.objects.get(user=usuario)
+
+            grupos = [grupo.name for grupo in Group.objects.all()]
+            
+            if funcionario.grupo and funcionario.grupo.name in grupos:
+                return super().dispatch(request, *args, **kwargs)
             return redirect('home:index')
-        return super().dispatch(request, *args, **kwargs)
+        except Funcionario.DoesNotExist:
+            return redirect('home:index')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -92,7 +128,19 @@ class BombaDeletarView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('cadastros:bombas:listar')
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.request.user.groups.filter(name__in=['administradores', 'gerente_geral']).exists():
+        usuario = self.request.user
+
+        if usuario.is_staff:
+            return super().dispatch(request, *args, **kwargs)
+        
+        try:
+            funcionario = Funcionario.objects.get(user=usuario)
+
+            grupos = [grupo.name for grupo in Group.objects.all()]
+            
+            if funcionario.grupo and funcionario.grupo.name in grupos:
+                return super().dispatch(request, *args, **kwargs)
             return redirect('home:index')
-        return super().dispatch(request, *args, **kwargs)
+        except Funcionario.DoesNotExist:
+            return redirect('home:index')
 
