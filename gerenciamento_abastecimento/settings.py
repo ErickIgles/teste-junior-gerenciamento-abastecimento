@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'cadastros.bombas.apps.BombasConfig',
     'cadastros.tanques.apps.TanquesConfig',
     'cadastros.funcionarios.apps.FuncionariosConfig',
+    'cadastros.empresas.apps.EmpresasConfig',
     
     'autenticacao.apps.AutenticacaoConfig',
     'relatorios.apps.RelatoriosConfig',
