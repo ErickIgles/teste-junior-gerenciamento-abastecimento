@@ -14,8 +14,10 @@
 <body>
     <header>
         <div>
-            <a style="text-decoration: none; color: #ffffff; font-size: 22px;" href="{% url 'home:index' %}">Sistema de Gestão de Abastecimento</a></header>
+            <a style="text-decoration: none; color: #ffffff; font-size: 22px;" href="{% url 'home:index' %}">Sistema de Gestão de Abastecimento</a>
         </div>
+    </header>
+
     <div class="container">
         <aside class="menu-lateral">
             <nav class="menu-navegacao">
@@ -25,47 +27,97 @@
                         <button type="button" class="menu-alternativo">Autenticação</button>
                         <ul class="submenu-lista">
                             {% if request.user.is_authenticated %}
-                                <li><a href="{% url 'autenticacao:logout' %}">Logout</a></li>
+                                {% if request.user.is_empresa %}
+                                    <li><a href="{% url 'autenticacao:logout' %}">Logout Empresa</a></li>   
+                                {% else %}
+                                    <li><a href="{% url 'autenticacao:logout' %}">Logout</a></li>  
+                                {% endif %}
                             {% else %}
-                                <li><a href="{% url 'autenticacao:login' %}">Login</a></li>
+                                <li><a href="{% url 'autenticacao:login' %}">Login Usuário</a></li>
+                                <li class="menu-navegacao-lista-item">
+                                    <button type="button" class="menu-alternativo">Empresas</button>
+                                    <ul class="submenu-lista">
+                                        <li><a href="{% url 'cadastros:empresas:cadastrar' %}">Cadastro de Empresa</a></li>
+                                        <li><a href="{% url 'autenticacao:login' %}">Login Empresa</a></li>
+                                    </ul>
+                                </li>
                             {% endif %}
                         </ul>
                     </li>
+
                     {% if request.user.is_staff %}
                         <li class="menu-navegacao-lista-item">
                             <button type="button" class="menu-alternativo">Cadastros</button>
                             <ul class="submenu-lista">
-                                <button type="button" class="menu-alternativo" >Tanque</button>
+                                <button type="button" class="menu-alternativo">Tanque</button>
                                 <ul class="submenu-lista">
-                                    <li><a href="{% url 'cadastros:tanques:cadastrar'%}">Cadastrar Tanque</a></li>
+                                    <li><a href="{% url 'cadastros:tanques:cadastrar' %}">Cadastrar Tanque</a></li>
                                     <li><a href="{% url 'cadastros:tanques:listar' %}">Listagem Tanque</a></li>
                                 </ul>
+
                                 <button type="button" class="menu-alternativo">Bomba</button>
                                 <ul class="submenu-lista">
                                     <li><a href="{% url 'cadastros:bombas:cadastrar' %}">Cadastrar Bomba</a></li>
                                     <li><a href="{% url 'cadastros:bombas:listar' %}">Listagem Bomba</a></li>
                                 </ul>
-                                
+
                                 <button type="button" class="menu-alternativo">Funcionários</button>
                                 <ul class="submenu-lista">
-                                    <li><a href="{% url 'cadastros:funcionarios:cadastrar' %}">Cadastro de funcionários</a></li>
-                                    <li><a href="{% url 'cadastros:funcionarios:listar' %}">Listagem de funcionários</a></li>
-                                </ul>
+                                    <li><a href="{% url 'cadastros:funcionarios:cadastrar' %}">Cadastro de Funcionários</a></li>
+                                    <li><a href="{% url 'cadastros:funcionarios:listar' %}">Listagem de Funcionários</a></li>
+                                </ul> 
+                                                                
+                                <button type="button" class="menu-alternativo">Empresa</button>
+                                <ul class="submenu-lista">
+                                    <li><a href="{% url 'cadastros:empresas:perfil' request.user.pk %}">Empresas Perfil</a></li>
+                                </ul>                               
                             </ul>
                         </li>
                     {% endif %}
+                    {% if request.user.is_authenticated %}
+                        {% if request.user.is_empresa %}                        
+                            <li class="menu-navegacao-lista-item">
+                                <button type="button" class="menu-alternativo">Cadastros</button>
+                                <ul class="submenu-lista">
+                                    <button type="button" class="menu-alternativo">Tanque</button>
+                                    <ul class="submenu-lista">
+                                        <li><a href="{% url 'cadastros:tanques:cadastrar' %}">Cadastrar Tanque</a></li>
+                                        <li><a href="{% url 'cadastros:tanques:listar' %}">Listagem Tanque</a></li>
+                                    </ul>
+
+                                    <button type="button" class="menu-alternativo">Bomba</button>
+                                    <ul class="submenu-lista">
+                                        <li><a href="{% url 'cadastros:bombas:cadastrar' %}">Cadastrar Bomba</a></li>
+                                        <li><a href="{% url 'cadastros:bombas:listar' %}">Listagem Bomba</a></li>
+                                    </ul>
+
+                                    <button type="button" class="menu-alternativo">Funcionários</button>
+                                    <ul class="submenu-lista">
+                                        <li><a href="{% url 'cadastros:funcionarios:cadastrar' %}">Cadastro de Funcionários</a></li>
+                                        <li><a href="{% url 'cadastros:funcionarios:listar' %}">Listagem de Funcionários</a></li>
+                                    </ul>
+                                    <button type="button" class="menu-alternativo">Empresa</button>
+                                    <ul class="submenu-lista">
+                                        <li><a href="{% url 'cadastros:empresas:perfil' request.user.pk %}">Empresas Perfil</a></li>
+                                    </ul>                 
+                                </ul>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+
                     <li class="menu-navegacao-lista-item">
                         <button type="button" class="menu-alternativo">Abastecimentos</button>
                         <ul class="submenu-lista">
-                            <li><a href="{% url 'cadastros:abastecimento:cadastrar' %}">Cadastar Abastecimento</a></li>
+                            <li><a href="{% url 'cadastros:abastecimento:cadastrar' %}">Cadastrar Abastecimento</a></li>
                             <li><a href="{% url 'cadastros:abastecimento:listar' %}">Listagem de Abastecimentos</a></li>
                         </ul>
                     </li>
+
                     <li class="menu-navegacao-lista-item">
                         <button type="button" class="menu-alternativo">Relatórios</button>
                         <ul class="submenu-lista">
                             <li>
-                                <button type="button" class="menu-alternativo" >Abastecimentos</button>
+                                <button type="button" class="menu-alternativo">Abastecimentos</button>
                                 <ul class="submenu-lista">
                                     <li><a href="{% url 'relatorios:listar' %}">Visualizar Relatório</a></li>
                                 </ul>
@@ -94,6 +146,7 @@
             {% endblock %}
         </main>
     </div>
+
 
     <footer>Feito por Erick Almeida</footer>
 
