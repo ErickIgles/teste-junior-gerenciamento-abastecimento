@@ -1,6 +1,7 @@
 .titulo {
     font-size: 28px;
     color: #2c3e50;
+    margin-top: 20px;
     margin-bottom: 20px;
 }
 
@@ -42,4 +43,17 @@
 .total-abastecimento span {
     font-weight: bold;
     color: #27ae60;
+}
+
+.perfil-botao-deletar{
+    text-decoration: none;
+    font-size: 1rem;
+    color: #ff0000;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+.perfil-botao-deletar:hover{
+    text-decoration: underline;
 }
