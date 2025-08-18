@@ -30,7 +30,7 @@ class Setor(Base):
         verbose_name_plural = 'Setores'
     
     def __str__(self):
-        return f'{self.nome_setor} - {self.empresa}'
+        return f'{self.nome_setor}'
     
 
 
@@ -43,7 +43,7 @@ class Cargo(Base):
         verbose_name_plural = 'Cargos'
     
     def __str__(self):
-        return f'{self.nome_cargo} - {self.setor}'
+        return f'{self.nome_cargo}'
 
 
 def is_empresa(user):
