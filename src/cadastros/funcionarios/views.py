@@ -13,7 +13,7 @@ from .forms import FuncionarioForm, FuncionarioUpdateForm
 from django.contrib.auth.models import Group
 from cadastros.empresas.models import Empresa, Cargo
 
-from core.views import GroupRequiredMixin
+from core.mixins import GroupRequiredMixin
 
 from .utils.mixins import EmpresaPermissionMixin
 
