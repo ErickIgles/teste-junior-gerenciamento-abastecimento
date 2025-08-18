@@ -15,7 +15,7 @@ class EmpresaAdmin(admin.ModelAdmin):
 @admin.register(Setor)
 class SetorAdmin(admin.ModelAdmin):
     list_display = ['id', 'nome_setor', 'empresa']
-    list_display = ['nome_setor']
+    list_display_link = ['id', 'nome_setor']
     ordering = ('id',)
     search_fields = ('nome_setor',)
 
@@ -23,7 +23,7 @@ class SetorAdmin(admin.ModelAdmin):
 @admin.register(Cargo)
 class CargoAdmin(admin.ModelAdmin):
     list_display = ['id', 'nome_cargo', 'setor']
-    list_display = ['nome_cargo']
+    list_display_link = ['nome_cargo']
     ordering = ('id',)
     search_fields = ('nome_cargo',)
 
