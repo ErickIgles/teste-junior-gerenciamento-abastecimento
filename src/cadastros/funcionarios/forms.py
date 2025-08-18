@@ -2,7 +2,8 @@ from django import forms
 
 from django.contrib.auth.models import User, Group
 
-from .models import Funcionario, Cargo
+from .models import Funcionario
+from cadastros.empresas.models import Cargo
 
 
 class FuncionarioForm(forms.ModelForm):
@@ -15,11 +16,10 @@ class FuncionarioForm(forms.ModelForm):
 
     class Meta:
         model = Funcionario
-        fields = ['nome_funcionario', 'grupo', 'cargo', 'setor']
+        fields = ['nome_funcionario', 'cargo']
 
         widgets = {
             'nome_funcionario': forms.TextInput(attrs={'class': 'form__input', 'placeholder': 'Nome do Funcionário'}),
-            'setor': forms.Select(attrs={'class': 'form__input'})
         }
     
     def clean(self):
@@ -47,16 +47,20 @@ class FuncionarioForm(forms.ModelForm):
         password1 = self.cleaned_data.get('password1')
         email = self.cleaned_data.get('email')
 
-        setor = self.cleaned_data.get('setor')
         cargo = self.cleaned_data.get('cargo')
         grupo = self.cleaned_data.get('grupo')
 
-        user = User.objects.create_user(username=nome_funcionario, email=email, password=password1)
+        usuario = User.objects.create_user(username=nome_funcionario, email=email, password=password1)
 
-        funcionario = Funcionario(nome_funcionario=nome_funcionario, user=user, setor=setor, cargo=cargo ,grupo=grupo)
+        funcionario = Funcionario(nome_funcionario=nome_funcionario, user=usuario, cargo=cargo)
         if commit:
-            funcionario.grupo = grupo
             funcionario.save()
+
+            grupo = self.cleaned_data.get('grupo')
+
+            if grupo:
+                usuario.groups.add(grupo)
+                
         return funcionario
 
 
@@ -66,12 +70,11 @@ class FuncionarioUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Funcionario
-        fields = ['nome_funcionario', 'grupo', 'cargo', 'setor', 'email']
+        fields = ['nome_funcionario', 'cargo', 'email']
 
         widgets = {
             'nome_funcionario': forms.TextInput(attrs={'class': 'form__input', 'placeholder': 'Nome do Funcionário'}),
             'cargo': forms.Select(attrs={'class': 'form__input'}),
-            'setor': forms.Select(attrs={'class': 'form__input'})
         }
 
     def clean_nome_funcionario(self):
@@ -94,18 +97,23 @@ class FuncionarioUpdateForm(forms.ModelForm):
         nome_funcionario = self.cleaned_data.get('nome_funcionario')
         email = self.cleaned_data.get('email')
 
-        user = self.instance.user
-        user.username = nome_funcionario
-        user.email = email
+        usuario = self.instance.user
+        usuario.username = nome_funcionario
+        usuario.email = email
 
         funcionario = self.instance
         funcionario.nome_funcionario = nome_funcionario
         funcionario.cargo = self.cleaned_data.get('cargo')
-        funcionario.setor = self.cleaned_data.get('setor')
-        funcionario.user = user
+        funcionario.user = usuario
 
         if commit:
-            user.save()
+            usuario.save()
             funcionario.save()
+
+            grupo = self.cleaned_data.get('grupo')
+
+            if grupo:
+                usuario.groups.clear()
+                usuario.groups.add(grupo)
         return funcionario
 
