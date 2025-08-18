@@ -11,35 +11,36 @@ from django.urls import reverse_lazy
 from .models import Funcionario
 from .forms import FuncionarioForm, FuncionarioUpdateForm
 from django.contrib.auth.models import Group
+from cadastros.empresas.models import Empresa, Cargo
+
+from core.views import GroupRequiredMixin
+
+from .utils.mixins import EmpresaPermissionMixin
 
 
 
-class FuncionarioCadastrarView(LoginRequiredMixin, CreateView):
+
+""" OK  """
+class FuncionarioCadastrarView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
+    group_required = ['gerente_geral', 'administradores']
+
     template_name = 'funcionarios/form_register.html'
     model = Funcionario
     form_class = FuncionarioForm
     success_url = reverse_lazy('home:index')
 
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
 
-        if not usuario.is_authenticated:
-            return redirect('home:index')
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
 
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
         try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
-
+            empresa = Empresa.objects.get(usuario_responsavel=self.request.user)
+        except Empresa.DoesNotExist:
+           return redirect('home:index')
+        
+        form.fields['cargo'].queryset = Cargo.objects.filter(setor__empresa=empresa)
+        return form
+       
     def form_valid(self, form):
         messages.success(self.request, f'Funcionário(a) {form.instance.nome_funcionario} cadastrado(a) com sucesso.')
         return super().form_valid(form)
@@ -48,34 +49,17 @@ class FuncionarioCadastrarView(LoginRequiredMixin, CreateView):
         messages.error(self.request, 'Erro ao realizar o cadastro. Confira as informações fornecidas.')
         return super().form_invalid(form)
 
+""" OK """
+class FuncionarioListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+    group_required = ['gerente_geral', 'administradores']
 
-class FuncionarioListarView(LoginRequiredMixin, ListView):
     template_name = 'funcionarios/lista_funcionario.html'
     model = Funcionario
     context_object_name = 'funcionarios'
-
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
-
+    
     def get_queryset(self):
         queryset = super().get_queryset()
+        queryset = queryset.filter(cargo__setor__empresa__usuario_responsavel=self.request.user)
         q = self.request.GET.get('q')
         
         data_inicio = self.request.GET.get('data_inicio')
@@ -99,38 +83,24 @@ class FuncionarioListarView(LoginRequiredMixin, ListView):
         context['page_obj'] = page_obj
         return context
     
+""" ok """
+class FuncionarioAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionMixin, UpdateView):
+    group_required = ['gerente_geral', 'administradores']
 
-class FuncionarioAtualizarView(LoginRequiredMixin, UpdateView):
     template_name = 'funcionarios/form_update.html'
     model = Funcionario
     context_object_name = 'funcionario'
     form_class = FuncionarioUpdateForm
     success_url = reverse_lazy('cadastros:funcionarios:listar')
 
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
-
-
     def get_initial(self):
         initial = super().get_initial()
+
+        funcionario = self.get_object()
+        grupo = funcionario.user.groups.all()
+
         initial['email'] = self.object.user.email
+        initial['grupo'] = grupo.first()
         return initial
 
     def form_valid(self, form):
@@ -141,30 +111,18 @@ class FuncionarioAtualizarView(LoginRequiredMixin, UpdateView):
         messages.error(self.request, f'Erro ao tentar atualizar os dados. Confira as informações.')
         return super().form_invalid(form)
 
-class FuncionarioDeletarView(LoginRequiredMixin, DeleteView):
+""" Ok """
+class FuncionarioDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionMixin, DeleteView):
     template_name = 'funcionarios/form_delete.html'
     model = Funcionario
     success_url = reverse_lazy('cadastros:funcionarios:listar')
 
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        funcionario = self.get_object()
+        if funcionario:
+            context['funcionario'] = funcionario
+        return context
 
     def delete(self, request, *args, **kwargs):
         funcionario = self.get_object()
