@@ -3,16 +3,21 @@
 {% load static %}
 
 {% block main %}
-    <form method="POST" action="{% url 'cadastros:funcionarios:deletar' funcionario.pk %}" class="form">
-        {% csrf_token %}
+    
+    {% if funcionario %}
+        <form method="POST" action="{% url 'cadastros:funcionarios:deletar' funcionario.pk %}" class="form">
+            {% csrf_token %}
 
-        <P style="margin-top: 20px;">Deseja apagar o(a) funcionário(a) <strong>{{ funcionario.username }}</strong> do registro?</P>
+            <P style="margin-top: 20px;">Deseja apagar o(a) funcionário(a) <strong>{{ funcionario.username }}</strong> do registro?</P>
 
-        <div style="margin-top: 10px;" class="form__actions">
-            <button class="form__button form__button__deletar" type="submit">Deletar</button>
-            <a href="{% url 'cadastros:funcionarios:listar' %}" class="form__button form__button__voltar">Cancelar</a>
-        </div>
-    </form>
+            <div style="margin-top: 10px;" class="form__actions">
+                <button class="form__button form__button__deletar" type="submit">Deletar</button>
+                <a href="{% url 'cadastros:funcionarios:listar' %}" class="form__button form__button__voltar">Cancelar</a>
+            </div>
+        </form>
 
+    {% else %}
+       <h1>403 Not Fould</h1>
+    {% endif %}
 
 {% endblock %}
