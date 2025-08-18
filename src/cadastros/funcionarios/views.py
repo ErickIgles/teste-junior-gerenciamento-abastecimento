@@ -53,7 +53,7 @@ class FuncionarioCadastrarView(LoginRequiredMixin, GroupRequiredMixin, CreateVie
 class FuncionarioListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     group_required = ['gerente_geral', 'administradores']
 
-    template_name = 'funcionarios/lista_funcionario.html'
+    template_name = 'funcionarios/lista.html'
     model = Funcionario
     context_object_name = 'funcionarios'
     
