@@ -1,6 +1,6 @@
 from django.db import models
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 
 from core.models import Base
 
@@ -20,6 +20,30 @@ class Empresa(Base):
         verbose_name = "Empresa"
         verbose_name_plural = "Empresas"
 
+
+class Setor(Base):
+    nome_setor = models.CharField(max_length=225, verbose_name='Setor')
+    empresa = models.ForeignKey(Empresa, verbose_name='Empresa', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Setor'
+        verbose_name_plural = 'Setores'
+    
+    def __str__(self):
+        return f'{self.nome_setor} - {self.empresa}'
+    
+
+
+class Cargo(Base):
+    nome_cargo = models.CharField(max_length=255, verbose_name='Cargo')
+    setor = models.ForeignKey(Setor, verbose_name='Setor', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Cargo'
+        verbose_name_plural = 'Cargos'
+    
+    def __str__(self):
+        return f'{self.nome_cargo} - {self.setor}'
 
 
 def is_empresa(user):
