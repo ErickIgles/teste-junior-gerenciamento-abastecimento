@@ -9,7 +9,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 
 from .models import Tanque
-from .forms import TanqueForm
+from .forms import TanqueForm, TanqueUpdateForm
 from core.mixins import GroupRequiredMixin
 from ..empresas.models import Empresa
 from .utils.mixins import EmpresaPermissionTanqueMixin
@@ -78,11 +78,18 @@ class TanqueListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
 
 class TanqueAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionTanqueMixin, UpdateView):
     group_required = ['gerente_geral', 'administradores']
+
     model = Tanque
-    form_class = TanqueForm
+    form_class = TanqueUpdateForm
     context_object_name = 'tanque'
     template_name = 'tanques/form_update.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
+
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['status'] = self.object.ativo
+        return initial
 
 
 # class TanqueDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionTanqueMixin, DeleteView):
