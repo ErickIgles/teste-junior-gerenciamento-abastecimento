@@ -26,3 +26,16 @@ class TanqueForm(forms.ModelForm):
         if Tanque.objects.filter(identificador_tanque=identificador_tanque).exists():
             raise forms.ValidationError('Identificador já cadastrado.')
         return identificador_tanque
+    
+
+    def save(self, commit=True):
+        usuario = self.request.user
+
+        tanque = self.instance
+        tanque.empresa = usuario
+
+        if commit:
+            tanque.save()
+
+        return tanque
+        
