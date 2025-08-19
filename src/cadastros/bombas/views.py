@@ -7,41 +7,21 @@ from django.urls import reverse_lazy
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from django.contrib.auth.models import Group
-
 from .models import Bomba
 from .forms import BombaForm
-from cadastros.funcionarios.models import Funcionario
+from core.mixins import GroupRequiredMixin
 
 from ..tanques.models import Tanque
+from .utils.mixins import EmpresaTanquePermissionMixin
 
 
-class BombaCadastroView(LoginRequiredMixin, CreateView):
+class BombaCadastroView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
+    group_required = ['gerente_geral', 'administradores']
+
     model = Bomba
     form_class = BombaForm
-    template_name = 'bombas/bomba_form.html'
+    template_name = 'bombas/form_register.html'
     success_url = reverse_lazy('cadastros:bombas:listar')
-
-
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -49,30 +29,12 @@ class BombaCadastroView(LoginRequiredMixin, CreateView):
         return context
 
 
-class BombaListarView(LoginRequiredMixin, ListView):
+class BombaListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+    group_required = ['gerente_geral', 'administradores']
+    
     model = Bomba
     context_object_name = 'bombas'
-    template_name = 'bombas/bomba_lista.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
+    template_name = 'bombas/lista.html'
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -98,33 +60,14 @@ class BombaListarView(LoginRequiredMixin, ListView):
         context['page_obj'] = page_obj
         return context
 
-class BombaAtualizarView(LoginRequiredMixin, UpdateView):
+class BombaAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaTanquePermissionMixin, UpdateView):
+    group_required = ['gerente_geral', 'administradores']
+    
     model = Bomba
     form_class = BombaForm
     context_object_name = 'bomba'
-    template_name = 'bombas/bomba_form_atualizar.html'
+    template_name = 'bombas/form_update.html'
     success_url = reverse_lazy('cadastros:bombas:listar')
-
-
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -132,29 +75,10 @@ class BombaAtualizarView(LoginRequiredMixin, UpdateView):
         return context 
 
 
-class BombaDeletarView(LoginRequiredMixin, DeleteView):
+class BombaDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaTanquePermissionMixin, DeleteView):
+    group_required = ['gerente_geral', 'administradores']
+    
     model = Bomba
     context_object_name = 'bomba'
-    template_name = 'bombas/bomba_form_delete.html'
+    template_name = 'bombas/form_delete.html'
     success_url = reverse_lazy('cadastros:bombas:listar')
-
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
-
