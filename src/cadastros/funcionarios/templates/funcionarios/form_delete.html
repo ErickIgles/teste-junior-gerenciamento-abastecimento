@@ -1,18 +1,36 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
 {% block main %}
     
     {% if funcionario %}
-        <form method="POST" action="{% url 'cadastros:funcionarios:deletar' funcionario.pk %}" class="form">
+        <form method="POST" action="{% url 'cadastros:funcionarios:inativar' funcionario.pk %}" class="form">
             {% csrf_token %}
 
-            <P style="margin-top: 20px;">Deseja apagar o(a) funcionário(a) <strong>{{ funcionario.username }}</strong> do registro?</P>
+            <P 
+                style="margin-top: 20px;"
+            >
+                Deseja inativar o(a) funcionário(a) 
+                <strong>{{ funcionario.username }}</strong> 
+                no sistema?
+            </P>
 
-            <div style="margin-top: 10px;" class="form__actions">
-                <button class="form__button form__button__deletar" type="submit">Deletar</button>
-                <a href="{% url 'cadastros:funcionarios:listar' %}" class="form__button form__button__voltar">Cancelar</a>
+            <div 
+                style="margin-top: 10px;" 
+                class="form__actions"
+            >
+                <button 
+                    class="form__button form__button__deletar" 
+                    type="submit"
+                >
+                    Inativar
+                </button>
+                <a 
+                    href="{% url 'cadastros:funcionarios:listar' %}" 
+                    class="form__button form__button__voltar"
+                >
+                    Cancelar
+                </a>
             </div>
         </form>
 
