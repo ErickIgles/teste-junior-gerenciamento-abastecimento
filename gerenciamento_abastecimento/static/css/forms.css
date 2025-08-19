@@ -69,3 +69,22 @@
     color: white;
     padding: 12px 4px;
 }
+
+.checkbox{
+    margin-top: 12px;
+    width: 20px;
+    height: 20px;
+    accent-color: #007bff;
+    cursor: pointer;
+    border-radius: 4px; 
+    border: 1px solid #ccc;
+    transition: all 0.2s;
+}
+
+.checkbox:hover {
+    border-color: #007bff;
+}
+
+.checkbox:checked {
+    background-color: #007bff;
+}
