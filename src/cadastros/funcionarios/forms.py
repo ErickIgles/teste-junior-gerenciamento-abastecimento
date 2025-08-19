@@ -67,6 +67,7 @@ class FuncionarioForm(forms.ModelForm):
 class FuncionarioUpdateForm(forms.ModelForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form__input', 'placeholder': 'E-mail'}), label='E-mail')
     grupo = forms.ModelChoiceField(queryset=Group.objects.all(), widget=forms.Select(attrs={'class': 'form__input', 'placeholder': 'Grupo do funcionário'}), label='Grupo do funcionário')
+    status = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'checkbox'}), label='Status do funcionário')
 
     class Meta:
         model = Funcionario
@@ -101,10 +102,17 @@ class FuncionarioUpdateForm(forms.ModelForm):
         usuario.username = nome_funcionario
         usuario.email = email
 
+
+
+        status = self.cleaned_data.get('status')
+
         funcionario = self.instance
         funcionario.nome_funcionario = nome_funcionario
         funcionario.cargo = self.cleaned_data.get('cargo')
         funcionario.user = usuario
+        funcionario.ativo = status
+
+
 
         if commit:
             usuario.save()
