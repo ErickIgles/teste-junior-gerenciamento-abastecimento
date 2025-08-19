@@ -119,11 +119,11 @@ main{
 }
 
 .success {
-  background-color: #d4edda;
+  background-color: #9af8b0;
   color: #155724;
 }
 
 .error {
-  background-color: #f8d7da;
+  background-color: #fd9aa2;
   color: #721c24;
 }
