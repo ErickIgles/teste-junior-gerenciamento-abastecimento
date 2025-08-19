@@ -1,16 +1,18 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+
+from django.views import View
 
 from django.contrib import messages
 from django.core.paginator import Paginator
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.detail import SingleObjectMixin
 
 from django.urls import reverse_lazy
 
 from .models import Funcionario
 from .forms import FuncionarioForm, FuncionarioUpdateForm
-from django.contrib.auth.models import Group
 from cadastros.empresas.models import Empresa, Cargo
 
 from core.mixins import GroupRequiredMixin
@@ -59,7 +61,13 @@ class FuncionarioListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(cargo__setor__empresa__usuario_responsavel=self.request.user)
+        queryset = queryset.select_related(
+            'user', 
+            'cargo', 
+            'cargo__setor'
+        ).filter(cargo__setor__empresa__usuario_responsavel=self.request.user)
+        
+
         q = self.request.GET.get('q')
         
         data_inicio = self.request.GET.get('data_inicio')
@@ -71,6 +79,7 @@ class FuncionarioListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
             queryset = queryset.filter(criado__gte=data_inicio)
         if data_fim:
             queryset = queryset.filter(criado__lte=data_fim)
+
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -101,6 +110,7 @@ class FuncionarioAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPe
 
         initial['email'] = self.object.user.email
         initial['grupo'] = grupo.first()
+        initial['status'] = self.object.ativo
         return initial
 
     def form_valid(self, form):
@@ -111,22 +121,43 @@ class FuncionarioAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPe
         messages.error(self.request, f'Erro ao tentar atualizar os dados. Confira as informações.')
         return super().form_invalid(form)
 
-""" Ok """
-class FuncionarioDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionMixin, DeleteView):
-    template_name = 'funcionarios/form_delete.html'
+# """ Ok """
+# class FuncionarioDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionMixin, DeleteView):
+#     template_name = 'funcionarios/form_delete.html'
+#     model = Funcionario
+#     success_url = reverse_lazy('cadastros:funcionarios:listar')
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         funcionario = self.get_object()
+#         if funcionario:
+#             context['funcionario'] = funcionario
+#         return context
+
+#     def delete(self, request, *args, **kwargs):
+#         funcionario = self.get_object()
+
+#         funcionario.ativo = False
+#         funcionario.save()
+        
+#         messages.success(request, f'Funcionário(a) {funcionario.nome_funcionario} deletado(a) com sucesso.')
+#         return redirect(self.success_url)
+        
+
+class FuncionarioInativarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionMixin, SingleObjectMixin, View):
     model = Funcionario
-    success_url = reverse_lazy('cadastros:funcionarios:listar')
+    group_required = ['gerente_geral', 'administradores']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        funcionario = self.get_object()
-        if funcionario:
-            context['funcionario'] = funcionario
-        return context
+    def get(self, request, *args, **kwargs):
+        funcionario = self.get_object
+        return render(request, 'funcionarios/form_delete.html', {'funcionario': funcionario})
 
-    def delete(self, request, *args, **kwargs):
+
+    def post(self, request, *args, **kwargs):
         funcionario = self.get_object()
-        nome_funcionario = funcionario.nome_funcionario
-        messages.success(request, f'Funcionário(a) {nome_funcionario} deletado(a) com sucesso.')
-        return super().delete(request, *args, **kwargs)
+        funcionario.ativo = False
+        funcionario.save()
+
+        messages.success(request, f'Funcionário(a) {funcionario.nome_funcionario} foi deletado(a) com sucesso.')
+        return redirect('cadastros:funcionarios:listar')
 
