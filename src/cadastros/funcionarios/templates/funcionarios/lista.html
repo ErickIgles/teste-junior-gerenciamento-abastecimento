@@ -1,20 +1,53 @@
 {% extends 'base.html' %}
-
 {% load static %}
+
 
 {% block main %}
     <nav>
-        <form method="get" style="display: flex; margin: 20px 20px 20px 0px; flex-direction: row; gap: 20px;">
-            <input style="padding: 8px;" type="text" placeholder="pesquisar..." name="q" value="{{ request.GET.q }}">
+        <form method="get" 
+            style="display: flex; margin: 20px 20px 20px 0px; flex-direction: row; gap: 20px;"
+        >
+            <input 
+            style="padding: 8px;" 
+                type="text"
+                placeholder="pesquisar..." 
+                name="q" 
+                value="{{ request.GET.q }}"
+            >
+        
             <div>
-                <label for="data_inicio">De:</label>
-                <input style="padding: 8px;" type="date" name="data_inicio" value="{{ request.GET.data_inicio }}">
+                <label for="data_inicio">
+                    De:
+                </label>
+        
+                <input style="padding: 8px;" 
+                    type="date" 
+                    name="data_inicio" 
+                    value="{{ request.GET.data_inicio }}"
+                >
             </div>
+        
             <div>
-                <label for="data_fim">Até:</label>
-                <input style="padding: 8px;" type="date" name="data_fim" value="{{ request.GET.data_fim }}">
+                <label 
+                for="data_fim"
+                >
+                    Até:
+                </label>
+        
+                <input 
+                    style="padding: 8px;" 
+                    type="date" 
+                    name="data_fim" 
+                    value="{{ request.GET.data_fim }}"
+                >
             </div>
-            <button style="padding: 8px;" type="submit">🔍 Filtrar</button>
+
+            <button 
+                style="padding: 8px;" 
+                type="submit"
+            >
+                🔍 Filtrar
+            </button>
         </form>
 
 
@@ -51,14 +84,50 @@
     {% if funcionarios %}
         {% for func in page_obj %}
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
-                <p><strong>Nome do funcionário: </strong> {{ func.nome_funcionario }}</p>
-                <p><strong>E-mail: </strong> {{ func.user.email }}</p>
-                <p><strong>Grupo: </strong>{{ func.grupo }}</p>
-                <p><strong>Data de registro: </strong>{{ func.user.date_joined }}</p>
+                <p>
+                    <strong>Nome do funcionário: </strong> 
+                    {{ func.nome_funcionario }}
+                </p>
+                <p>
+                    <strong>E-mail: </strong> 
+                    {{ func.user.email }}
+                </p>
+                <p>
+                    <strong>Grupo: </strong>
+                    {{ func.user.groups.first }}
+                </p>
+                {% if func.ativo %}
+                    <p>
+                        <strong>Status do funcionário: </strong>
+                        Ativo 🟢
+                    </p>
+                {% else %}
+                    <p>
+                        <strong>Status do funcionário: </strong>
+                        Desativado 🔴
+                    </p>
+                {% endif %}
+                <p>
+                    <strong>Data de registro: </strong>
+                    {{ func.user.date_joined }}
+                </p>
                 <hr>
                 <div class="form__actions">
-                    <a href="{% url 'cadastros:funcionarios:atualizar' func.pk %}"><button type="button" class="form__button form__button__enviar">Atualizar</button></a> 
-                    <a href="{% url 'cadastros:funcionarios:deletar' func.pk %}" class="form__button form__button__deletar">Deletar</a>
+                    <a 
+                        href="{% url 'cadastros:funcionarios:atualizar' func.pk %}">
+                        <button 
+                            type="button" 
+                            class="form__button form__button__enviar"
+                        >
+                            Atualizar
+                        </button>
+                    </a> 
+                    <a 
+                        href="{% url 'cadastros:funcionarios:inativar' func.pk %}" 
+                        class="form__button form__button__deletar"
+                    >
+                        Inativar
+                    </a>
                 </div> 
             </div>
         {% endfor %}
