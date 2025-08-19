@@ -1,67 +1,53 @@
 from django.urls import reverse_lazy
 
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.detail import SingleObjectMixin
+
 
 from .models import Tanque
 from .forms import TanqueForm
+from core.mixins import GroupRequiredMixin
+from ..empresas.models import Empresa
+from .utils.mixins import EmpresaPermissionTanqueMixin
 
-from django.contrib.auth.models import Group
-from cadastros.funcionarios.models import Funcionario
+from django.contrib import messages
 
-
-class TanqueCadastroView(LoginRequiredMixin, CreateView):
+class TanqueCadastroView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
+    group_required = ['gerente_geral', 'administradores']
     model = Tanque
     form_class = TanqueForm
-    template_name = 'tanques/tanque_form.html'
+    template_name = 'tanques/form_register.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
 
-    def dispatch(self, request, *args, **kwargs):
+    def form_valid(self, form):
+
         usuario = self.request.user
 
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
         try:
-            funcionario = Funcionario.objects.get(user=usuario)
+            empresa = usuario.cargo.setor.empresa
+            form.instance.empresa = empresa
 
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
+        except Empresa.DoesNotExist:
+            form.add_error(None, "Empresa não encontrada para este usuário.")
+            return self.form_invalid(form)
+        
+        messages.success(self.request, f'Tanque {form.instance.identificador_tanque} cadastrado com sucesso.')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Erro ao realizar o cadastro. Confira às informações.')
+        return super().form_invalid(form)
 
 
-class TanqueListarView(LoginRequiredMixin, ListView):
+class TanqueListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+    group_required = ['gerente_geral', 'administradores']
     model = Tanque
     context_object_name = 'tanques'
-    template_name = 'tanques/tanque_lista.html'
-
-    def dispatch(self, request, *args, **kwargs):
-            usuario = self.request.user
-
-            if not usuario.is_authenticated:
-                return redirect('home:index')
-
-            if usuario.is_staff:
-                return super().dispatch(request, *args, **kwargs)
-            try:
-                funcionario = Funcionario.objects.get(user=usuario)
-
-                grupos = Group.objects.exclude(name='funcionarios')
-                
-                if funcionario.grupo and funcionario.grupo.name in grupos:
-                    return super().dispatch(request, *args, **kwargs)
-                return redirect('home:index')
-            except Funcionario.DoesNotExist:
-                return redirect('home:index')
+    template_name = 'tanques/lista.html'
 
 
     def get_queryset(self):
@@ -90,59 +76,35 @@ class TanqueListarView(LoginRequiredMixin, ListView):
         return context
 
 
-class TanqueAtualizarView(LoginRequiredMixin, UpdateView):
+class TanqueAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionTanqueMixin, UpdateView):
+    group_required = ['gerente_geral', 'administradores']
     model = Tanque
     form_class = TanqueForm
     context_object_name = 'tanque'
-    template_name = 'tanques/tanque_form_atualizar.html'
+    template_name = 'tanques/form_update.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
 
 
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
+# class TanqueDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionTanqueMixin, DeleteView):
+#     model = Tanque
+#     context_object_name = 'tanque'
+#     template_name = 'tanques/tanque_form_delete.html'
+#     success_url = reverse_lazy('cadastros:tanques:listar')    
 
 
-
-
-class TanqueDeletarView(LoginRequiredMixin, DeleteView):
+class TanqueInativarView(LoginRequiredMixin, GroupRequiredMixin, SingleObjectMixin, EmpresaPermissionTanqueMixin, View):
+    group_required = ['gerente_geral', 'administradores']
     model = Tanque
-    context_object_name = 'tanque'
-    template_name = 'tanques/tanque_form_delete.html'
-    success_url = reverse_lazy('cadastros:tanques:listar')    
 
 
-    def dispatch(self, request, *args, **kwargs):
-            usuario = self.request.user
+    def get(self, request, *args, **kwargs):
+        tanque = self.get_object()
+        return render(request, 'tanques/form_inativar.html', {'tanque': tanque})
+    
+    def post(self, request, *args, **kwargs):
+        tanque = self.get_object()
+        tanque.ativo = False
+        tanque.save()
 
-            if not usuario.is_authenticated:
-                return redirect('home:index')
-
-            if usuario.is_staff:
-                return super().dispatch(request, *args, **kwargs)
-            try:
-                funcionario = Funcionario.objects.get(user=usuario)
-
-                grupos = Group.objects.exclude(name='funcionarios')
-                
-                if funcionario.grupo and funcionario.grupo.name in grupos:
-                    return super().dispatch(request, *args, **kwargs)
-                return redirect('home:index')
-            except Funcionario.DoesNotExist:
-                return redirect('home:index')
-        
+        messages.success(request, f'Tanque {tanque.identificador_tanque} desativado com sucesso.')
+        return redirect('cadastros:tanques:listar')
