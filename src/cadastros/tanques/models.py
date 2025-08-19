@@ -26,7 +26,7 @@ class Combustivel(Base):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.nome_combustivel}'
+        return f'{self.nome_combustivel} - {self.empresa}'
 
 
 
