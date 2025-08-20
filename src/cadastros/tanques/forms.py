@@ -92,7 +92,7 @@ class TanqueUpdateForm(forms.ModelForm):
                 'class': 'checkbox'
             }
         ), 
-        label='Status do tanque'
+        label='Status do Tanque'
     )
     class Meta:
         
@@ -133,12 +133,12 @@ class TanqueUpdateForm(forms.ModelForm):
         }
 
 
-        def __init__(self, *args, **kwargs):
-            self.empresa = kwargs.pop('empresa', None)
-            super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        self.empresa = kwargs.pop('empresa', None)
+        super().__init__(*args, **kwargs)
 
-            if self.empresa:
-                self.fields['tipo_combustivel'].queryset = Combustivel.objects.filter(empresa=self.empresa)
+        if self.empresa:
+            self.fields['tipo_combustivel'].queryset = Combustivel.objects.filter(empresa=self.empresa)
 
 
     def clean_identificador_tanque(self):
