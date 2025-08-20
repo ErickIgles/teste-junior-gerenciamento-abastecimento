@@ -17,8 +17,10 @@ class CombustivelAdmin(admin.ModelAdmin):
         'modificado',
         'ativo'
     ]
-    list_display_links = ['id', 'nome_combustivel']
-
+    list_display_links = [
+        'id', 
+        'nome_combustivel'
+    ]
 
 
 @admin.register(Tanque)
@@ -34,4 +36,9 @@ class TanqueAdmin(admin.ModelAdmin):
         'modificado',
         'ativo'
     ]
-    list_display_links = ['id', 'tipo_combustivel', 'identificador_tanque', 'capacidade_maxima', 'quantidade_disponivel']
+    list_display_links = [
+        'id', 
+        'tipo_combustivel', 
+        'identificador_tanque',
+    ]
+
