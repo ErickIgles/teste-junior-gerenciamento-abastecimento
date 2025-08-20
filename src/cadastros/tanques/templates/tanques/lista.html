@@ -109,8 +109,12 @@
                 "
             >
                 <p>
-                    <strong>Tipo de combustivel: </strong> 
-                    {{ tanque.tipo_combustivel }}
+                    <strong>Tipo de combustivel: </strong>
+                    {% if tanque.tipo_combustivel is None %}
+                        Sem tipo definido
+                    {% else %}
+                        {{ tanque.tipo_combustivel }}
+                    {% endif%}
                 </p>
                 <p>
                     <strong>Identificador do tanque: </strong> 
