@@ -37,7 +37,7 @@ class TanqueCadastroView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
         messages.error(self.request, 'Erro ao realizar o cadastro. Confira às informações.')
         return super().form_invalid(form)
 
-""" ok """
+
 class TanqueListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     group_required = ['gerente_geral', 'administradores']
     model = Tanque
@@ -85,7 +85,7 @@ class TanqueAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermiss
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['empresa'] = Empresa.objects.filter(empresa__usuario_responsavel=self.request.user)
+        kwargs['empresa'] = Empresa.objects.get(usuario_responsavel=self.request.user)
         return kwargs
 
 # class TanqueDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionTanqueMixin, DeleteView):
