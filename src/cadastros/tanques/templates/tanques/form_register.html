@@ -14,8 +14,8 @@
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
                 {% if field.errors %}
-                    {% for erro in field.errors %}
-                        <p>{{ erro }}</p>
+                    {% for error in field.errors %}
+                        <p>{{ error }}</p>
                     {% endfor %}
                 {% endif %}
             </div>
