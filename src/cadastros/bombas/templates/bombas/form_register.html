@@ -2,34 +2,44 @@
 {% load static %}
 
 {% block main %}
-    <h2 class="form__titulo">Cadastro de Bomba</h2>
+    
+    <h2 
+        class="form__titulo"
+    >
+        Cadastro de Bomba
+    </h2>
 
     <form method="POST" class="form">
         {% csrf_token %}
+        
+        {% for field in form %}
+            <div class="form__group">
+                <label for="{{field.id_for_label}}">
+                    {{ field.label }}
+                </label>
+                {{ field }}
 
-        <div class="form__group">
-            <label for="id_nome_bomba" class="form__label">Nome da Bomba</label>
-            <input class="form__input" type="text" name="nome_bomba" required id="id_nome_bomba">
-        </div>
-
-        <div class="form__group">
-            <label for="id_tanque" class="form__label">Identificador Tanque</label>
-            <select class="form__select" name="tanque" id="id_tanque" required>
-                <option value="">------------</option>
-                {% for tanque in tanques %}
-                    <option value="{{ tanque.id }}" data-combustivel="{{ tanque.tipo_combustivel }}">
-                        {{ tanque.identificador_tanque }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form__group">
-            <p id="id_info_combustivel" class="form__info"></p>
-        </div>
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
 
         <div class="form__actions">
-            <button class="form__button form__button__enviar" type="submit">Cadastrar</button>
-            <a href="{% url 'cadastros:bombas:listar' %}" class="form__button form__button__voltar">Voltar</a>
+            <button 
+                class="form__button form__button__enviar" 
+                type="submit"
+            >
+                Cadastrar
+            </button>
+            <a 
+                href="{% url 'cadastros:bombas:listar' %}" 
+                class="form__button form__button__voltar"
+            >
+                Voltar
+            </a>
         </div>
     </form>
     
