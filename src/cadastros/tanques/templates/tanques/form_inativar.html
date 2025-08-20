@@ -9,10 +9,25 @@
 <form method="POST" style="gap: 20px;" class="form" accept="{% url 'cadastros:tanques:inativar' tanque.pk %}">
     {% csrf_token %}
 
-    <P style="margin-top: 20px;">Deseja desativar esse registro de tanque?</P>
-    <div style="margin-top: 10px;" class="form__actions">
-        <button class="form__button form__button__deletar" type="submit">Desativar</button>
-        <a href="{% url 'cadastros:tanques:listar' %}" class="form__button form__button__voltar">Cancelar</a>
+    <P style="margin-top: 20px;">
+        Deseja desativar o tanque <strong>{{ tanque.identificador_tanque }}</strong>?
+    </P>
+    <div 
+        style="margin-top: 10px;" 
+        class="form__actions"
+    >
+        <button 
+            class="form__button form__button__deletar" 
+            type="submit"
+        >
+            Desativar
+        </button>
+        <a 
+            href="{% url 'cadastros:tanques:listar' %}" 
+            class="form__button form__button__voltar"
+        >
+            Cancelar
+        </a>
     </div>
 </form>
 {% endblock %}
