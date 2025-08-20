@@ -23,18 +23,13 @@ class TanqueCadastroView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
     template_name = 'tanques/form_register.html'
     success_url = reverse_lazy('cadastros:tanques:listar')
 
-    def form_valid(self, form):
 
-        usuario = self.request.user
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['empresa'] = Empresa.objects.get(usuario_responsavel=self.request.user)
+        return kwargs
 
-        try:
-            empresa = usuario.cargo.setor.empresa
-            form.instance.empresa = empresa
-
-        except Empresa.DoesNotExist:
-            form.add_error(None, "Empresa não encontrada para este usuário.")
-            return self.form_invalid(form)
-        
+    def form_valid(self, form):        
         messages.success(self.request, f'Tanque {form.instance.identificador_tanque} cadastrado com sucesso.')
         return super().form_valid(form)
     
@@ -42,16 +37,18 @@ class TanqueCadastroView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
         messages.error(self.request, 'Erro ao realizar o cadastro. Confira às informações.')
         return super().form_invalid(form)
 
-
+""" ok """
 class TanqueListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     group_required = ['gerente_geral', 'administradores']
     model = Tanque
     context_object_name = 'tanques'
     template_name = 'tanques/lista.html'
+    paginate_by = 9
 
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        queryset = queryset.filter(empresa__usuario_responsavel=self.request.user)
         q = self.request.GET.get("q")
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
@@ -67,12 +64,7 @@ class TanqueListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        lista_objetos = context.get('object_list')
-        paginator = Paginator(lista_objetos, 2)
-
-        page_number = self.request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-        context['page_obj'] = page_obj
+        context['tanques'] = self.get_queryset() 
         return context
 
 
@@ -90,7 +82,11 @@ class TanqueAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermiss
         initial = super().get_initial()
         initial['status'] = self.object.ativo
         return initial
-
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['empresa'] = Empresa.objects.filter(empresa__usuario_responsavel=self.request.user)
+        return kwargs
 
 # class TanqueDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionTanqueMixin, DeleteView):
 #     model = Tanque
