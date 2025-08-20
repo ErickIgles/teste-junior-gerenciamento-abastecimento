@@ -68,7 +68,7 @@ class BombaForm(forms.ModelForm):
 
 
 class BombaUpdateForm(forms.ModelForm):
-    status = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'checkbox'}), label='Status do tanque')
+    status = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'checkbox'}), label='Status da Bomba')
 
     nome_bomba = forms.CharField(
         widget=forms.TextInput(
