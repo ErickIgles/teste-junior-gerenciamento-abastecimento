@@ -6,7 +6,7 @@ from cadastros.empresas.models import Empresa
 
 
 class Bomba(Base):
-    nome_bomba = models.CharField(verbose_name='Nome', max_length=144, unique=True)
+    nome_bomba = models.CharField(verbose_name='Nome', max_length=144)
     tanque = models.ForeignKey(Tanque, verbose_name='Tanque', on_delete=models.SET_NULL, null=True, blank=True)
     empresa = models.ForeignKey(Empresa, verbose_name='Empresa', on_delete=models.CASCADE, null=True, blank=True)
 
