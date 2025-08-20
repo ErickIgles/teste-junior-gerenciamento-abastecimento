@@ -98,7 +98,7 @@ class TanqueAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermiss
 class TanqueInativarView(LoginRequiredMixin, GroupRequiredMixin, SingleObjectMixin, EmpresaPermissionTanqueMixin, View):
     group_required = ['gerente_geral', 'administradores']
     model = Tanque
-
+    context_object_name = 'tanque'
 
     def get(self, request, *args, **kwargs):
         tanque = self.get_object()
