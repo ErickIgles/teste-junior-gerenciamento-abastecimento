@@ -1,18 +1,17 @@
-from django.shortcuts import redirect
-
-from django.core.paginator import Paginator
-
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.shortcuts import redirect, render
+from django.contrib import messages
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView, View
+from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse_lazy
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Bomba
-from .forms import BombaForm
+from .forms import BombaForm, BombaUpdateForm
 from core.mixins import GroupRequiredMixin
 
-from ..tanques.models import Tanque
-from .utils.mixins import EmpresaTanquePermissionMixin
+from .utils.mixins import EmpresaBombaPermissionMixin
+from cadastros.empresas.models import Empresa
 
 
 class BombaCadastroView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
@@ -23,10 +22,10 @@ class BombaCadastroView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
     template_name = 'bombas/form_register.html'
     success_url = reverse_lazy('cadastros:bombas:listar')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['tanques'] = Tanque.objects.all()
-        return context
+    def get_form_kwargs(self):
+        kwargs =  super().get_form_kwargs()
+        kwargs['empresa'] = Empresa.objects.get(usuario_responsavel=self.request.user)
+        return kwargs
 
 
 class BombaListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
@@ -35,9 +34,11 @@ class BombaListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     model = Bomba
     context_object_name = 'bombas'
     template_name = 'bombas/lista.html'
+    paginate_by = 9
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        queryset = queryset.filter(empresa__usuario_responsavel=self.request.user)
         q = self.request.GET.get('q')
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
@@ -52,33 +53,53 @@ class BombaListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        lista_objetos = context.get('object_list')
-        pagination = Paginator(lista_objetos, 2)
-        
-        page_number = self.request.GET.get('page')
-        page_obj = pagination.get_page(page_number)
-        context['page_obj'] = page_obj
+        context['bombas'] = self.get_queryset()
         return context
 
-class BombaAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaTanquePermissionMixin, UpdateView):
+
+class BombaAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaBombaPermissionMixin, UpdateView):
     group_required = ['gerente_geral', 'administradores']
     
     model = Bomba
-    form_class = BombaForm
+    form_class = BombaUpdateForm
     context_object_name = 'bomba'
     template_name = 'bombas/form_update.html'
     success_url = reverse_lazy('cadastros:bombas:listar')
-        
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['tanques'] = Tanque.objects.all()
-        return context 
 
 
-class BombaDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaTanquePermissionMixin, DeleteView):
-    group_required = ['gerente_geral', 'administradores']
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['status'] = self.object.ativo
+        return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['empresa'] = Empresa.objects.get(usuario_responsavel=self.request.user)
+        return kwargs
+
+
+# class BombaDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaBombaPermissionMixin, DeleteView):
+#     group_required = ['gerente_geral', 'administradores']
     
+#     model = Bomba
+#     context_object_name = 'bomba'
+#     template_name = 'bombas/form_delete.html'
+#     success_url = reverse_lazy('cadastros:bombas:listar')
+
+
+
+class BombaInativarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaBombaPermissionMixin, SingleObjectMixin, View):
+    group_required = ['gerente_geral', 'administradores']
     model = Bomba
     context_object_name = 'bomba'
-    template_name = 'bombas/form_delete.html'
-    success_url = reverse_lazy('cadastros:bombas:listar')
+
+    def get(self, request, *args, **kwargs):
+        bomba = self.get_object()
+        return render(request, 'bombas/form_inativar.html', {'bomba': bomba})
+    
+    def post(self, request, *args, **kwargs):
+        bomba = self.get_object()
+        bomba.ativo = False
+        bomba.save()
+        messages.success(request, f'Bomba {bomba.nome_bomba} desativada com sucesso.')
+        return redirect('cadastros:bombas:listar')
