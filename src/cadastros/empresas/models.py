@@ -11,7 +11,7 @@ class Empresa(Base):
     cnpj = models.CharField(max_length=18, unique=True, verbose_name="CNPJ")
     telefone = models.CharField(max_length=15, blank=True, null=True, verbose_name="Telefone")
     email = models.EmailField(max_length=255, blank=True, null=True, verbose_name="Email")    
-    usuario_responsavel = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Responsável")
+    usuario_responsavel = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Responsável")
 
     def __str__(self):
         return f'{self.nome_empresa}'
