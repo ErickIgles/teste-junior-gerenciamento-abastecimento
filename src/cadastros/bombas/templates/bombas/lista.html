@@ -47,7 +47,6 @@
             </button>
         </form>
 
-
         <div 
             style="
                 margin: 20px 0; 
@@ -110,7 +109,7 @@
                     {{ bomba.nome_bomba }}
                 </p>
 
-                {% if tanque %}
+                {% if bomba.tanque.tipo_combustivel %}
                     <p>
                         <strong>Tipo de Tanque: </strong> 
                         {{ bomba.tanque.tipo_combustivel }}
@@ -118,6 +117,10 @@
                     <p>
                         <strong>Identificador do tanque: </strong> 
                         {{ bomba.tanque.identificador_tanque }}
+                    </p>
+                {% else %}
+                    <p>
+                        <strong>Tanque:</strong> Não vinculado
                     </p>
                 {% endif %}
                 {% if bomba.ativo %}
@@ -158,4 +161,4 @@
     {% else %}
         <h2>Ainda não há registros no sistema</h2>
     {% endif %}
-{% endblock %}j
+{% endblock %}
