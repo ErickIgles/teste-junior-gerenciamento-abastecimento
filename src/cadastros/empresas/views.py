@@ -49,6 +49,7 @@ class EmpresaPerfilView(
     form_class = EmpresaUpdateModelForm
     template_name = 'empresas/perfil.html'
     context_object_name = 'empresa'
+    success_url = reverse_lazy('cadastros:empresas:perfil')
 
     def get_object(self, queryset=None):
         try:
