@@ -44,7 +44,7 @@ class EmpresaPerfilView(
     UpdateView
 ):
 
-    group_required = ['gerente_geral', 'administradores']
+    group_required = ['administradores']
     model = Empresa
     form_class = EmpresaUpdateModelForm
     template_name = 'empresas/perfil.html'
@@ -82,7 +82,7 @@ class EmpresaInativarView(
     UserPermissionMixin,
     View
 ):
-    group_required = ['gerente_geral', 'administradores']
+    group_required = ['administradores']
     model = User
 
     def get_object(self, queryset=None):
