@@ -28,7 +28,7 @@ class Funcionario(Base):
     empresa = models.ForeignKey(
         Empresa,
         on_delete=models.CASCADE,
-        verbose_name='name',
+        verbose_name='Empresa',
         null=True,
         blank=True
     )
