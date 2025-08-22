@@ -12,7 +12,7 @@ from .models import Empresa
 
 from .forms import EmpresaModelForm, EmpresaUpdateModelForm
 from core.mixins import GroupRequiredMixin
-from .utils.mixin import UserPermissionMixin, EmpresaPermissionMixin
+from .utils.mixins import UserPermissionMixin, EmpresaPermissionMixin
 from django.contrib.auth.models import User
 
 
