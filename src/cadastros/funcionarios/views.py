@@ -1,10 +1,9 @@
-from django.shortcuts import redirect, render
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.shortcuts import redirect, render, get_object_or_404
+from django.views.generic import CreateView, ListView, UpdateView
 
 from django.views import View
 
 from django.contrib import messages
-from django.core.paginator import Paginator
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import SingleObjectMixin
@@ -13,17 +12,18 @@ from django.urls import reverse_lazy
 
 from .models import Funcionario
 from .forms import FuncionarioForm, FuncionarioUpdateForm
-from cadastros.empresas.models import Empresa, Cargo
+from cadastros.empresas.models import Empresa
 
 from core.mixins import GroupRequiredMixin
 
 from .utils.mixins import EmpresaPermissionMixin
 
 
-
-
-""" OK  """
-class FuncionarioCadastrarView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
+class FuncionarioCadastrarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    CreateView
+):
     group_required = ['gerente_geral', 'administradores']
 
     template_name = 'funcionarios/form_register.html'
@@ -31,45 +31,60 @@ class FuncionarioCadastrarView(LoginRequiredMixin, GroupRequiredMixin, CreateVie
     form_class = FuncionarioForm
     success_url = reverse_lazy('home:index')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        usuario = Funcionario.objects.get(
+            user=self.request.user
+        )
+        kwargs['empresa'] = get_object_or_404(
+            Empresa,
+            usuario_responsavel=usuario.empresa.usuario_responsavel
+        )
+        return kwargs
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-
-        try:
-            empresa = Empresa.objects.get(usuario_responsavel=self.request.user)
-        except Empresa.DoesNotExist:
-           return redirect('home:index')
-        
-        form.fields['cargo'].queryset = Cargo.objects.filter(setor__empresa=empresa)
-        return form
-       
     def form_valid(self, form):
-        messages.success(self.request, f'Funcionário(a) {form.instance.nome_funcionario} cadastrado(a) com sucesso.')
+        messages.success(
+            self.request,
+            f"""Funcionário(a) {form.instance.nome_funcionario}
+            cadastrado(a) com sucesso."""
+        )
         return super().form_valid(form)
-    
+
     def form_invalid(self, form):
-        messages.error(self.request, 'Erro ao realizar o cadastro. Confira as informações fornecidas.')
+        messages.error(
+            self.request,
+            'Erro ao realizar o cadastro. Confira as informações fornecidas.'
+        )
         return super().form_invalid(form)
 
-""" OK """
-class FuncionarioListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+
+class FuncionarioListarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    ListView
+):
     group_required = ['gerente_geral', 'administradores']
 
     template_name = 'funcionarios/lista.html'
     model = Funcionario
     context_object_name = 'funcionarios'
-    
+
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        usuario = Funcionario.objects.get(
+            user=self.request.user
+        )
         queryset = queryset.select_related(
-            'user', 
-            'cargo', 
+            'user',
+            'cargo',
             'cargo__setor'
-        ).filter(cargo__setor__empresa__usuario_responsavel=self.request.user)
-        
+        ).filter(
+            empresa=usuario.empresa
+        )
 
         q = self.request.GET.get('q')
-        
+
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
 
@@ -81,19 +96,19 @@ class FuncionarioListarView(LoginRequiredMixin, GroupRequiredMixin, ListView):
             queryset = queryset.filter(criado__lte=data_fim)
 
         return queryset
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        lista_objetos = context.get('object_list')
-        pagination = Paginator(lista_objetos, 2)
-
-        page_number = self.request.GET.get('page')
-        page_obj = pagination.get_page(page_number)
-        context['page_obj'] = page_obj
+        context['funcionarios'] = self.get_queryset()
         return context
-    
-""" ok """
-class FuncionarioAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionMixin, UpdateView):
+
+
+class FuncionarioAtualizarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    EmpresaPermissionMixin,
+    UpdateView
+):
     group_required = ['gerente_geral', 'administradores']
 
     template_name = 'funcionarios/form_update.html'
@@ -114,50 +129,48 @@ class FuncionarioAtualizarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPe
         return initial
 
     def form_valid(self, form):
-        messages.success(self.request, f'Dados do(a) funcionário(a) {form.instance.nome_funcionario} atualizado com sucesso.')
+        messages.success(
+            self.request,
+            f"""Dados do(a) funcionário(a)
+            {form.instance.nome_funcionario} atualizado com sucesso."""
+        )
         return super().form_valid(form)
-    
+
     def form_invalid(self, form):
-        messages.error(self.request, f'Erro ao tentar atualizar os dados. Confira as informações.')
+        messages.error(
+            self.request,
+            """Erro ao tentar atualizar os dados.
+            Confira as informações."""
+        )
         return super().form_invalid(form)
 
-# """ Ok """
-# class FuncionarioDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionMixin, DeleteView):
-#     template_name = 'funcionarios/form_delete.html'
-#     model = Funcionario
-#     success_url = reverse_lazy('cadastros:funcionarios:listar')
 
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         funcionario = self.get_object()
-#         if funcionario:
-#             context['funcionario'] = funcionario
-#         return context
-
-#     def delete(self, request, *args, **kwargs):
-#         funcionario = self.get_object()
-
-#         funcionario.ativo = False
-#         funcionario.save()
-        
-#         messages.success(request, f'Funcionário(a) {funcionario.nome_funcionario} deletado(a) com sucesso.')
-#         return redirect(self.success_url)
-        
-
-class FuncionarioInativarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionMixin, SingleObjectMixin, View):
+class FuncionarioInativarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    EmpresaPermissionMixin,
+    SingleObjectMixin,
+    View
+):
     model = Funcionario
     group_required = ['gerente_geral', 'administradores']
 
     def get(self, request, *args, **kwargs):
         funcionario = self.get_object
-        return render(request, 'funcionarios/form_delete.html', {'funcionario': funcionario})
-
+        return render(
+            request,
+            'funcionarios/form_delete.html',
+            {'funcionario': funcionario}
+        )
 
     def post(self, request, *args, **kwargs):
         funcionario = self.get_object()
         funcionario.ativo = False
         funcionario.save()
 
-        messages.success(request, f'Funcionário(a) {funcionario.nome_funcionario} foi deletado(a) com sucesso.')
+        messages.success(
+            request,
+            f"""Funcionário(a) {funcionario.nome_funcionario}
+            foi deletado(a) com sucesso."""
+        )
         return redirect('cadastros:funcionarios:listar')
-
