@@ -214,8 +214,8 @@ class EmpresaUpdateModelForm(forms.ModelForm):
     def save(self, commit=True):
 
         usuario = self.instance.usuario_responsavel
-        usuario.username = self.cleaned_data.get('usuario_responsavel')
-        usuario.email = self.cleaned_data.get('emal')
+        usuario.username = self.cleaned_data.get('nome_empresa')
+        usuario.email = self.cleaned_data.get('email')
         usuario.telefone = self.cleaned_data.get('telefone')
 
         empresa = self.instance
