@@ -5,6 +5,28 @@
 
     <h1 class="titulo">Detalhes da empresa</h1>
 
-    <a href="{% url 'cadastros:empresas:deletar' empresa.pk %}" class="perfil-botao-deletar">deletar conta</a>
+    <form method="POST" action="{% url 'cadastros:empresas:perfil' %}" class="form">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="form__group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        {{ error }}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+        <div class="form__actions">
+            <button class="form__button form__button__enviar" type="submit">Atualizar</button>
+            <a href="{% url 'home:index' %}" class="form__button form__button__voltar">Voltar</a>
+        </div>
+    </form>
+
+
+    <a href="{% url 'cadastros:empresas:inativar' user.pk %}" class="perfil-botao-deletar">deletar conta</a>
 
 {% endblock %}

@@ -45,37 +45,8 @@
                         </ul>
                     </li>
 
-                    {% if request.user.is_staff %}
-                        <li class="menu-navegacao-lista-item">
-                            <button type="button" class="menu-alternativo">Cadastros</button>
-                            <ul class="submenu-lista">
-                                <button type="button" class="menu-alternativo">Tanque</button>
-                                <ul class="submenu-lista">
-                                    <li><a href="{% url 'cadastros:tanques:cadastrar' %}">Cadastrar Tanque</a></li>
-                                    <li><a href="{% url 'cadastros:tanques:listar' %}">Listagem Tanque</a></li>
-                                </ul>
-
-                                <button type="button" class="menu-alternativo">Bomba</button>
-                                <ul class="submenu-lista">
-                                    <li><a href="{% url 'cadastros:bombas:cadastrar' %}">Cadastrar Bomba</a></li>
-                                    <li><a href="{% url 'cadastros:bombas:listar' %}">Listagem Bomba</a></li>
-                                </ul>
-
-                                <button type="button" class="menu-alternativo">Funcionários</button>
-                                <ul class="submenu-lista">
-                                    <li><a href="{% url 'cadastros:funcionarios:cadastrar' %}">Cadastro de Funcionários</a></li>
-                                    <li><a href="{% url 'cadastros:funcionarios:listar' %}">Listagem de Funcionários</a></li>
-                                </ul> 
-                                                                
-                                <button type="button" class="menu-alternativo">Empresa</button>
-                                <ul class="submenu-lista">
-                                    <li><a href="{% url 'cadastros:empresas:perfil' request.user.pk %}">Empresas Perfil</a></li>
-                                </ul>                               
-                            </ul>
-                        </li>
-                    {% endif %}
                     {% if request.user.is_authenticated %}
-                        {% if request.user.is_empresa %}                        
+                        {% if request.user.is_empresa or usuario_grupo %}                        
                             <li class="menu-navegacao-lista-item">
                                 <button type="button" class="menu-alternativo">Cadastros</button>
                                 <ul class="submenu-lista">
@@ -98,7 +69,7 @@
                                     </ul>
                                     <button type="button" class="menu-alternativo">Empresa</button>
                                     <ul class="submenu-lista">
-                                        <li><a href="{% url 'cadastros:empresas:perfil' request.user.pk %}">Empresas Perfil</a></li>
+                                        <li><a href="{% url 'cadastros:empresas:perfil'%}">Empresas Perfil</a></li>
                                     </ul>                 
                                 </ul>
                             </li>
