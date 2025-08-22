@@ -82,21 +82,21 @@
         </div>
     </nav>
     {% if funcionarios %}
-        {% for func in page_obj %}
+        {% for funcionario in funcionarios %}
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
                 <p>
                     <strong>Nome do funcionário: </strong> 
-                    {{ func.nome_funcionario }}
+                    {{ funcionario.nome_funcionario }}
                 </p>
                 <p>
                     <strong>E-mail: </strong> 
-                    {{ func.user.email }}
+                    {{ funcionario.user.email }}
                 </p>
                 <p>
                     <strong>Grupo: </strong>
-                    {{ func.user.groups.first }}
+                    {{ funcionario.user.groups.first }}
                 </p>
-                {% if func.ativo %}
+                {% if funcionario.ativo %}
                     <p>
                         <strong>Status do funcionário: </strong>
                         Ativo 🟢
@@ -109,12 +109,12 @@
                 {% endif %}
                 <p>
                     <strong>Data de registro: </strong>
-                    {{ func.user.date_joined }}
+                    {{ funcionario.user.date_joined }}
                 </p>
                 <hr>
                 <div class="form__actions">
                     <a 
-                        href="{% url 'cadastros:funcionarios:atualizar' func.pk %}">
+                        href="{% url 'cadastros:funcionarios:atualizar' funcionario.pk %}">
                         <button 
                             type="button" 
                             class="form__button form__button__enviar"
@@ -123,10 +123,10 @@
                         </button>
                     </a> 
                     <a 
-                        href="{% url 'cadastros:funcionarios:inativar' func.pk %}" 
+                        href="{% url 'cadastros:funcionarios:inativar' funcionario.pk %}" 
                         class="form__button form__button__deletar"
                     >
-                        Inativar
+                        Desativar
                     </a>
                 </div> 
             </div>
