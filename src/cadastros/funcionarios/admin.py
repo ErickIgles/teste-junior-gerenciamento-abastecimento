@@ -9,8 +9,8 @@ class FuncionarioAdmin(admin.ModelAdmin):
         'id',
         'nome_funcionario',
         'user',
-        'cargo',
         'empresa',
+        'cargo',
         'criado',
         'modificado',
         'ativo'
