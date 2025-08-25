@@ -1,6 +1,8 @@
 from django import forms
-from .models import Bomba
+
 from cadastros.tanques.models import Tanque
+
+from .models import Bomba
 
 
 class BombaForm(forms.ModelForm):
@@ -135,6 +137,7 @@ class BombaUpdateForm(forms.ModelForm):
     def save(self, commit=True):
         bomba = self.instance
         bomba.empresa = self.empresa
+        bomba.ativo = self.cleaned_data.get('status')
         if commit:
             bomba.save()
         return bomba
