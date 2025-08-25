@@ -12,15 +12,26 @@ class EmpresaPermissionMixin:
 
     def dispatch(self, request, *args, **kwargs):
 
-        usuario = Funcionario.objects.get(
-            user=request.user
-        )
-
+        usuario_logado = self.request.user
         obj = self.get_object()
-        if obj.empresa.usuario_responsavel != usuario.empresa.usuario_responsavel:
-            messages.error(
-                request,
-                'Você não tem permissão para acessar este registro.'
+
+        if usuario_logado.is_empresa():
+            if obj.empresa.usuario_responsavel != usuario_logado:
+                messages.error(
+                    request,
+                    'Você não tem permissão para acessar este registro.'
+                )
+                return redirect('home:index')
+
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
             )
-            return redirect('home:index')
+
+            if obj.empresa.usuario_responsavel != usuario_funcionario.empresa.usuario_responsavel:
+                messages.error(
+                    request,
+                    'Você não tem permissão para acessar este registro.'
+                )
+                return redirect('home:index')
         return super().dispatch(request, *args, **kwargs)
