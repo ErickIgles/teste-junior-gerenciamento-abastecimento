@@ -3,6 +3,7 @@ from core.models import Base
 from django.contrib.auth.models import User
 
 from ..tanques.models import Tanque, Combustivel
+from ..bombas.models import Bomba
 
 
 class RegistroAbastecimento(Base):
@@ -17,6 +18,13 @@ class RegistroAbastecimento(Base):
         Tanque,
         verbose_name='Tanque',
         on_delete=models.CASCADE
+    )
+    bomba = models.ForeignKey(
+        Bomba,
+        on_delete=models.PROTECT,
+        verbose_name='Bomba',
+        null=True,
+        blank=True
     )
     tipo_combustivel = models.ForeignKey(
         Combustivel,
