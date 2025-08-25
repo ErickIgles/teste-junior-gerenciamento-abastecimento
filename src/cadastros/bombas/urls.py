@@ -1,11 +1,10 @@
 from django.urls import path
 
 from .views import (
-    BombaCadastroView,
-    BombaListarView,
     BombaAtualizarView,
-    # BombaDeletarView,
+    BombaCadastroView,
     BombaInativarView,
+    BombaListarView
 )
 
 app_name = 'bombas'
@@ -26,7 +25,6 @@ urlpatterns = [
         BombaAtualizarView.as_view(),
         name='atualizar'
         ),
-    # path('deletar/<int:pk>/', BombaDeletarView.as_view(), name='deletar'),
     path(
         'inativar/<int:pk>/',
         BombaInativarView.as_view(),
