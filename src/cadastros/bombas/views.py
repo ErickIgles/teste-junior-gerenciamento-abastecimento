@@ -1,17 +1,23 @@
-from django.shortcuts import redirect, render
 from django.contrib import messages
-from django.views.generic import CreateView, ListView, UpdateView, View
-from django.views.generic.detail import SingleObjectMixin
-from django.urls import reverse_lazy
-
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.views.generic import (
+    CreateView,
+    ListView,
+    UpdateView,
+    View
+)
 
-from .models import Bomba
-from .forms import BombaForm, BombaUpdateForm
+from django.views.generic.detail import SingleObjectMixin
+
+from cadastros.empresas.models import Empresa
+from cadastros.funcionarios.models import Funcionario
 from core.mixins import GroupRequiredMixin
 
+from .forms import BombaForm, BombaUpdateForm
+from .models import Bomba
 from .utils.mixins import EmpresaBombaPermissionMixin
-from cadastros.empresas.models import Empresa
 
 
 class BombaCadastroView(
@@ -27,9 +33,22 @@ class BombaCadastroView(
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['empresa'] = Empresa.objects.get(
-            usuario_responsavel=self.request.user
-        )
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+             )
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
         return kwargs
 
 
@@ -46,9 +65,22 @@ class BombaListarView(
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(
-            empresa__usuario_responsavel=self.request.user
-        )
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            queryset = queryset.filter(
+                empresa__usuario_responsavel=usuario_logado
+            )
+
+        else:
+            usuario = Funcionario.objects.get(
+                user=self.request.user
+            )
+
+            queryset = queryset.filter(
+                empresa=usuario.empresa
+            )
+
         q = self.request.GET.get('q')
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
@@ -87,23 +119,21 @@ class BombaAtualizarView(
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['empresa'] = Empresa.objects.get(
-            usuario_responsavel=self.request.user
-        )
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+             )
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
         return kwargs
-
-
-# class BombaDeletarView(
-#     LoginRequiredMixin,
-#     GroupRequiredMixin,
-#     EmpresaBombaPermissionMixin,
-#     DeleteView
-# ):
-#     group_required = ['gerente_geral', 'administradores']
-#     model = Bomba
-#     context_object_name = 'bomba'
-#     template_name = 'bombas/form_delete.html'
-#     success_url = reverse_lazy('cadastros:bombas:listar')
 
 
 class BombaInativarView(
@@ -119,7 +149,11 @@ class BombaInativarView(
 
     def get(self, request, *args, **kwargs):
         bomba = self.get_object()
-        return render(request, 'bombas/form_inativar.html', {'bomba': bomba})
+        return render(
+            request,
+            'bombas/form_inativar.html',
+            {'bomba': bomba}
+        )
 
     def post(self, request, *args, **kwargs):
         bomba = self.get_object()
