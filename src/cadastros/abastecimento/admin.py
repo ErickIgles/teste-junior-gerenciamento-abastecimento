@@ -10,6 +10,7 @@ class RegistroAbastecimentoAdmin(admin.ModelAdmin):
         'id',
         'funcionario',
         'tanque',
+        'bomba',
         'tipo_combustivel',
         'litros_abastecido',
         'valor_total_abastecimento'
