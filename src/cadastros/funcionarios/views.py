@@ -1,21 +1,17 @@
-from django.shortcuts import redirect, render, get_object_or_404
-from django.views.generic import CreateView, ListView, UpdateView
-
-from django.views import View
-
 from django.contrib import messages
-
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import (get_list_or_404, get_object_or_404, redirect,
+                              render)
+from django.urls import reverse_lazy
+from django.views import View
+from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 
-from django.urls import reverse_lazy
-
-from .models import Funcionario
-from .forms import FuncionarioForm, FuncionarioUpdateForm
 from cadastros.empresas.models import Empresa
-
 from core.mixins import GroupRequiredMixin
 
+from .forms import FuncionarioForm, FuncionarioUpdateForm
+from .models import Funcionario
 from .utils.mixins import EmpresaPermissionMixin
 
 
@@ -33,13 +29,24 @@ class FuncionarioCadastrarView(
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        usuario = Funcionario.objects.get(
-            user=self.request.user
-        )
-        kwargs['empresa'] = get_object_or_404(
-            Empresa,
-            usuario_responsavel=usuario.empresa.usuario_responsavel
-        )
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            kwargs['empresa'] = get_object_or_404(
+                Empresa,
+                usuario_responsavel=usuario_logado
+            )
+
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=self.request.user
+            )
+
+            kwargs['empresa'] = get_object_or_404(
+                Empresa,
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
         return kwargs
 
     def form_valid(self, form):
@@ -72,16 +79,25 @@ class FuncionarioListarView(
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        usuario = Funcionario.objects.get(
-            user=self.request.user
-        )
-        queryset = queryset.select_related(
-            'user',
-            'cargo',
-            'cargo__setor'
-        ).filter(
-            empresa=usuario.empresa
-        )
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+
+            queryset = get_list_or_404(Funcionario,
+                empresa__usuario_responsavel = usuario_logado
+            )
+
+        else:
+            usuario = Funcionario.objects.get(
+                user=self.request.user
+            )
+            queryset = queryset.select_related(
+                'user',
+                'cargo',
+                'cargo__setor'
+            ).filter(
+                empresa=usuario.empresa
+            )
 
         q = self.request.GET.get('q')
 
@@ -159,7 +175,7 @@ class FuncionarioInativarView(
         funcionario = self.get_object
         return render(
             request,
-            'funcionarios/form_delete.html',
+            'funcionarios/form_inativar.html',
             {'funcionario': funcionario}
         )
 
