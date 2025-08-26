@@ -1,7 +1,7 @@
 from django.db import models
-from core.models import Base
-from ..funcionarios.models import Funcionario
+from django.contrib.auth.models import User
 
+from core.models import Base
 from ..tanques.models import Tanque, Combustivel
 from ..bombas.models import Bomba
 from ..empresas.models import Empresa
@@ -9,7 +9,7 @@ from ..empresas.models import Empresa
 
 class RegistroAbastecimento(Base):
     funcionario = models.ForeignKey(
-        Funcionario,
+        User,
         verbose_name='Funcionário',
         on_delete=models.CASCADE,
         null=False,
