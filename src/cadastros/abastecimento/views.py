@@ -25,7 +25,7 @@ class RegistroAbastecimentoCadastroView(
     group_required = ['gerente_geral', 'administradores']
     model = RegistroAbastecimento
     form_class = AbastecimentoForm
-    template_name = 'abastecimento/abastecimento_form.html'
+    template_name = 'abastecimento/form_register.html'
     success_url = reverse_lazy('cadastros:abastecimento:listar')
 
     def get_form_kwargs(self):
@@ -68,7 +68,7 @@ class RegitroAbastecimentoListaView(
     group_required = ['gerente_geral', 'administradores']
     model = RegistroAbastecimento
     context_object_name = 'abastecimentos'
-    template_name = 'abastecimento/abastecimento_lista.html'
+    template_name = 'abastecimento/lista.html'
     paginate_by = 9
 
     def get_queryset(self):
@@ -117,7 +117,7 @@ class RegistroAbastecimentoAtualizarView(
     model = RegistroAbastecimento
     form_class = AbastecimentoUpdateForm
     context_object_name = 'abastecimento'
-    template_name = 'abastecimento/abastecimento_form_atualizar.html'
+    template_name = 'abastecimento/form_update.html'
     success_url = reverse_lazy('cadastros:abastecimento:listar')
 
     def get_form_kwargs(self):
@@ -161,5 +161,5 @@ class RegistroAbastecimentoDeletarView(
     group_required = ['gerente_geral', 'administradores']
     model = RegistroAbastecimento
     context_object_name = 'abastecimento'
-    template_name = 'abastecimento/abastecimento_form_delete.html'
+    template_name = 'abastecimento/form_delete.html'
     success_url = reverse_lazy('cadastros:abastecimento:listar')
