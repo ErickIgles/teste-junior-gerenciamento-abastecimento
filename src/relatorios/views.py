@@ -1,85 +1,68 @@
-from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
+
+from core.mixins import GroupRequiredMixin
+from cadastros.funcionarios.models import Funcionario
 from cadastros.tanques.models import Tanque
 from cadastros.abastecimento.models import RegistroAbastecimento
-
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import Group
-
-from cadastros.funcionarios.models import Funcionario
+from cadastros.empresas.models import Empresa
 
 
-
-class RelatorioAbastecimento(LoginRequiredMixin, ListView):
+class RelatorioAbastecimento(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    ListView
+):
+    group_required = ['gerente_geral', 'administradores']
     template_name = 'abastecimentos/relatorio.html'
     model = RegistroAbastecimento
 
-
-
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
-
-
     def get_context_data(self, **kwargs):
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+
+            empresa = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+            )
+
+        else:
+
+            funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+
+            empresa = Empresa.objects.get(
+                usuario_responsavel=funcionario.empresa.usuario_responsavel
+            )
+
         context = super().get_context_data(**kwargs)
-        tanques = Tanque.objects.all()
+        tanques = Tanque.objects.filter(
+            empresa=empresa
+        )
 
         tanques_com_registro = []
 
         for tanque in tanques:
 
             if RegistroAbastecimento.objects.filter(tanque=tanque).exists():
-                tanques_com_registro.append(tanque)            
+                tanques_com_registro.append(tanque)
 
         context['tanques_com_registro'] = tanques_com_registro
         return context
 
 
-class RelatorioAbastecimentoDetalhe(LoginRequiredMixin, DetailView):
+class RelatorioAbastecimentoDetalhe(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    DetailView
+):
+    group_required = ['gerente_geral', 'administradores']
     template_name = 'abastecimentos/detalhe.html'
     model = Tanque
     context_object_name = 'tanque'
-
-
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-        
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = Group.objects.exclude(name='funcionarios')
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
-
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,4 +82,3 @@ class RelatorioAbastecimentoDetalhe(LoginRequiredMixin, DetailView):
         })
 
         return context
-
