@@ -1,14 +1,15 @@
 from django.db import models
 from core.models import Base
-from django.contrib.auth.models import User
+from ..funcionarios.models import Funcionario
 
 from ..tanques.models import Tanque, Combustivel
 from ..bombas.models import Bomba
+from ..empresas.models import Empresa
 
 
 class RegistroAbastecimento(Base):
     funcionario = models.ForeignKey(
-        User,
+        Funcionario,
         verbose_name='Funcionário',
         on_delete=models.CASCADE,
         null=False,
@@ -23,6 +24,13 @@ class RegistroAbastecimento(Base):
         Bomba,
         on_delete=models.PROTECT,
         verbose_name='Bomba',
+        null=True,
+        blank=True
+    )
+    empresa = models.ForeignKey(
+        Empresa,
+        on_delete=models.CASCADE,
+        verbose_name='Empresa',
         null=True,
         blank=True
     )
