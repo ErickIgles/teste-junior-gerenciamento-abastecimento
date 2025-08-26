@@ -1,101 +1,97 @@
-from django.core.paginator import Paginator
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
-
+from django.views.generic import (
+    CreateView,
+    ListView,
+    UpdateView,
+    DeleteView
+)
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import Group
+from django.contrib import messages
 
 from .models import RegistroAbastecimento
-from .forms import AbastecimentoForm
-from cadastros.tanques.models import Tanque
+from .forms import AbastecimentoForm, AbastecimentoUpdateForm
+
+from core.mixins import GroupRequiredMixin
 from cadastros.funcionarios.models import Funcionario
+from cadastros.empresas.models import Empresa
+from .utils.mixins import EmpresaAbastecimentoPermissionMixin
 
 
-
-
-
-
-
-class RegistroAbastecimentoCadastroView(LoginRequiredMixin, CreateView):
+class RegistroAbastecimentoCadastroView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    CreateView
+):
+    group_required = ['gerente_geral', 'administradores']
     model = RegistroAbastecimento
     form_class = AbastecimentoForm
     template_name = 'abastecimento/abastecimento_form.html'
     success_url = reverse_lazy('cadastros:abastecimento:listar')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        usuario_logado = self.request.user
+        if usuario_logado.is_empresa():
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+            )
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
+            kwargs['usuario_funcionario'] = usuario_logado
+        return kwargs
 
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = [grupo.name for grupo in Group.objects.all()]
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
-
-    def get_initial(self):
-        initial = super().get_initial()
-        initial['funcionario'] = self.request.user
-        return initial
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['tanques'] = Tanque.objects.all()
-        return context
-    
     def form_valid(self, form):
-        form.instance.funcionario = self.request.user
+        messages.success(
+            self.request,
+            'Registro cadastrado com sucesso.'
+        )
         return super().form_valid(form)
 
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            'Erro ao realizar o cadastro. Confira às informações.'
+        )
+        return super().form_invalid(form)
 
-class RegitroAbastecimentoListaView(LoginRequiredMixin, ListView):
+
+class RegitroAbastecimentoListaView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    ListView
+):
+    group_required = ['gerente_geral', 'administradores']
     model = RegistroAbastecimento
     context_object_name = 'abastecimentos'
     template_name = 'abastecimento/abastecimento_lista.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = [grupo.name for grupo in Group.objects.all()]
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
+    paginate_by = 9
 
     def get_queryset(self):
 
         queryset = super().get_queryset()
-        usuario = self.request.user
+        usuario_logado = self.request.user
 
-        if not usuario.is_staff:
-            queryset = queryset.filter(funcionario=self.request.user)
-        
+        if usuario_logado.is_empresa():
+            queryset = queryset.filter(
+                empresa__usuario_responsavel=usuario_logado
+            )
+
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+            queryset = queryset.filter(
+                empresa=usuario_funcionario.empresa
+            )
+
         q = self.request.GET.get('q')
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
-
 
         if q:
             queryset = queryset.filter(bomba__nome_bomba__icontains=q)
@@ -103,78 +99,67 @@ class RegitroAbastecimentoListaView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(criado__gte=data_inicio)
         if data_fim:
             queryset = queryset.filter(criado__lte=data_fim)
-        
+
         return queryset
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        lista_objetos = context.get('object_list')
-        
-        pagination = Paginator(lista_objetos, 1)
-
-        page_number = self.request.GET.get('page')
-        page_obj = pagination.get_page(page_number)
-        context['page_obj'] = page_obj
         return context
 
 
-class RegistroAbastecimentoAtualizarView(LoginRequiredMixin, UpdateView):
+class RegistroAbastecimentoAtualizarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    EmpresaAbastecimentoPermissionMixin,
+    UpdateView
+):
+    group_required = ['gerente_geral', 'administradores']
     model = RegistroAbastecimento
-    form_class = AbastecimentoForm
+    form_class = AbastecimentoUpdateForm
     context_object_name = 'abastecimento'
     template_name = 'abastecimento/abastecimento_form_atualizar.html'
     success_url = reverse_lazy('cadastros:abastecimento:listar')
 
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        usuario_logado = self.request.user
+        if usuario_logado.is_empresa():
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+            )
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
+            kwargs['usuario_funcionario'] = usuario_logado
+        return kwargs
 
-        if not usuario.is_authenticated:
-            return redirect('home:index')
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            'Dados atualizados com suceso.'
+        )
+        return super().form_valid(form)
 
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = [grupo.name for grupo in Group.objects.all()]
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['tanques'] = Tanque.objects.all()
-        return context
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            'Erro ao atualizar os dados. Confira às informações.'
+        )
+        return super().form_invalid(form)
 
 
-class RegistroAbastecimentoDeletarView(LoginRequiredMixin, DeleteView):
+class RegistroAbastecimentoDeletarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    EmpresaAbastecimentoPermissionMixin,
+    DeleteView
+):
+    group_required = ['gerente_geral', 'administradores']
     model = RegistroAbastecimento
     context_object_name = 'abastecimento'
     template_name = 'abastecimento/abastecimento_form_delete.html'
     success_url = reverse_lazy('cadastros:abastecimento:listar')
-
-
-    def dispatch(self, request, *args, **kwargs):
-        usuario = self.request.user
-
-        if not usuario.is_authenticated:
-            return redirect('home:index')
-
-        if usuario.is_staff:
-            return super().dispatch(request, *args, **kwargs)
-        
-        try:
-            funcionario = Funcionario.objects.get(user=usuario)
-
-            grupos = [grupo.name for grupo in Group.objects.all()]
-            
-            if funcionario.grupo and funcionario.grupo.name in grupos:
-                return super().dispatch(request, *args, **kwargs)
-            return redirect('home:index')
-        except Funcionario.DoesNotExist:
-            return redirect('home:index')
-
