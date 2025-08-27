@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>  {% block title %}Home{% endblock %}  </title>
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    {% block head %}{% endblock  %}
+
+</head>
+<body>
+    
+    <div class="layout">
+        
+        {% include 'partials/asidebar.html' %}
+        
+        <div class="container">
+            <button id="hamburguer-btn">☰</button>
+            {% include 'partials/header.html' %}
+            
+            <main class="main">
+                {% include 'partials/messages.html' %}
+    
+                {% block main %}
+    
+                {% endblock %}
+            </main>
+            {% include 'partials/footer.html' %}
+        
+        </div>
+
+    </div>
+    <script src="{% static 'js/script.js' %}"></script>
+    {% block script %}{% endblock  %}
+</body>
+</html>
