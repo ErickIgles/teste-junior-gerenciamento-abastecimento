@@ -1,171 +1,117 @@
-{% extends 'base.html' %}
+{% extends 'pages/base.html' %}
+{% load static %}
 
+
+{% block title %} Tanques {% endblock %}
+
+{% block head %} 
+    <link rel="stylesheet" href="{% static 'css/lista_tanque.css' %}">
+{% endblock %}
 
 
 {% block main %}
-    <nav>
 
-        <div>
-            <form method="get" style="display: flex; margin: 20px 20px 20px 0px; flex-direction: row; gap: 20px;">
-                <input 
-                    style="padding: 8px;" 
-                    type="text" 
-                    placeholder="pesquisar..." 
-                    name="q" 
-                    value="{{ request.GET.q }}"
-                >
+    <div>
+        <nav class="nav-pesquisa">
+            <form method="GET" class="form">
+                {% csrf_token %}
+
                 <div>
-                    <label 
-                        for="data_inicio"
-                    >
-                        De:
-                    </label>
                     <input 
-                        style="padding: 8px;" 
-                        type="date" 
-                        name="data_inicio" 
-                        value="{{ request.GET.data_inicio }}"
+                        type="text" 
+                        class="form-input"
+                        placeholder="Pesquisar..."
+                        name="q"
                     >
                 </div>
                 <div>
-                    <label for="data_fim">Até:</label>
                     <input 
-                        style="padding: 8px;" 
                         type="date" 
-                        name="data_fim" 
-                        value="{{ request.GET.data_fim }}"
+                        class="form-data"
                     >
-                </div>
+                    <input 
+                        type="date" 
+                        class="form-data"
+                    >
+                </div> 
                 <button 
-                    style="padding: 8px;" 
-                    type="submit"
+                    type="submit" 
+                    class="button-pesquisa"
                 >
-                        🔍 Filtrar
+                    🔍
                 </button>
             </form>
-        </div>
-        <div 
-            style=
-            "
-            margin: 20px 0; 
-            background-color: #ffffff; 
-            width: 320px; 
-            height: 40px; 
-            padding: 10px 0; 
-            text-align: center;
-            "
-        >
-            <span>
-                {% if page_obj.has_previous %}
-                    <a 
-                        style=
-                        "
-                        text-decoration: none; 
-                        color: #000000;
-                        border: 2px solid rgba(34, 133, 255, 0.667); 
-                        padding: 3px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        " 
-                        href="?page=1"
-                    >
-                        &laquo; voltar
-                    </a>
-                {% endif %}
 
-                <span class="current">
-                    Page {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
-                </span>
-
-                {% if page_obj.has_next %}
-                    <a 
-                        style="
-                        text-decoration: none; 
-                        color: #000000; 
-                        border: 2px solid rgba(34, 133, 255, 0.667); 
-                        padding: 3px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        " 
-                        href="?page={{ page_obj.next_page_number }}"
-                    > 
-                        próxima
-                    </a>
-                {% endif %}
-            </span>
-        </div>
+            <a 
+                class="novo-registro"
+                href="{% url 'cadastros:tanques:cadastrar' %}"
+                >
+                Novo registro
+            </a>
+        </nav>
         
-    </nav>
-    {% if tanques %}
-        {% for tanque in tanques %}
-
-            <div 
-                style=
-                "
-                display: flex; 
-                flex-direction: column; 
-                gap: 10px; 
-                margin-bottom: 40px;
-                "
-            >
-                <p>
-                    <strong>Tipo de combustivel: </strong>
-                    {% if tanque.tipo_combustivel is None %}
-                        Sem tipo definido
-                    {% else %}
-                        {{ tanque.tipo_combustivel }}
-                    {% endif%}
-                </p>
-                <p>
-                    <strong>Identificador do tanque: </strong> 
-                    {{ tanque.identificador_tanque }}
-                </p>
-                <p>
-                    <strong>Capacidade do tanque: </strong> 
-                    {{ tanque.capacidade_maxima }} 
-                    L</p>
-                <p>
-                    <strong>Capacidade disponivel: </strong> 
-                    {{ tanque.quantidade_disponivel }} L
-                </p>
-                {% if tanque.ativo %}
-                    <p>
-                        <strong>Status do Tanque: </strong>
-                        Ativo 🟢
-                    </p>
-                {% else %}
-                    <p>
-                        <strong>Status do Tanque: </strong>
-                        Desativado 🔴
-                    </p>
-                {% endif %}
-                <p>
-                <p>
-                    <strong>Data de registro: </strong>
-                    {{ tanque.criado }}
-                </p>
-                <hr>
-                <div class="form__actions">
-                    <a 
-                        href="{% url 'cadastros:tanques:atualizar' tanque.pk %}"
-                    >
-                        <button 
-                            type="button" 
-                            class="form__button form__button__enviar"
-                        >
-                            Atualizar
-                        </button>
-                    </a>
-                    <a 
-                        href="{% url 'cadastros:tanques:inativar' tanque.pk %}" 
-                        class="form__button form__button__deletar"
-                    >
-                        Desativar
-                    </a>
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <h2>Ainda não há registros no sistema</h2>
-    {% endif %}
-{% endblock %}j
+        
+        <div class="lista-tanque">
+            {% if tanques %}
+                
+                {% for tanque  in tanques %}
+                    <table class="tabela-tanque">
+                        <tbody class="tabela-body">
+                            <tr>
+                                <th>Tipo de combustível</th>
+                                <td>
+                                    {% if tanque.tipo_combustivel %}
+                                        {{ tanque.tipo_combustivel }}
+                                    {% else %}
+                                        Sem tipo definido
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Identificador do tanque</th>
+                                <td>
+                                    {{ tanque.identificador_tanque }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Capacidade máxima</th>
+                                <td>
+                                    {{ tanque.capacidade_maxima }} L
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Quatidade disponível</th>
+                                <td>
+                                    {{ tanque.quantidade_disponivel }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    {% if tanque.ativo %}
+                                        <p class="status status-ativo">Ativo 🟢</p>
+                                    {% else %}
+                                        <p class="status status-desativado">Desativado 🔴</p> 
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ações</th>
+                                <td class="acoes-buttons">
+                                    <a 
+                                        href="{% url 'cadastros:tanques:atualizar' tanque.pk %}"
+                                        class="btn atualizar"
+                                    >
+                                        Detalhes
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endfor %}
+            {% else %}
+                <h2>Não há registros de tanques</h2>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
