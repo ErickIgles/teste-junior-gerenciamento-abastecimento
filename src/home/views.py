@@ -1,24 +1,9 @@
 from django.views.generic import TemplateView
-from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class IndexTemplateView(TemplateView):
-
-    def get(self, request, *args, **kwargs):
-
-        usuario_grupo = request.user.groups.filter(
-            name__in=[
-                'gerente_geral',
-                'administradores'
-            ]
-        ).exists()
-        if usuario_grupo:
-            return render(
-                request,
-                'base.html',
-                {'usuario_grupo': usuario_grupo}
-            )
-        return render(
-            request,
-            'base.html'
-        )
+class IndexTemplateView(
+    LoginRequiredMixin,
+    TemplateView
+):
+    template_name = 'pages/base.html'
