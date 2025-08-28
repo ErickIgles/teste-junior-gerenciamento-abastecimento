@@ -1,0 +1,168 @@
+
+
+classe de permissao 
+  - verificar se o usuario é superusuario = True
+  - se possui is_staff = True
+
+
+
+
+
+
+
+
+
+Perminissoes a serem definidas:
+
+  feat/abastecimento-manager | X |
+  feat/autenticacao  | X | ok
+  feat/bombas-manager | X | ok
+  feat/cadastro-funcionario-manager | X | ok
+  feat/relatorios | X | ok
+  feat/tanques-manager | X | ok 
+
+
+
+  Permissoes - estado atual
+    - verifico atraves do model funcionario
+    - verifico o grupo a qual o funcionario pertence
+    - atraves da verificação do grupo a qual o funcionario pertencie, permito que tenha acesso a rota.
+  
+  Permissao - estado novo
+    - verifico pelo o user e sua relação com o grupo
+
+
+
+Correções
+
+1 - Um único login
+
+2 - Ao invés de apagar o usuario ou coisas do tipo, apenas desativar. OK
+
+3 - Relações - OK
+  -> Modelo de Empresa
+    - Empresa - relação com - User do django
+    - Empresa - realação com - Group do django
+
+  -> Modelo Setor "OK"
+    - Setor - relação com - Empresa
+  -> Modelo - Cargo  "OK"
+    - Cargo - relação com - Setor
+    - Cargo - relação com - Empresa
+  
+  -> Modelo funcionario
+    - Funcionario - relação com - User do django
+    - Funcionario - relação com - cargo
+    - Funcionario - relação com - Grupo
+    - Funcionario - relação com - Empresa
+
+  -> Modelo Bomba "OK"
+    - Bomba - relação com - Tanque
+    - Bomba - relação com - Empresa
+  -> Modelo Tanque "OK"
+    - Bomba - relação com - Empresa
+
+  -> Modelo Abastecimento
+    - Abastecimento - relação com - Funcionario
+    - Abastecimento - relação com - Bomba - que tem relação com - Tanque
+    - Abastecimento - relação com - Combustivel
+
+4 - Correção verificação de grupos - OK 
+
+5 - Ao invés de estabelecer FK em entidade, apenas interar sobre os grupos na tabela Group e ao selecionar no formulário, receber o valor e atrelar ao usuário no User do django. OK
+
+
+
+
+
+NOVOS PROBLEMAS 
+1 - RELAÇÕES 
+  -> Empresa com User - OneToOne   "OK"
+  -> Funcionario com User - OneToOne
+  
+2 - Filtragem de /Relatorios por empresa
+
+3 - Erro ao atualizar o status da Bomba - CONCERTAR! / 
+  -> Não está recebendo o valor do status no formulario de atualização.
+
+4 - Duplicação de aba de cadastros - CONCERTAR!
+
+
+
+
+
+Usuario - Funcionario
+ - seguir a unicidade do usuario
+ - seguir a referencia de usuario já pertencente a empresa.
+ - cpf - UTILIZAR
+
+
+
+
+
+
+
+
+template
+
+ -- verifico se usuario é autenticado
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TANQUE - cadastro
+
+1 - verifico o usuario
+2 - verifico a empresa desse usuario
+3 - ao realizar o cadastro preenche a emoresa pela a empresa vincula ao funcionario
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
