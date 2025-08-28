@@ -1,9 +1,8 @@
 from django.contrib import messages
+from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView, View
-from django.views.generic.detail import SingleObjectMixin
+from django.urls import reverse_lazy, reverse
+from django.views.generic import CreateView, ListView, UpdateView
 
 from cadastros.funcionarios.models import Funcionario
 from core.mixins import GroupRequiredMixin
@@ -27,28 +26,45 @@ class TanqueCadastroView(
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+
         usuario_logado = self.request.user
+
         if usuario_logado.is_empresa():
+
             kwargs['empresa'] = Empresa.objects.get(
+
                 usuario_responsavel=self.request.user
             )
 
         else:
+
             usuario_funcionario = Funcionario.objects.get(
+
                 user=usuario_logado
             )
 
             kwargs['empresa'] = Empresa.objects.get(
+
                 usuario_responsavel = usuario_funcionario.empresa.usuario_responsavel
             )
         return kwargs
 
-    def form_valid(self, form):        
-        messages.success(self.request, f'Tanque {form.instance.identificador_tanque} cadastrado com sucesso.')
+    def form_valid(self, form):
+
+        messages.success(self.request,
+                        f"""Tanque
+                        {form.instance.identificador_tanque}
+                        cadastrado com sucesso.""")
+
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, 'Erro ao realizar o cadastro. Confira às informações.')
+
+        messages.error(self.request,
+                       """ Erro ao realizar o cadastro.
+                       Confira às informações."""
+                       )
+
         return super().form_invalid(form)
 
 
@@ -61,7 +77,7 @@ class TanqueListarView(
     model = Tanque
     context_object_name = 'tanques'
     template_name = 'tanques/lista.html'
-    paginate_by = 9
+    paginate_by = 6
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -69,32 +85,54 @@ class TanqueListarView(
         usuario_logado = self.request.user
 
         if usuario_logado.is_empresa():
+
             queryset = queryset.filter(
                 empresa__usuario_responsavel=usuario_logado
             )
+
         else:
+
             usuario_funcionario = Funcionario.objects.get(
                 user=usuario_logado
             )
+
             queryset = queryset.filter(
                 empresa__usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
             )
+
         q = self.request.GET.get("q")
+
         data_inicio = self.request.GET.get('data_inicio')
+
         data_fim = self.request.GET.get('data_fim')
 
         if q:
-            queryset = queryset.filter(tipo_combustivel__icontains=q)
+            queryset = queryset.filter(
+
+                Q(tipo_combustivel__nome_combustivel__icontains=q) |
+
+                Q(identificador_tanque__icontains=q) |
+
+                Q(capacidade_maxima__icontains=q) |
+
+                Q(ativo__icontains=q)
+            )
+
         if data_inicio:
+
             queryset = queryset.filter(criado__gte=data_inicio)
+
         if data_fim:
+
             queryset = queryset.filter(criado__lte=data_fim)    
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tanques'] = self.get_queryset() 
+
+        context['tanques'] = self.get_queryset()
+
         return context
 
 
@@ -110,30 +148,70 @@ class TanqueAtualizarView(
     form_class = TanqueUpdateForm
     context_object_name = 'tanque'
     template_name = 'tanques/form_update.html'
-    success_url = reverse_lazy('cadastros:tanques:listar')
+
+    def get_success_url(self):
+
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:tanques:listar')
 
     def get_initial(self):
+
         initial = super().get_initial()
+
         initial['status'] = self.object.ativo
+
         return initial
 
     def get_form_kwargs(self):
+
         kwargs = super().get_form_kwargs()
+
         usuario_logado = self.request.user
+
         if usuario_logado.is_empresa():
+
             kwargs['empresa'] = Empresa.objects.get(
+
                 usuario_responsavel=self.request.user
             )
 
         else:
+
             usuario_funcionario = Funcionario.objects.get(
+
                 user=usuario_logado
             )
 
             kwargs['empresa'] = Empresa.objects.get(
+
                 usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
             )
+
         return kwargs
+
+    def form_valid(self, form):
+
+        messages.success(
+            self.request,
+            'Tanque atualizado com sucesso.'
+            )
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+
+        messages.error(
+            self.request,
+            """Erro ao atualizar o Tanque.
+                Confira às informações"""
+        )
+
+        return super().form_invalid(form)
 
 # class TanqueDeletarView(LoginRequiredMixin, GroupRequiredMixin, EmpresaPermissionTanqueMixin, DeleteView):
 #     model = Tanque
@@ -142,32 +220,32 @@ class TanqueAtualizarView(
 #     success_url = reverse_lazy('cadastros:tanques:listar')
 
 
-class TanqueInativarView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    SingleObjectMixin,
-    EmpresaPermissionTanqueMixin,
-    View
-):
-    group_required = ['gerente_geral', 'administradores']
-    model = Tanque
-    context_object_name = 'tanque'
+# class TanqueInativarView(
+#     LoginRequiredMixin,
+#     GroupRequiredMixin,
+#     SingleObjectMixin,
+#     EmpresaPermissionTanqueMixin,
+#     View
+# ):
+#     group_required = ['gerente_geral', 'administradores']
+#     model = Tanque
+#     context_object_name = 'tanque'
 
-    def get(self, request, *args, **kwargs):
-        tanque = self.get_object()
-        return render(
-            request,
-            'tanques/form_inativar.html',
-            {'tanque': tanque}
-        )
+#     def get(self, request, *args, **kwargs):
+#         tanque = self.get_object()
+#         return render(
+#             request,
+#             'tanques/form_inativar.html',
+#             {'tanque': tanque}
+#         )
 
-    def post(self, request, *args, **kwargs):
-        tanque = self.get_object()
-        tanque.ativo = False
-        tanque.save()
+#     def post(self, request, *args, **kwargs):
+#         tanque = self.get_object()
+#         tanque.ativo = False
+#         tanque.save()
 
-        messages.success(
-            request,
-            f'Tanque {tanque.identificador_tanque} desativado com sucesso.'
-        )
-        return redirect('cadastros:tanques:listar')
+#         messages.success(
+#             request,
+#             f'Tanque {tanque.identificador_tanque} desativado com sucesso.'
+#         )
+#         return redirect('cadastros:tanques:listar')
