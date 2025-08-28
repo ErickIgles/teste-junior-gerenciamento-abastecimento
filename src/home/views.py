@@ -6,4 +6,4 @@ class IndexTemplateView(
     LoginRequiredMixin,
     TemplateView
 ):
-    template_name = 'pages/base.html'
+    template_name = 'home_template/pages/base.html'
