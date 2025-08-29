@@ -32,7 +32,11 @@
             </button>
         </form>
 
-        <a class="novo-registro" href="{% url 'cadastros:tanques:cadastrar' %}">
+        <a 
+            class="novo-registro" 
+            href="{% url 'cadastros:tanques:cadastrar' %}?next={{ request.get_full_path }}"
+        
+        >
             Novo registro
         </a>
     </nav>
