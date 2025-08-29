@@ -3,12 +3,13 @@ from .models import Tanque, Combustivel
 
 
 class TanqueForm(forms.ModelForm):
+
     tipo_combustivel = forms.ModelChoiceField(
         required=False,
         queryset=Combustivel.objects.none(),
         widget=forms.Select(
             attrs={
-                'class': 'form__input',
+                'class': 'form-select',
             }
         ),
         label='Tipo de Combustível'
@@ -24,24 +25,20 @@ class TanqueForm(forms.ModelForm):
             'quantidade_disponivel'
             ]
         widgets = {
-            'tipo_combustivel': forms.Select(
-                attrs={
-                    'class': 'form__select'
-                }
-            ),
+
             'identificador_tanque': forms.TextInput(
                 attrs={
-                    'class': 'form__input'
+                    'class': 'form-textarea'
                 }
             ),
             'capacidade_maxima': forms.NumberInput(
                 attrs={
-                    'class': 'form__input'
+                    'class': 'form-input'
                 }
             ),
             'quantidade_disponivel': forms.NumberInput(
                 attrs={
-                    'class': 'form__input'
+                    'class': 'form-input'
                 }
             ),
         }
@@ -52,32 +49,65 @@ class TanqueForm(forms.ModelForm):
             'quantidade_disponivel': 'Quantidade Disponível',
         }
 
-
     def __init__(self, *args, **kwargs):
+
         self.empresa = kwargs.pop('empresa', None)
+
         super().__init__(*args, **kwargs)
 
         if self.empresa:
+
             self.fields['tipo_combustivel'].queryset = Combustivel.objects.filter(
                 empresa=self.empresa
             )
 
     def clean_identificador_tanque(self):
+
         identificador_tanque = self.cleaned_data.get('identificador_tanque')
 
-        if Tanque.objects.filter(
+        id_tanque_busca = Tanque.objects.filter(
             identificador_tanque=identificador_tanque
-            ).exists():
+        )
+
+        if id_tanque_busca.exists():
+
             raise forms.ValidationError('Identificador já cadastrado.')
+
         return identificador_tanque
 
+    def clean_capacidade_maxima(self):
+
+        capacidade_maxima = self.cleaned_data.get(
+            'capacidade_maxima'
+        )
+
+        if capacidade_maxima <= 0:
+
+            raise forms.ValidationError("""
+            A capacidade do tanque não pode ser menor
+            ou igual à zero.
+        """)
+
+    def clean_quantidade_disponivel(self):
+        quantidade_disponivel = self.cleaned_data.get(
+            'quantidade_disponivel'
+        )
+
+        if quantidade_disponivel <= 0:
+
+            raise forms.ValidationError("""
+            A quantidade disponível no tanque
+            não pode ser menor ou igual à zero.
+        """)
 
     def save(self, commit=True):
-    
+
         tanque = self.instance
+
         tanque.empresa = self.empresa
 
         if commit:
+
             tanque.save()
 
         return tanque
@@ -106,22 +136,22 @@ class TanqueUpdateForm(forms.ModelForm):
         widgets = {
             'tipo_combustivel': forms.Select(
                 attrs={
-                    'class': 'form__select'
+                    'class': 'form-select'
                 }
             ),
             'identificador_tanque': forms.TextInput(
                 attrs={
-                    'class': 'form__input'
+                    'class': 'form-input'
                 }
             ),
             'capacidade_maxima': forms.NumberInput(
                 attrs={
-                    'class': 'form__input'
+                    'class': 'form-input'
                 }
             ),
             'quantidade_disponivel': forms.NumberInput(
                 attrs={
-                    'class': 'form__input'
+                    'class': 'form-input'
                 }
             ),
         }
@@ -166,7 +196,8 @@ class TanqueUpdateForm(forms.ModelForm):
         if quantidade_disponivel < 0:
 
             raise forms.ValidationError(
-            'A quantidade não pode ser negativo.'
+                """A quantidade não
+                pode ser negativo."""
             )
 
         if quantidade_disponivel > capacidade_maxima:
