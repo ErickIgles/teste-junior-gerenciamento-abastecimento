@@ -2,29 +2,58 @@
 {% load static %}
 
 
+{% block head %}
+    <link rel="stylesheet" href="{% static 'tanques/css/forms.css' %}">
+{% endblock %}
+    
 
 {% block main %}
-    <h2 class="form__titulo">Cadastro de Tanque</h2>
 
-    <form method="POST" class="form">
-        {% csrf_token %}
+    <div 
+        class="form-espaco-tanque"
+    >
+        <h2 
+            class="form-titulo"
+        >
+            Cadastro de Tanque
+        </h2>
+        
+        <form method="POST" class="form">
+            {% csrf_token %}
+        
+            {% for field in form %}
+                <div 
+                    class="form-group"
+                >
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
 
-        {% for field in form %}
-            <div class="form__group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    {% for error in field.errors %}
-                        <p>{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        {% endfor %}
+            <hr>
             
-        <div class="form__actions">
-            <button class="form__button form__button__enviar" type="submit">Cadastrar</button>
-            <a href="{% url 'cadastros:tanques:listar' %}" class="form__button form__button__voltar">Voltar</a>
-        </div>
-    </form>
+            <div 
+                class="form-actions"
+            >
+                <button 
+                    class="btn cadastrar" 
+                    type="submit"
+                >
+                    Cadastrar
+                </button>
+                <a 
+                    href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" class=" btn cancelar"
+                >
+                    Cancelar
+                </a>
+            </div>
+        </form>
+
+    </div>
 {% endblock %}
 
