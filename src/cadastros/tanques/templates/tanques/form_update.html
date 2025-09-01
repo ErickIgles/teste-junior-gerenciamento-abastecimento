@@ -17,6 +17,9 @@
         >
             Atualização de Tanque
         </h2>
+            
+        {% include 'home_template/partials/messages.html' %}
+
     
         <form method="POST" class="form" action="{% url 'cadastros:tanques:atualizar' tanque.pk %}">
             {% csrf_token %}
@@ -31,9 +34,9 @@
                     </label>
                     {{ field }}
     
-                    {% if fields.errors %}
-                        {% for error in fields.errors %}
-                            {{ error }}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <p class="messages-error">{{ error }}</p>
                         {% endfor %}
                     {% endif %}
                 </div>
