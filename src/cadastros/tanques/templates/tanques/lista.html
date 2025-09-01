@@ -11,111 +11,111 @@
 
 {% block main %}
 
-<div>
-    <h2 class="titulo-tanque-listagem">Listagem de Tanques</h2>
+    <div class="campo-pagina-lista">
+        <h2 class="titulo-tanque-listagem">Listagem de Tanques</h2>
 
-    {% include 'home_template/partials/messages.html' %}
-    
-    
-    <nav class="nav-pesquisa">
-        <form method="GET" class="form">
+        {% include 'home_template/partials/messages.html' %}
 
-            <div>
-                <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
+            
+        <nav class="nav-pesquisa">
+            <form method="GET" class="form">
+
+                <div>
+                    <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
+                </div>
+                <div class="espaco-datas">
+                    <input type="date" name="data_inicio" class="form-data">
+                    <input type="date" name="data_fim" class="form-data">
+                </div>
+                <button type="submit" class="button-pesquisa">
+                    🔍
+                </button>
+            </form>
+
+            <a 
+                class="novo-registro" 
+                href="{% url 'cadastros:tanques:cadastrar' %}?next={{ request.get_full_path }}"
+            
+            >
+                Novo registro
+            </a>
+        </nav>
+
+
+        {% if page_obj %}
+            <div class="lista-tanque">
+                {% for tanque in page_obj %}
+                    <table class="tabela-tanque">
+                        <tbody class="tabela-body">
+                            <tr>
+                                <th>Tipo de combustível</th>
+                                <td>
+                                    {% if tanque.tipo_combustivel %}
+                                    {{ tanque.tipo_combustivel }}
+                                    {% else %}
+                                    Sem tipo definido
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Identificador</th>
+                                <td>
+                                    {{ tanque.identificador_tanque }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Capacidade máxima</th>
+                                <td>
+                                    {{ tanque.capacidade_maxima }} L
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Quatidade disponível</th>
+                                <td>
+                                    {{ tanque.quantidade_disponivel }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Situação</th>
+                                <td>
+                                    {% if tanque.ativo %}
+                                    <p class="status status-ativo">Ativo 🟢</p>
+                                    {% else %}
+                                    <p class="status status-desativado">Desativado 🔴</p>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ações</th>
+                                <td class="acoes-buttons">
+                                    <a a href="{% url 'cadastros:tanques:atualizar' tanque.pk %}?next={{ request.get_full_path }}" class="btn atualizar">
+                                        Editar
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endfor %}
             </div>
-            <div>
-                <input type="date" name="data_inicio" class="form-data">
-                <input type="date" name="data_fim" class="form-data">
+
+            <div class="paginacao">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">«</a>
+                {% endif %}
+
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">»</a>
+                {% endif %}
             </div>
-            <button type="submit" class="button-pesquisa">
-                🔍
-            </button>
-        </form>
 
-        <a 
-            class="novo-registro" 
-            href="{% url 'cadastros:tanques:cadastrar' %}?next={{ request.get_full_path }}"
-        
-        >
-            Novo registro
-        </a>
-    </nav>
+        {% else %}
+            <h2>Não há registros de tanques</h2>
+        {% endif %}
 
 
-    {% if page_obj %}
-        <div class="lista-tanque">
-            {% for tanque in page_obj %}
-                <table class="tabela-tanque">
-                    <tbody class="tabela-body">
-                        <tr>
-                            <th>Tipo de combustível</th>
-                            <td>
-                                {% if tanque.tipo_combustivel %}
-                                {{ tanque.tipo_combustivel }}
-                                {% else %}
-                                Sem tipo definido
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Identificador do tanque</th>
-                            <td>
-                                {{ tanque.identificador_tanque }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Capacidade máxima</th>
-                            <td>
-                                {{ tanque.capacidade_maxima }} L
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Quatidade disponível</th>
-                            <td>
-                                {{ tanque.quantidade_disponivel }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Status</th>
-                            <td>
-                                {% if tanque.ativo %}
-                                <p class="status status-ativo">Ativo 🟢</p>
-                                {% else %}
-                                <p class="status status-desativado">Desativado 🔴</p>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Ações</th>
-                            <td class="acoes-buttons">
-                                <a a href="{% url 'cadastros:tanques:atualizar' tanque.pk %}?next={{ request.get_full_path }}" class="btn atualizar">
-                                    Detalhes
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            {% endfor %}
-        </div>
-
-        <div class="paginacao">
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">«</a>
-            {% endif %}
-
-            <span>
-                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-            </span>
-
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">»</a>
-            {% endif %}
-        </div>
-
-    {% else %}
-        <h2>Não há registros de tanques</h2>
-    {% endif %}
-
-
-</div>
+    </div>
 {% endblock %}
