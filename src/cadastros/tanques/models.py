@@ -5,9 +5,6 @@ from core.models import Base
 from ..empresas.models import Empresa
 
 
-
-
-
 class Combustivel(Base):
     class TipoCombustivel(models.TextChoices):
     
@@ -42,7 +39,6 @@ class Combustivel(Base):
         on_delete=models.CASCADE
     )
 
-
     class Meta:
         verbose_name = 'Combustível'
         verbose_name_plural = 'Combustíveis'
@@ -53,7 +49,6 @@ class Combustivel(Base):
 
     def __str__(self):
         return f'{self.nome_combustivel}'
-
 
 
 class Tanque(Base):
@@ -67,7 +62,6 @@ class Tanque(Base):
     identificador_tanque = models.CharField(
         verbose_name='Identificador', 
         max_length=24, 
-        unique=True
     )
     capacidade_maxima = models.DecimalField(
         verbose_name='Capacidade Máxima', 
@@ -94,4 +88,3 @@ class Tanque(Base):
     
     def __str__(self):
         return f'{self.identificador_tanque}'
-
