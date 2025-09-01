@@ -184,3 +184,86 @@ body{
 .messages li.warning {
     background-color: #f39c12;
 }
+
+
+@media (max-width: 1024px) {
+  .asidebar {
+    width: 200px;
+  }
+}
+
+@media (max-width: 760px){
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .layout {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .asidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 999;
+    width: 220px;
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
+  }
+
+  .asidebar.hidden {
+    transform: translateX(-100%);
+  }
+
+  .asidebar:not(.hidden) {
+    transform: translateX(0);
+  }
+
+  #hamburguer-btn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+  }
+
+  .container {
+    margin-top: 60px;
+    padding: 10px;
+  }
+
+  .header {
+    flex-direction: column;
+    padding: 15px;
+    text-align: center;
+  }
+
+  .header ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer {
+    padding: 15px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .asidebar {
+    width: 180px;
+  }
+
+  .header {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .footer {
+    font-size: 12px;
+    padding: 10px;
+  }
+}
