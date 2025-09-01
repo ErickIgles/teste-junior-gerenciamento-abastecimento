@@ -17,6 +17,9 @@
         >
             Cadastro de Tanque
         </h2>
+
+        {% include 'home_template/partials/messages.html' %}
+
         
         <form method="POST" class="form">
             {% csrf_token %}
@@ -29,7 +32,7 @@
                     {{ field }}
                     {% if field.errors %}
                         {% for error in field.errors %}
-                            <p>{{ error }}</p>
+                            <p class="messages-error">{{ error }}</p>
                         {% endfor %}
                     {% endif %}
                 </div>
