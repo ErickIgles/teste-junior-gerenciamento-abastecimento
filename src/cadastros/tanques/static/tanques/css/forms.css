@@ -5,7 +5,6 @@
     margin-bottom: 40px;
     background: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
 }
 
 .form-titulo{
@@ -130,4 +129,11 @@
 
 .cancelar:hover{
     background-color: #7f8c8d;
+}
+
+.messages-error{
+    padding: 10px;
+    color: #e74c3c;
+    border-radius: 5px;
+    font-weight: bold;
 }
