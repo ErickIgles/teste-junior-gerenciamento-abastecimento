@@ -235,21 +235,27 @@ class TanqueUpdateForm(forms.ModelForm):
             'capacidade_maxima'
         )
 
+        if capacidade_maxima is None:
+
+            raise forms.ValidationError(
+                """
+                Informe um valor.
+                """
+            )
+
         if capacidade_maxima < 0:
+
             raise forms.ValidationError(
                 """A capacidade máxima não pode ser
                 negativo."""
             )
+
         return capacidade_maxima
 
     def clean_quantidade_disponivel(self):
 
         quantidade_disponivel = self.cleaned_data.get(
             'quantidade_disponivel'
-        )
-
-        capacidade_maxima = self.cleaned_data.get(
-            'capacidade_maxima'
         )
 
         if quantidade_disponivel < 0:
@@ -259,13 +265,28 @@ class TanqueUpdateForm(forms.ModelForm):
                 pode ser negativo."""
             )
 
-        if quantidade_disponivel > capacidade_maxima:
-
-            raise forms.ValidationError(
-                """A quantidade de combustível não pode ser
-                maior que a capacidade máxima do tanque."""
-            )
         return quantidade_disponivel
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        quantidade = self.cleaned_data.get(
+            'quantidade_disponivel'
+        )
+        capacidade = self.cleaned_data.get(
+            'capacidade_maxima'
+        )
+
+        if quantidade is not None and capacidade is not None:
+
+            if quantidade > capacidade:
+
+                self.add_error(
+                    "quantidade_disponivel",
+                    "A quantidade não pode exceder a capacidade máxima."
+                )
+
+        return cleaned_data
 
     def save(self, commit=True):
 
