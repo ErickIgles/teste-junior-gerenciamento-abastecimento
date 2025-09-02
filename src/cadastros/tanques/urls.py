@@ -4,8 +4,11 @@ from .views import (
     TanqueCadastroView,
     TanqueListarView,
     TanqueAtualizarView,
-    # TanqueDeletarView,
-    # TanqueInativarView,
+
+    CombustivelCadastroView,
+    CombustivelListarView,
+    CombustivelAtualizarView,
+    CombustivelDeletarView
 )
 
 app_name = 'tanques'
@@ -25,7 +28,27 @@ urlpatterns = [
         'atualizar/<int:pk>/',
         TanqueAtualizarView.as_view(),
         name='atualizar'
+    ),
+
+    path(
+        'combustiveis/cadastrar/',
+        CombustivelCadastroView.as_view(),
+        name='cadastrar_combustivel',
+    ),
+    path(
+        'combustiveis/listar/',
+        CombustivelListarView.as_view(),
+        name='listar_combustivel'
+    ),
+    path(
+        'combustivel/atualizar/<int:pk>/',
+        CombustivelAtualizarView.as_view(),
+        name='atualizar_combustivel',
+    ),
+    path(
+        'combustivel/deletar/<int:pk>/',
+        CombustivelDeletarView.as_view(),
+        name='deletar_combustivel'
     )
-    # path('deletar/<int:pk>/', TanqueDeletarView.as_view(), name='deletar'),
-    # path('inativar/<int:pk>/', TanqueInativarView.as_view(), name='inativar')
+
 ]
