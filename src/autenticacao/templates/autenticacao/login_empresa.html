@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="{% static 'gerenciamento_abastecimento/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'autenticacao/css/forms.css'%}">
+
+
+    <title>Login</title>
+</head>
+<body>
+    <div class="form-espaco-login">
+        <form method="POST" action="{% url 'autenticacao:login_empresa' %}" class="form">
+            <h2 
+                class="form-titulo"
+            >
+            Login - Empresa
+        </h2>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ form.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+    
+            <div class="form-actions">
+                <button class="btn login" type="submit">Entrar</button>
+            </div>
+
+            <div class="campo-adicional">
+                <p>Não tem conta para sua empresa?</p>
+                <a 
+                    href="{% url 'cadastros:empresas:cadastrar' %}"
+                >
+                    Cadastre-se
+                </a>
+            </div>
+        </form>
+        {% include 'home_template/partials/footer.html' %}
+    </div>
+
+</body>
+</html>
