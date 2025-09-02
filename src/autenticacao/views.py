@@ -1,16 +1,28 @@
-from django.shortcuts import render
-
-from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView, LogoutView
-from .forms import UserLoginForm
+from django.contrib.auth import login
+from django.views.generic import FormView
+from django.urls import reverse_lazy
 
 
-class UsuarioLoginView(LoginView):
+from .forms import FuncionarioLoginForm, EmpresaLoginForm
+
+
+class FuncionarioLoginView(LoginView):
     template_name = 'registration/login.html'
     redirect_authenticated_user = True
-    form_class = UserLoginForm
+    form_class = FuncionarioLoginForm
 
-    
+
 class UsuarioLogoutView(LogoutView):
     next_page = 'home:index'
 
+
+class EmpresaLoginForm(FormView):
+    template_name = 'autenticacao/login_empresa.html'
+    form_class = EmpresaLoginForm
+    success_url = reverse_lazy('home:index')
+
+    def form_valid(self, form):
+        login(self.request, form.user)
+        self.request.session['empresa_id'] = form.empresa.id
+        return super().form_valid(form)
