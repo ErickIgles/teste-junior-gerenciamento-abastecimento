@@ -20,13 +20,13 @@ class Combustivel(Base):
         verbose_name='Imposto',
         max_digits=10,
         decimal_places=2,
-        default=0.0
+        default=0
     )
     valor_total = models.DecimalField(
         verbose_name='Valor Total',
         max_digits=10,
         decimal_places=2,
-        default=0.0
+        default=0
     )
     empresa = models.ForeignKey(
         Empresa,
@@ -67,7 +67,7 @@ class Tanque(Base):
         verbose_name='Quantidade disponivel',
         max_digits=10,
         decimal_places=2,
-        default=0.00
+        default=0
     )
     empresa = models.ForeignKey(
         Empresa,
