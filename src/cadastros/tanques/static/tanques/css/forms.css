@@ -19,6 +19,16 @@
     gap: 10px;
 }
 
+
+.form-deletar{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+
+}
+
 .form-group{
     width: 100%;
     display: flex;
@@ -94,6 +104,14 @@
     gap: 20px;
 }
 
+.form-action-deletar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0px 10px;
+    gap: 20px;}
+
 .btn{
     padding: 10px 10px;
     border-radius: 5px;
@@ -130,6 +148,16 @@
 .cancelar:hover{
     background-color: #7f8c8d;
 }
+
+.deletar{
+    background-color: #e74c3c;
+}
+
+.deletar:hover{
+    background-color: #c0392b;
+}
+
+
 
 .messages-error{
     padding: 10px;
