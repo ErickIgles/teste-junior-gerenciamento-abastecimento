@@ -32,13 +32,25 @@
                 </button>
             </form>
 
-            <a 
-                class="novo-registro" 
-                href="{% url 'cadastros:tanques:cadastrar' %}?next={{ request.get_full_path }}"
+            <div class="acoes-buttons">
+                <a 
+                    class="novo-registro"
+                    href="{% url 'cadastros:tanques:cadastrar_combustivel' %}?next={{ request.get_full_path }}"
+                >
+                    Combustível
+                </a>
+
+                <a 
+                    class="novo-registro" 
+                    href="{% url 'cadastros:tanques:cadastrar' %}?next={{ request.get_full_path }}"
             
-            >
-                Novo registro
-            </a>
+                >
+                    Tanque
+                </a>
+
+            </div>
+
+
         </nav>
 
 
