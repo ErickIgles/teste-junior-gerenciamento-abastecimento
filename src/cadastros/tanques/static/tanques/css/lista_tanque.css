@@ -129,6 +129,7 @@
 
 .acoes-buttons{
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 10px
@@ -163,6 +164,15 @@
 .desativar:hover{
     background-color: #636e72;
 }
+
+.deletar{
+    background-color: #e74c3c;
+}
+
+.deletar:hover{
+    background-color: #c0392b;
+}
+
 
 
 .paginacao {
