@@ -299,3 +299,120 @@ class TanqueUpdateForm(forms.ModelForm):
             tanque.save()
 
         return tanque
+
+
+class CombustivelForm(forms.ModelForm):
+
+    nome_combustivel = forms.CharField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-select'
+            }
+        ),
+        label='Tipo de combustível'
+    )
+
+    valor_base = forms.DecimalField(
+        localize=True,
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-input'
+            }
+        ),
+        label='Valor base: R$'
+    )
+
+    imposto = forms.DecimalField(
+        localize=True,
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-input'
+            }
+        ),
+        label='Valor do imposto: %'
+    )
+
+    class Meta:
+        model = Combustivel
+        fields = [
+            'nome_combustivel',
+            'valor_base',
+            'imposto'
+        ]
+
+    def __init__(self, *args, **kwargs):
+
+        self.empresa = kwargs.pop('empresa', None)
+        super().__init__(*args, **kwargs)
+
+    def clean_nome_combustivel(self):
+
+        nome_combustivel = self.cleaned_data.get(
+            'nome_combustivel'
+        )
+
+        if len(nome_combustivel) < 3:
+
+            raise forms.ValidationError(
+                """
+                O nome do combustivel
+                tem que ter mais do que 3 caracteres.
+                """
+            )
+
+        return nome_combustivel
+
+    def clean_valor_base(self):
+
+        valor_base = self.cleaned_data.get(
+            'valor_base'
+        )
+
+        if valor_base < 0:
+
+            raise forms.ValidationError(
+                """
+                O valor base não pode ser negativo.
+                """
+            )
+        return valor_base
+
+    def clean_imposto(self):
+
+        imposto = self.cleaned_data.get(
+            'imposto'
+        )
+
+        if imposto < 0:
+            raise forms.ValidationError(
+                """ O valor do imposto não pode ser negativo."""
+            )
+
+        return imposto
+
+    def save(self, commit=True):
+
+        valor_base = self.cleaned_data.get(
+            'valor_base'
+        )
+
+        nome_combustivel = self.cleaned_data.get(
+            'nome_combustivel'
+        )
+
+        imposto = self.cleaned_data.get(
+            'imposto'
+        )
+
+        combustivel = self.instance
+        combustivel.nome_combustivel = nome_combustivel
+        combustivel.valor_base = valor_base
+        combustivel.imposto = imposto
+        combustivel.empresa = self.empresa
+
+        if commit:
+            combustivel.save()
+        return combustivel
