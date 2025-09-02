@@ -1,0 +1,72 @@
+{% extends 'home_template/pages/base.html' %}
+{% load static %}
+
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'tanques/css/forms.css' %}">
+{% endblock %}
+    
+
+{% block main %}
+    <div 
+        class="form-espaco-tanque"
+    >
+
+        <h2 
+            class="form-titulo"
+        >
+            Atualização de Combustivel
+        </h2>
+            
+        {% include 'home_template/partials/messages.html' %}
+
+    
+        <form method="POST" class="form" action="{% url 'cadastros:tanques:atualizar_combustivel' combustivel.pk %}">
+            {% csrf_token %}
+    
+            {% for field in form %}
+                <div 
+                    class="form-group">
+                    <label 
+                        for="{{ field.id_for_label }}" 
+                    >
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+    
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <p class="messages-error">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <hr>
+            
+            <input 
+                type="hidden"
+                name='next'
+                value="{{ request.GET.next }}"
+            >
+            
+            <div 
+                class="form-actions">
+                <button 
+                    class="btn atualizar" 
+                    type="submit"
+                >
+                    Atualizar
+                </button>
+                <a 
+                    href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" 
+                    class="btn cancelar"
+                >
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
