@@ -1,0 +1,72 @@
+{% extends 'home_template/pages/base.html' %}
+{% load static %}
+
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'tanques/css/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'tanques/css/lista_tanque.css' %}">
+{% endblock %}
+
+
+{% block main %}
+<div class="form-espaco-tanque">
+
+    <h2 class="form-titulo">
+        Deletar Combustivel
+    </h2>
+
+    {% include 'home_template/partials/messages.html' %}
+
+
+    <form method="POST" class="form-deletar"
+        action="{% url 'cadastros:tanques:deletar_combustivel' combustivel.pk %}">
+        {% csrf_token %}
+
+        <p>Deseja deletar este registro de combustível?</p>
+
+        {% if combustivel %}
+
+            <table class="tabela-tanque">
+                <tbody class="tabela-body">
+                    <tr>
+                        <th> Combustível</th>
+                        <td>
+                            {{ combustivel.nome_combustivel }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Valor base R$</th>
+                        <td>
+                            {{ combustivel.valor_base }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Imposto %</th>
+                        <td>
+                            {{ combustivel.imposto }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Valor total R$</th>
+                        <td>
+                            {{ combustivel.valor_total }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+
+        <input type="hidden" name='next' value="{{ request.GET.next }}">
+
+        <div class="form-action-deletar">
+            <button class="btn deletar" type="submit">
+                Deletar
+            </button>
+            <a href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" class="btn cancelar">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
