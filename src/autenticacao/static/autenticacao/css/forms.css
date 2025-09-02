@@ -1,0 +1,121 @@
+body{
+    background-color: #f4f4f4;;
+}
+
+.form-espaco-login{
+    margin-top: 40px;
+    height: 100vh;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 8px;
+    flex: 1;
+}
+
+.form-titulo{
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    gap: 10px;
+    width: 50%;
+    background-color: #ffffff;
+    border-radius: 0px 0px 4px 4px;
+}
+
+.form-group{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.form-group label{
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.form-input{
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid #cccccc;
+}
+
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    outline: none;
+}
+
+
+.form-actions{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+    padding: 0px 10px;
+    gap: 20px;
+}
+
+.campo-adicional{
+    display: flex;
+    gap: 20px;
+}
+
+.campo-adicional a{
+    text-decoration: none;
+    color: #2980b9;
+}
+
+.campo-adicional a:hover{
+    text-decoration: underline;
+    color: #2980b9;
+}
+
+.btn{
+    padding: 10px 10px;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bolder;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-align: center;
+}
+
+.login{
+    background-color: #3498db;
+}
+
+.login:hover{
+    background-color: #2980b9;
+}
+
+.footer{
+    width: 50%;
+    border-radius: 0px 0px 4px 4px;
+}
+
+
+@media(max-width: 1024px){
+    .form{
+        width: 100%;
+    }
+
+    .footer{
+        width: 100%;
+    }
+}
