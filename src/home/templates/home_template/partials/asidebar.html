@@ -1,4 +1,4 @@
-
+{% load static %}
     <aside class="asidebar">
         <nav class="navegacao">
             <h3 class="titulo-menu">Menu</h3>
@@ -9,6 +9,23 @@
                         Início
                     </a>
                 </li>
+
+                <li class="campo-logout">
+                    <a 
+                        href="{% url 'autenticacao:logout' %}"
+                    >
+                        <img 
+                            class="image-logout"
+                            src="{% static 'gerenciamento_abastecimento/icons/logout.png' %}" 
+                            alt="Logout"
+                        >
+                        <p>
+                            Sair
+                        </p>
+                            
+                    </a>
+                </li>
+                
 
                 <li>
                     <a
