@@ -1,21 +1,47 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="{% static 'gerenciamento_abastecimento/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'autenticacao/css/forms.css'%}">
 
 
-{% block main %}
-
-    <form method="POST" action="{% url 'autenticacao:login' %}" class="form">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="form__group">
-                <label for="{{ form.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
+    <title>Login</title>
+</head>
+<body>
+    <div class="form-espaco-login">
+        <form method="POST" action="{% url 'autenticacao:login' %}" class="form">
+            <h2 
+                class="form-titulo"
+            >
+            Login - Funcionário
+        </h2>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ form.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+    
+            <div class="form-actions">
+                <button class="btn login" type="submit">Entrar</button>
             </div>
-        {% endfor %}
 
-        <div class="form__actions">
-            <button class="form__button form__button__enviar" type="submit">Entrar</button>
-            <a href="{% url 'home:index' %}" class="form__button form__button__voltar">Voltar</a>
-        </div>
-    </form>
+            <div class="campo-adicional">
+                <p>É empresa?</p>
+                <a 
+                    href="{% url 'autenticacao:login_empresa' %}"
+                >
+                    Por aqui!
+                </a>
+            </div>
+        </form>
+        {% include 'home_template/partials/footer.html' %}
+    </div>
 
-{% endblock %}
+</body>
+</html>
