@@ -9,7 +9,7 @@ app_name = 'autenticacao'
 
 urlpatterns = [
     path(
-        'login/',
+        'login/funcionário/',
         FuncionarioLoginView.as_view(),
         name='login'
     ),
