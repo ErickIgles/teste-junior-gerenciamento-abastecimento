@@ -39,6 +39,25 @@ body{
   width: 0;
 }
 
+
+.campo-logout{
+  display: flex;
+  align-items: center;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.campo-logout a{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.image-logout {
+  width: 32px;
+  height: 32px;
+}
+
 .navegacao{
   height: 100%;
   display: flex;
