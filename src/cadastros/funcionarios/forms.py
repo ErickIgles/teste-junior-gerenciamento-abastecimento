@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.models import User, Group
 
 from .models import Funcionario
-from cadastros.empresas.models import Cargo
+from cadastros.empresas.models import Cargo, Setor
 
 
 class FuncionarioForm(forms.ModelForm):
@@ -11,7 +11,7 @@ class FuncionarioForm(forms.ModelForm):
     email = forms.EmailField(
         widget=forms.EmailInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'E-mail'
             }
         ),
@@ -20,7 +20,7 @@ class FuncionarioForm(forms.ModelForm):
     password1 = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'Senha'
             }
         ),
@@ -29,7 +29,7 @@ class FuncionarioForm(forms.ModelForm):
     password2 = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'Confirmação de senha'
             }
         ),
@@ -39,21 +39,31 @@ class FuncionarioForm(forms.ModelForm):
         queryset=Group.objects.all(),
         widget=forms.Select(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'Grupo do funcionário'
             }
         ),
         label='Grupo do funcionário'
     )
     cargo = forms.ModelChoiceField(
-        queryset=Cargo.objects.all(),
+        queryset=Cargo.objects.none(),
         widget=forms.Select(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'Cargo'
             }
         ),
         label='Cargo do funcionário'
+    )
+    setor = forms.ModelChoiceField(
+        queryset=Setor.objects.none(),
+        widget=forms.Select(
+            attrs={
+                'class': 'form-input',
+                'placeholder': 'Setor'
+            }
+        ),
+        label='Setor do funcionário'
     )
 
     class Meta:
@@ -63,7 +73,7 @@ class FuncionarioForm(forms.ModelForm):
         widgets = {
             'nome_funcionario': forms.TextInput(
                 attrs={
-                    'class': 'form__input',
+                    'class': 'form-input',
                     'placeholder': 'Nome do Funcionário'
                 }
             ),
@@ -74,6 +84,9 @@ class FuncionarioForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.empresa:
             self.fields['cargo'].queryset = Cargo.objects.filter(
+                empresa=self.empresa
+            )
+            self.fields['setor'].queryset = Setor.objects.filter(
                 empresa=self.empresa
             )
 
@@ -90,20 +103,31 @@ class FuncionarioForm(forms.ModelForm):
 
     def clean_nome_funcionario(self):
         nome_funcionario = self.cleaned_data.get('nome_funcionario')
-        if User.objects.filter(username=nome_funcionario).exists():
+
+        nome_usuario_existe = User.objects.filter(
+            username=nome_funcionario
+        )
+
+        if nome_usuario_existe.exists():
+
             raise forms.ValidationError(
                 'Este nome de usuário não pode ser utilizado.'
             )
+
         return nome_funcionario
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if User.objects.filter(
+
+        email_existe = User.objects.filter(
             email=email
-        ).exists():
+        )
+        if email_existe.exists():
+
             raise forms.ValidationError(
                 'Este e-mail de usuário não pode ser utilizado.'
             )
+
         return email
 
     def save(self, commit=True):
@@ -135,7 +159,7 @@ class FuncionarioUpdateForm(forms.ModelForm):
     email = forms.EmailField(
         widget=forms.EmailInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'E-mail'
             }
         ),
@@ -145,12 +169,33 @@ class FuncionarioUpdateForm(forms.ModelForm):
         queryset=Group.objects.all(),
         widget=forms.Select(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'Grupo do funcionário'
             }
         ),
         label='Grupo do funcionário'
     )
+    cargo = forms.ModelChoiceField(
+        queryset=Cargo.objects.none(),
+        widget=forms.Select(
+            attrs={
+                'class': 'form-input',
+                'placeholder': 'Cargo'
+            }
+        ),
+        label='Cargo do funcionário'
+    )
+    setor = forms.ModelChoiceField(
+        queryset=Setor.objects.none(),
+        widget=forms.Select(
+            attrs={
+                'class': 'form-input',
+                'placeholder': 'Setor'
+            }
+        ),
+        label='Setor do funcionário'
+    )
+
     status = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(
@@ -166,65 +211,98 @@ class FuncionarioUpdateForm(forms.ModelForm):
         fields = [
             'nome_funcionario',
             'cargo',
+            'setor',
             'email'
         ]
 
         widgets = {
             'nome_funcionario': forms.TextInput(
                 attrs={
-                    'class': 'form__input',
+                    'class': 'form-input',
                     'placeholder': 'Nome do Funcionário'
                 }
             ),
-            'cargo': forms.Select(
-                attrs={
-                    'class': 'form__input'
-                }
-            ),
         }
+
+    def __init__(self, *args, **kwargs):
+        self.empresa = kwargs.pop('empresa', None)
+        super().__init__(*args, **kwargs)
+        if self.empresa:
+            self.fields['cargo'].queryset = Cargo.objects.filter(
+                empresa=self.empresa
+            )
+            self.fields['setor'].queryset = Setor.objects.filter(
+                empresa=self.empresa
+            )
 
     def clean_nome_funcionario(self):
         nome_funcionario = self.cleaned_data.get('nome_funcionario')
         user_id = self.instance.user.pk
 
-        if User.objects.filter(
+        nome_user = User.objects.filter(
             username=nome_funcionario
-        ).exclude(pk=user_id).exists():
+        ).exclude(
+            pk=user_id
+        )
+
+        if nome_user.exists():
             raise forms.ValidationError(
                 'Este nome de usuário não pode ser utilizado.'
             )
         return nome_funcionario
 
     def clean_email(self):
+
         email = self.cleaned_data.get('email')
+
         user_id = self.instance.user.pk
-        if User.objects.filter(email=email).exclude(pk=user_id).exists():
+
+        email_existente = User.objects.filter(
+            email=email
+        ).exclude(
+            pk=user_id
+        )
+
+        if email_existente.exists():
+
             raise forms.ValidationError('Este e-mail não pode ser utilizado.')
+
         return email
 
     def save(self, commit=True):
 
         usuario = self.instance.user
+
         usuario.username = self.cleaned_data.get('nome_funcionario')
+
         usuario.email = self.cleaned_data.get('email')
 
         status = self.cleaned_data.get('status')
 
         funcionario = self.instance
+
         funcionario.nome_funcionario = self.cleaned_data.get(
             'nome_funcionario'
         )
+
         funcionario.cargo = self.cleaned_data.get('cargo')
+
         funcionario.user = usuario
+
         funcionario.ativo = status
 
         if commit:
+
             usuario.save()
+
             funcionario.save()
 
             grupo = self.cleaned_data.get('grupo')
 
             if grupo:
+
                 usuario.groups.clear()
+
                 usuario.groups.add(grupo)
+
         return funcionario
