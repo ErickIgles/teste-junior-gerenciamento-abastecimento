@@ -1,0 +1,189 @@
+body{
+    background-color: #f4f4f4;;
+}
+
+.form-espaco{
+    margin-top: 30px;
+    height: 100vh;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    flex: 1;
+    background: #ffffff;
+
+}
+
+.form-titulo{
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 0px 0px 4px 4px;
+}
+
+.form-group{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.form-group label{
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.form-input{
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid #cccccc;
+}
+
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    outline: none;
+}
+
+
+.form-actions{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+    padding: 0px 10px;
+    gap: 20px;
+}
+
+.campo-adicional{
+    display: flex;
+    gap: 20px;
+}
+
+.campo-adicional a{
+    text-decoration: none;
+    color: #2980b9;
+}
+
+.campo-adicional a:hover{
+    text-decoration: underline;
+    color: #2980b9;
+}
+
+.btn{
+    padding: 10px 10px;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bolder;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-align: center;
+}
+
+.cadastrar{
+    background-color: #3498db;
+}
+.cadastrar:hover{
+    background-color: #2980b9;
+}
+
+.cancelar{
+    background-color: #95a5a6;
+    text-decoration: none;
+}
+
+.atualizar{
+    background-color: #3498db;
+}
+
+.atualizar:hover{
+    background-color: #2980b9;
+}
+
+.cancelar:hover{
+    background-color: #7f8c8d;
+}
+
+.deletar{
+    background-color: #e74c3c;
+}
+
+.deletar:hover{
+    background-color: #c0392b;
+}
+
+.login{
+    text-decoration: none;
+    color: #000000;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.login:hover{
+    border: 1px solid #000000;
+}
+
+.campo-botao-perfil-desativar{
+    padding: 0px 10px;
+    width: 100%;
+}
+
+.perfil-botao-deletar{
+    text-decoration: none;
+    color: #e74c3c;
+    cursor: pointer;
+}
+
+.perfil-botao-deletar:hover{
+    text-decoration: underline;
+}
+
+.messages-error{
+    padding: 10px;
+    color: #e74c3c;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.footer{
+    width: 100%;
+    border-radius: 0px 0px 4px 4px;
+}
+
+.form-action-deletar{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+@media(max-width: 1024px){
+    .form{
+        width: 100%;
+    }
+
+    .footer{
+        width: 100%;
+    }
+    .form-actions{
+        display: flex;
+        flex-direction: column;
+    }
+}
