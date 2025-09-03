@@ -1,46 +1,94 @@
-{% extends 'base.html' %}
+{% extends 'home_template/pages/base.html' %}
 {% load static %}
 
+
+{% block title %}
+    Cadastro
+{% endblock %}
+    
+
+    
+{% block head %}
+    <link rel="stylesheet" href="{% static 'bombas/css/forms.css' %}">
+
+{% endblock  %}
+
+
 {% block main %}
+
+    <div class="form-espaco">
+
+        <h2 
+            class="form-titulo"
+        >
+            Cadastro de Bomba
+        </h2>
+
+        {% include 'home_template/partials/messages.html' %}
+
     
-    <h2 
-        class="form__titulo"
-    >
-        Cadastro de Bomba
-    </h2>
+        <form method="POST" class="form" action="{% url 'cadastros:bombas:cadastrar' %}">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    {% if field.name == 'tanque' %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        <select 
+                            name="{{ field.html_name }}" 
+                            id="{{ field.id_for_label }}" 
+                            class="form-select"
+                        >
+                            <option value="">---------</option>
+                            {% for tanque in form.fields.tanque.queryset %}
+                                <option 
+                                    value="{{ tanque.pk }}"
+                                    data-combustivel="{{ tanque.tipo_combustivel.nome_combustivel }}"
+                                    data-situacao="{{ tanque.ativo }}"
+                                    {% if field.value == tanque.pk %} selected {% endif %}
+                                >
+                                    {{ tanque }}
+                                </option>
+                            {% endfor %}
+                        </select>
 
-    <form method="POST" class="form">
-        {% csrf_token %}
-        
-        {% for field in form %}
-            <div class="form__group">
-                <label for="{{field.id_for_label}}">
-                    {{ field.label }}
-                </label>
-                {{ field }}
+                        <div id="id_info_combustivel"></div>
+                        <div id="campo-messages-error" class="messages-error"></div>
 
-                {% if field.errors %}
-                    {% for error in field.errors %}
-                        <p>{{ error }}</p>
-                    {% endfor %}
+                    {% else %}
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <p class="messages-error">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
                 {% endif %}
-            </div>
-        {% endfor %}
+                </div>
+            {% endfor %}
 
-        <div class="form__actions">
-            <button 
-                class="form__button form__button__enviar" 
-                type="submit"
+            <input 
+                type="hidden"
+                name='next'
+                value="{{ request.GET.next }}"
             >
-                Cadastrar
-            </button>
-            <a 
-                href="{% url 'cadastros:bombas:listar' %}" 
-                class="form__button form__button__voltar"
-            >
-                Voltar
-            </a>
-        </div>
-    </form>
+
+            <div class="form-actions">
+                <button 
+                    class="btn cadastrar" 
+                    type="submit"
+                >
+                    Cadastrar
+                </button>
+                <a 
+                    href="{% url 'cadastros:bombas:listar' %}" 
+                    class="btn cancelar"
+                >
+                    cancelar
+                </a>
+            </div>
+        </form>
+    </div>
     
+    <script src="{% static 'bombas/js/situacao_tanque.js' %}"></script>
 {% endblock %}
