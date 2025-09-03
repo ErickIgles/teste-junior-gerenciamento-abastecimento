@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 from core.models import Base
 from cadastros.empresas.models import (
+    Setor,
     Cargo,
     Empresa
 )
@@ -22,8 +23,15 @@ class Funcionario(Base):
     )
     cargo = models.ForeignKey(
         Cargo,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         verbose_name='Cargo'
+    )
+    setor = models.ForeignKey(
+        Setor,
+        on_delete=models.PROTECT,
+        verbose_name='Setor',
+        null=True,
+        blank=True
     )
     empresa = models.ForeignKey(
         Empresa,
