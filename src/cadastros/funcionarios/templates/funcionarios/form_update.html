@@ -1,40 +1,75 @@
-{% extends 'base.html' %}
+{% extends 'home_template/pages/base.html' %}
+
 {% load static %}
 
+{% block title %} funcionários {% endblock  %}
+
+{% block head %}
+   <link rel="stylesheet" href="{% static 'funcionarios/css/forms.css' %}">
+{% endblock  %}
+
+
 {% block main %}
-    <form method="POST" action="{% url 'cadastros:funcionarios:atualizar' funcionario.pk %}" class="form">
-        {% csrf_token %}
 
-        {% for field in form %}
-            <div class="form__group">
-                <label for="{{ field.id_for_label }}">
-                    {{ field.label }}
-                </label>
+    <div class="form-espaco">
 
-                {{ field }}
+        <h2 class="form-titulo"> Atualizar dados de {{ funcionario.nome_funcionario }}</h2>
 
-                {% if field.errors %}
-                    {% for erro in field.errors %}
-                        <p>{{ erro }}</p>
-                    {% endfor %}
-                {% endif %}
+        {% include 'home_template/partials/messages.html' %}
+
+
+        <form method="POST" action="{% url 'cadastros:funcionarios:atualizar' funcionario.pk %}" class="form">
+            {% csrf_token %}
+            
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <p class="messages-error">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+             <p 
+                class="aviso-checkbox"
+            >
+                Para desativar o(a) funcionário(a) descelecione a caixa de status e click em salvar.<br>
+                Para ativar selecione a caixa de status e click em salvar.
+            </p>
+
+            <hr>
+
+            
+            <input 
+                type="hidden"
+                name='next'
+                value="{{ request.GET.next }}"
+            >
+            
+            <div 
+                class="form-actions">
+                <button 
+                    class="btn atualizar" 
+                    type="submit"
+                >
+                    Atualizar
+                </button>
+                <a 
+                    href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" 
+                    class="btn cancelar"
+                >
+                    Cancelar
+                </a>
             </div>
-        {% endfor %}
+        </form>
+    </div>
 
-        <div class="form__actions">
-            <button 
-            class="form__button form__button__enviar" 
-            type="submit"
-            >
-                Atualizar
-            </button>
 
-            <a 
-            href="{% url 'cadastros:funcionarios:listar' %}" 
-            class="form__button form__button__voltar"
-            >
-                Voltar
-            </a>
-        </div>
-    </form>
 {% endblock %}
