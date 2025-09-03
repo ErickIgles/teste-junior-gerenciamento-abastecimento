@@ -1,15 +1,12 @@
+from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
     ListView,
     UpdateView,
-    View
 )
-
-from django.views.generic.detail import SingleObjectMixin
 
 from cadastros.empresas.models import Empresa
 from cadastros.funcionarios.models import Funcionario
@@ -51,6 +48,30 @@ class BombaCadastroView(
             )
         return kwargs
 
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            'Bomba cadastrada com sucesso.'
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            'Erro ao realizar o cadastro. Confira às informações.'
+        )
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:bombas:listar')
+
 
 class BombaListarView(
     LoginRequiredMixin,
@@ -61,7 +82,7 @@ class BombaListarView(
     model = Bomba
     context_object_name = 'bombas'
     template_name = 'bombas/lista.html'
-    paginate_by = 9
+    paginate_by = 6
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -133,33 +154,29 @@ class BombaAtualizarView(
             kwargs['empresa'] = Empresa.objects.get(
                 usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
             )
+
         return kwargs
 
-
-class BombaInativarView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    EmpresaBombaPermissionMixin,
-    SingleObjectMixin,
-    View
-):
-    group_required = ['gerente_geral', 'administradores']
-    model = Bomba
-    context_object_name = 'bomba'
-
-    def get(self, request, *args, **kwargs):
-        bomba = self.get_object()
-        return render(
-            request,
-            'bombas/form_inativar.html',
-            {'bomba': bomba}
-        )
-
-    def post(self, request, *args, **kwargs):
-        bomba = self.get_object()
-        bomba.ativo = False
-        bomba.save()
+    def form_valid(self, form):
         messages.success(
-            request,
-            f'Bomba {bomba.nome_bomba} desativada com sucesso.')
-        return redirect('cadastros:bombas:listar')
+            self.request,
+            f'Dados da bomba {form.instance.nome_bomba} atualizado.'
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            'Erro ao atualizar dados. Confira às informações.'
+        )
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:bombas:listar')
