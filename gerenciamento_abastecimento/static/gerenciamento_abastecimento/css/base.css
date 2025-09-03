@@ -39,20 +39,6 @@ body{
   width: 0;
 }
 
-
-.campo-logout{
-  display: flex;
-  align-items: center;
-  border: 2px solid #ffffff;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.campo-logout a{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 .image-logout {
   width: 32px;
   height: 32px;
@@ -140,7 +126,7 @@ body{
   background-color: #2c3e50;
   padding: 20px 40px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -157,6 +143,11 @@ body{
 .header a{
   text-decoration: none;
   color: #ffffff;
+}
+
+.header-campos-acoes{
+  margin-top: 20px;
+  gap: 20px;
 }
 
 
