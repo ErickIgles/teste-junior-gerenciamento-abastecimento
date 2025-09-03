@@ -26,11 +26,14 @@
                     </a>
                 </li>
                 
-                <a 
-                    href="{% url 'cadastros:empresas:perfil' %}"
-                >
-                    Perfil
-                </a>
+                {% if request.user.is_empresa %}
+                    <a 
+                        href="{% url 'cadastros:empresas:perfil' %}"
+                    >
+                        Perfil
+                    </a>
+
+                {% endif %}
 
                 <li>
                     <a
