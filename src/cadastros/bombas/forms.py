@@ -9,7 +9,7 @@ class BombaForm(forms.ModelForm):
     nome_bomba = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                'class': 'form__input'
+                'class': 'form-input'
             }
         ),
         label='Nome da bomba'
@@ -20,7 +20,7 @@ class BombaForm(forms.ModelForm):
         required=False,
         widget=forms.Select(
             attrs={
-                'class': 'form__input'
+                'class': 'form-input'
             }
         ),
         label='Tanque'
@@ -84,7 +84,7 @@ class BombaUpdateForm(forms.ModelForm):
     nome_bomba = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                'class': 'form__input'
+                'class': 'form-input'
             }
         ),
         label='Nome da bomba'
@@ -95,7 +95,7 @@ class BombaUpdateForm(forms.ModelForm):
         queryset=Tanque.objects.none(),
         widget=forms.Select(
             attrs={
-                'class': 'form__input'
+                'class': 'form-select'
             }
         ),
         label='Tanque'
@@ -110,28 +110,37 @@ class BombaUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.empresa:
-            self.fields['tanque'].queryset = Tanque.objects.filter(
-                empresa=self.empresa
+            self.fields['tanque'].queryset = (
+                Tanque.objects
+                .filter(empresa=self.empresa)
+                .select_related('tipo_combustivel')
             )
 
     def clean_nome_bomba(self):
+
         nome_bomba = self.cleaned_data.get('nome_bomba')
+
         if not self.empresa:
+
             raise forms.ValidationError('Empresa não informada para validação')
-        if Bomba.objects.filter(
+
+        nome_bomba_existe = Bomba.objects.filter(
             nome_bomba=nome_bomba,
-            empresa=self.empresa).exclude(
-                id=self.instance.pk
-                ).exists():
+            empresa=self.empresa
+        ).exclude(id=self.instance.pk)
+
+        if nome_bomba_existe.exists():
+
             raise forms.ValidationError(
                 'Há uma bomba cadastrada com esse nome para esta empresa.'
             )
+
         return nome_bomba
 
     def clean_tanque(self):
         tanque = self.cleaned_data.get('tanque')
         if tanque and not tanque.ativo:
-            raise forms.ValidationError('Esta bomba está desativada.')
+            raise forms.ValidationError('Esta tanque está desativada.')
         return tanque
 
     def save(self, commit=True):
