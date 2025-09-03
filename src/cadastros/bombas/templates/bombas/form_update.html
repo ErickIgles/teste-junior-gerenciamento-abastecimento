@@ -1,98 +1,93 @@
-{% extends 'base.html' %}
+{% extends 'home_template/pages/base.html' %}
 {% load static %}
+
+{% block title %}Atualizar{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'bombas/css/forms.css' %}">
+{% endblock %}
 
 {% block main %}
 
-    <h2 class="form__titulo">Atualizar Bomba</h2>
+<div class="form-espaco">
+    <h2 class="form-titulo">Atualizar Bomba</h2>
+
+    {% include 'home_template/partials/messages.html' %}
 
     <form method="POST" class="form" action="{% url 'cadastros:bombas:atualizar' bomba.pk %}">
         {% csrf_token %}
 
         {% for field in form %}
-            <div 
-                class="form__group">
+            <div class="form-group">
+                
                 {% if field.name == 'tanque' %}
-                    <label 
-                        for="{{ field.id_for_label }}"
-                    >
-                        {{ field.label }}
-                    </label>
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <select 
                         name="{{ field.html_name }}" 
                         id="{{ field.id_for_label }}" 
-                        class="form__input"
+                        class="form-select"
                     >
-                        <option 
-                            value=""
-                        >
-                            ---------
-                        </option>
+                        <option value="">---------</option>
                         {% for tanque in form.fields.tanque.queryset %}
                             <option 
-                                value="{{ tanque.pk }}" 
+                                value="{{ tanque.pk }}"
                                 data-combustivel="{{ tanque.tipo_combustivel.nome_combustivel }}"
-                                {% if field.value == tanque.pk %}
-                                selected
-                                {% endif %}
-                                >
+                                data-situacao="{{ tanque.ativo }}"
+                                {% if field.value == tanque.pk %} selected {% endif %}
+                            >
                                 {{ tanque }}
                             </option>
                         {% endfor %}
                     </select>
-                    <p 
-                        id="id_info_combustivel" 
-                        class="form__info"
-                    >
-                    </p>
 
-                    {% if field.errors %}
-                        {% for error in field.errors %}
-                            <p>{{ error }}</p>
-                        {% endfor%}
-                    {% endif %}
+                    <div id="id_info_combustivel"></div>
+                    <div id="campo-messages-error" class="messages-error"></div>
+
                 {% else %}
                     {{ field.label_tag }}
                     {{ field }}
                     {% if field.errors %}
                         {% for error in field.errors %}
-                            <p>{{ error }}</p>
+                            <p class="messages-error">{{ error }}</p>
                         {% endfor %}
                     {% endif %}
                 {% endif %}
             </div>
         {% endfor %}
 
+        <p 
+            class="aviso-checkbox"
+        >
+            Para desativar o bomba descelecione a caixa de status e click em salvar.<br>
+            Para ativar selecione a caixa de status e click em salvar.
+        </p>
+
+        <hr>
+            
+        <input 
+            type="hidden"
+            name='next'
+            value="{{ request.GET.next }}"
+        >
+            
         <div 
-            class="form__actions">
+            class="form-actions">
             <button 
-                class="form__button form__button__enviar" 
+                class="btn atualizar" 
                 type="submit"
             >
                 Atualizar
             </button>
             <a 
-                href="{% url 'cadastros:bombas:listar' %}" 
-                class="form__button form__button__voltar"    
+                href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" 
+                class="btn cancelar"
             >
-                Voltar
+                Cancelar
             </a>
         </div>
     </form>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-        const selectTanque = document.getElementById('id_tanque');
-        const infoCombustivel = document.getElementById('id_info_combustivel');
+<script src="{% static 'bombas/js/situacao_tanque.js' %}"></script>
 
-        function atualizarInfoCombustivel() {
-        const combustivel = selectTanque.options[selectTanque.selectedIndex].dataset.combustivel;
-        infoCombustivel.textContent = combustivel ? `Tipo de combustível: ${combustivel}` : '';
-        }
-
-        selectTanque.addEventListener('change', atualizarInfoCombustivel);
-
-        // Atualiza ao carregar a página (caso já tenha um tanque selecionado)
-        atualizarInfoCombustivel();
-        });
-    </script>
 {% endblock %}
