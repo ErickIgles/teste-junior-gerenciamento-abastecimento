@@ -1,164 +1,117 @@
-{% extends 'base.html' %}
+{% extends 'home_template/pages/base.html' %}
 
+{% load static %}
+
+{% block title %} Bombas {% endblock %}
+    
+{% block head %}
+    <link rel="stylesheet" href="{% static 'bombas/css/lista_bombas.css' %}">
+
+{% endblock  %}
 
 
 {% block main %}
-    <nav>
-        <form method="get" 
-        style="display: flex; margin: 20px 20px 20px 0px; flex-direction: row; gap: 20px;">
-            <input 
-                style="padding: 8px;" 
-                type="text" 
-                placeholder="pesquisar..." 
-                name="q" 
-                value="{{ request.GET.q }}"
-            >
-            <div>
-                <label 
-                    for="data_inicio"
-                >
-                    De:
-                </label>
-                <input 
-                    style="padding: 8px;" 
-                    type="date" 
-                    name="data_inicio" 
-                    value="{{ request.GET.data_inicio }}"
-                >
-            </div>
-            <div>
-                <label 
-                    for="data_fim"
-                >
-                    Até:
-                </label>
-                <input 
-                    style="padding: 8px;" 
-                    type="date" 
-                    name="data_fim" 
-                    value="{{ request.GET.data_fim }}"
-                >
-            </div>
-            <button 
-                style="padding: 8px;" 
-                type="submit"
-            >
-                🔍 Filtrar
-            </button>
-        </form>
+    <div class="campo-pagina-bomba">
+        <h2 class="titulo-bomba-listagem">Listagem de Bombas</h2>
 
-        <div 
-            style="
-                margin: 20px 0; 
-                background-color: #ffffff; 
-                width: 320px; 
-                height: px; 
-                padding: 10px 0; 
-                text-align: center;"
-            >
-            <span>
+        {% include 'home_template/partials/messages.html' %}
+
+            
+        <nav class="nav-pesquisa">
+            <form method="GET" class="form">
+
+                <div>
+                    <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
+                </div>
+                <div class="espaco-datas">
+                    <input type="date" name="data_inicio" class="form-data">
+                    <input type="date" name="data_fim" class="form-data">
+                </div>
+                <button type="submit" class="button-pesquisa">
+                    🔍
+                </button>
+            </form>
+
+            <div class="acoes-buttons">
+
+                <a 
+                    class="novo-registro" 
+                    href="{% url 'cadastros:bombas:cadastrar' %}?next={{ request.get_full_path }}"
+            
+                >
+                    Novo registro
+                </a>
+
+            </div>
+
+
+        </nav>
+
+
+        {% if page_obj %}
+            <div class="lista-bomba">
+                {% for bomba in page_obj %}
+                    <table class="tabela-bomba">
+                        <tbody class="tabela-body">
+                            <tr>
+                                <th>Identificador</th>
+                                <td>
+                                    {{ bomba.nome_bomba }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Tanque</th>
+                                {% if bomba.tanque %}
+                                    <td>
+                                        {{ bomba.tanque.identificador_tanque }}
+                                    </td>
+                                {% else %}
+                                    <td>
+                                       Não há tanque relacionado
+                                    </td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <th>Situação</th>
+                                <td>
+                                    {% if bomba.ativo %}
+                                        <p class="status status-ativo">Ativo 🟢</p>
+                                    {% else %}
+                                        <p class="status status-desativado">Desativado 🔴</p>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ações</th>
+                                <td class="acoes-buttons">
+                                    <a a href="{% url 'cadastros:bombas:atualizar' bomba.pk %}?next={{ request.get_full_path }}" class="btn atualizar">
+                                        Editar
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+
+            <div class="paginacao">
                 {% if page_obj.has_previous %}
-                    <a 
-                        style="
-                            text-decoration: none; 
-                            color: #000000;
-                            border: 2px solid rgba(34, 133, 255, 0.667); 
-                            padding: 3px;
-                            border-radius: 4px;
-                            cursor: pointer;
-                        
-                    " href="?page=1"
-                    >
-                        &laquo; voltar
-                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">«</a>
                 {% endif %}
 
-                <span class="current">
-                    Page {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
                 </span>
 
                 {% if page_obj.has_next %}
-                    <a 
-                        style="
-                            text-decoration: none; 
-                            color: #000000; 
-                            border: 2px solid rgba(34, 133, 255, 0.667); 
-                            padding: 3px;
-                            border-radius: 4px;
-                            cursor: pointer;
-                        " 
-                    href="?page={{ page_obj.next_page_number }}"
-                    >
-                        próxima
-                    </a>
+                    <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">»</a>
                 {% endif %}
-            </span>
-        </div>
-    </nav>
-    {% if bombas %}
-        {% for bomba in bombas %}
-            <div 
-                style="
-                    display: flex; 
-                    flex-direction: 
-                    column; gap: 10px; 
-                    margin-bottom: 40px;"
-                >
-                <p>
-                    <strong>Nome da bomba: </strong> 
-                    {{ bomba.nome_bomba }}
-                </p>
-
-                {% if bomba.tanque.tipo_combustivel %}
-                    <p>
-                        <strong>Tipo de Tanque: </strong> 
-                        {{ bomba.tanque.tipo_combustivel }}
-                    </p>
-                    <p>
-                        <strong>Identificador do tanque: </strong> 
-                        {{ bomba.tanque.identificador_tanque }}
-                    </p>
-                {% else %}
-                    <p>
-                        <strong>Tanque:</strong> Não vinculado
-                    </p>
-                {% endif %}
-                {% if bomba.ativo %}
-                    <p>
-                        <strong>Status da Bomba: </strong>
-                        Ativo 🟢
-                    </p>
-                {% else %}
-                    <p>
-                        <strong>Status da Bomba: </strong>
-                        Desativado 🔴
-                    </p>
-                {% endif %}
-                <p>
-                    <strong>Data de registro: </strong>
-                    {{ bomba.criado }}
-                </p>
-                <hr>
-                <div class="form__actions">
-                    <a 
-                        href="{% url 'cadastros:bombas:atualizar' bomba.pk %}"
-                    >
-                        <button 
-                            type="button" 
-                            class="form__button form__button__enviar"
-                        >
-                            Atualizar
-                        </button>
-                    </a> 
-                    <a 
-                        href="{% url 'cadastros:bombas:inativar' bomba.pk %}" 
-                        class="form__button form__button__deletar">
-                        Desativar
-                    </a>
-                </div>
             </div>
-        {% endfor %}
-    {% else %}
-        <h2>Ainda não há registros no sistema</h2>
-    {% endif %}
+
+        {% else %}
+            <h2>Não há registros de Bombas</h2>
+        {% endif %}
+
+
+    </div>
 {% endblock %}
