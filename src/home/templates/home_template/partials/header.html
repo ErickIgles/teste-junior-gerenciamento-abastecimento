@@ -1,5 +1,26 @@
+{% load static %}
     <header class="header">
         <div>
             <a href="{% url 'home:index' %}">Sistema de Gestão de Abastecimento</a>
         </div>
+
+        <div class="header-campos-acoes">
+            <a 
+                href="{% url 'autenticacao:logout' %}"
+            >
+                <p>
+                    Sair
+                </p>
+                            
+            </a>
+
+            {% if request.user.is_empresa %}
+                    <a 
+                        href="{% url 'cadastros:empresas:perfil' %}"
+                    >
+                        Perfil
+                    </a>
+
+            {% endif %}
+        </div>  
     </header>
