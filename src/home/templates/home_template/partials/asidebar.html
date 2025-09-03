@@ -5,35 +5,10 @@
             <ul class="navegacao-lista-menu">
                 <li>
                     <a 
-                        href="#">
+                        href="{% url 'home:index' %}">
                         Início
                     </a>
                 </li>
-
-                <li class="campo-logout">
-                    <a 
-                        href="{% url 'autenticacao:logout' %}"
-                    >
-                        <img 
-                            class="image-logout"
-                            src="{% static 'gerenciamento_abastecimento/icons/logout.png' %}" 
-                            alt="Logout"
-                        >
-                        <p>
-                            Sair
-                        </p>
-                            
-                    </a>
-                </li>
-                
-                {% if request.user.is_empresa %}
-                    <a 
-                        href="{% url 'cadastros:empresas:perfil' %}"
-                    >
-                        Perfil
-                    </a>
-
-                {% endif %}
 
                 <li>
                     <a
@@ -73,6 +48,17 @@
                             >
                                 Funcionários
                             </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a
+                        class="button"
+                    > 
+                        Serviços 
+                    </a>
+                    <ul class="submenu">
+                        <li>
                             <a 
                                 href=""
                             >
@@ -81,6 +67,7 @@
                         </li>
                     </ul>
                 </li>
+
                 <li>
                     <a
                         class="button"
