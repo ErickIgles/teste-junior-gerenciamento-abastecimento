@@ -3,7 +3,6 @@ from django.urls import path
 from .views import (
     BombaAtualizarView,
     BombaCadastroView,
-    BombaInativarView,
     BombaListarView
 )
 
@@ -24,10 +23,5 @@ urlpatterns = [
         'atualizar/<int:pk>/',
         BombaAtualizarView.as_view(),
         name='atualizar'
-        ),
-    path(
-        'inativar/<int:pk>/',
-        BombaInativarView.as_view(),
-        name='inativar'
         ),
 ]
