@@ -1,46 +1,47 @@
-{% extends 'base.html' %}
+{% extends 'home_template/pages/base.html' %}
+
+{% load static %}
+
+
+{% block title %} Deletar conta{% endblock %}
+
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'empresas/css/forms.css' %}">
+{% endblock head %}
+    
 
 
 {% block main %}
+    <div class="form-espaco">
 
-
-
-    <form method="POST" action="{% url 'cadastros:empresas:inativar' usuario.pk %}" class="form" style="margin: 40px;">
-        {% csrf_token %}
-
-        <div 
-            class="form__group"
-        >
-            <p 
-                class="form__titulo"
+        <form method="POST" action="{% url 'cadastros:empresas:inativar' usuario.pk %}" class="form">
+            {% csrf_token %}
+    
+            <h2 
+                class="form-titulo"
+    
             >
                 Deseja apagar a sua conta?
-            </p>
-        </div>
-        
-        <div 
-            style="
-                display: flex;
-                flex-direction: row;
-                gap: 10px;
-                padding: 20px;"
+            </h2>
+            
+            <div
+                class="form-action-deletar"
             >
-            <button 
-                class="
-                    form__button
-                    form__button__deletar
-                " 
-                type="submit"
-            >
-                Deletar
-            </button>
-            <a 
-                href="{% url 'home:index' %}"
-                class="form__button form__button__voltar"
-            >
-                Voltar
-            </a>
-        </div>
-    </form>
+                <button 
+                    class=" btn deletar " 
+                    type="submit"
+                >
+                    Deletar
+                </button>
+                <a 
+                    href="{% url 'home:index' %}"
+                    class=" btn cancelar"
+                >
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
 
 {% endblock %}
