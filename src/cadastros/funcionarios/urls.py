@@ -4,7 +4,6 @@ from .views import (
     FuncionarioCadastrarView,
     FuncionarioListarView,
     FuncionarioAtualizarView,
-    FuncionarioInativarView
 )
 
 
@@ -24,10 +23,5 @@ urlpatterns = [
         'atualizar/<int:pk>/',
         FuncionarioAtualizarView.as_view(),
         name='atualizar'
-    ),
-    path(
-        'inativar/<int:pk>/',
-        FuncionarioInativarView.as_view(),
-        name='inativar'
     ),
 ]
