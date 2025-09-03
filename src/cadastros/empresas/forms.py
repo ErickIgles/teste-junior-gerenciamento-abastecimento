@@ -10,7 +10,7 @@ class EmpresaModelForm(forms.ModelForm):
         max_length=255,
         widget=forms.TextInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'Nome da empresa'
             }
         ),
@@ -20,7 +20,7 @@ class EmpresaModelForm(forms.ModelForm):
         max_length=18,
         widget=forms.TextInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'CNPJ'
             }
         ),
@@ -30,7 +30,7 @@ class EmpresaModelForm(forms.ModelForm):
         max_length=15,
         widget=forms.TextInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'telefone'
             }
         ),
@@ -40,7 +40,7 @@ class EmpresaModelForm(forms.ModelForm):
         max_length=255,
         widget=forms.EmailInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'E-mail'
             }
         ),
@@ -50,7 +50,7 @@ class EmpresaModelForm(forms.ModelForm):
     password1 = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'Senha'
             }
         ),
@@ -59,7 +59,7 @@ class EmpresaModelForm(forms.ModelForm):
     password2 = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'Confirmação de senha'
             }
         ),
@@ -139,7 +139,7 @@ class EmpresaUpdateModelForm(forms.ModelForm):
         max_length=255,
         widget=forms.TextInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'Nome da empresa'
             }
         ),
@@ -149,7 +149,7 @@ class EmpresaUpdateModelForm(forms.ModelForm):
         max_length=15,
         widget=forms.TextInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'telefone'
             }
         ),
@@ -159,7 +159,7 @@ class EmpresaUpdateModelForm(forms.ModelForm):
         max_length=255,
         widget=forms.EmailInput(
             attrs={
-                'class': 'form__input',
+                'class': 'form-input',
                 'placeholder': 'E-mail'
             }
         ),
@@ -180,20 +180,34 @@ class EmpresaUpdateModelForm(forms.ModelForm):
 
         usuario_id = self.instance.pk
 
-        if Empresa.objects.filter(nome_empresa=nome_empresa).exclude(
+        empresa = Empresa.objects.filter(
+            nome_empresa=nome_empresa
+        ).exclude(
             pk=usuario_id
-        ).exists():
+        )
+
+        if empresa.exists():
             raise forms.ValidationError(
                 'Não é possível utilizar esse nome de empresa.'
             )
+
         return nome_empresa
 
     def clean_email(self):
+
         email = self.cleaned_data.get('email')
+
         usuario_id = self.instance.pk
 
-        if Empresa.objects.filter(email=email).exclude(pk=usuario_id).exists():
+        empresa = Empresa.objects.filter(
+            email=email
+        ).exclude(
+            pk=usuario_id
+        )
+
+        if empresa.exists():
             raise forms.ValidationError('Não é possível utilizar esse e-mail.')
+
         return email
 
     def clean_telefone(self):
@@ -201,28 +215,39 @@ class EmpresaUpdateModelForm(forms.ModelForm):
         telefone = self.cleaned_data.get('telefone')
         usuario_id = self.instance.pk
 
-        if Empresa.objects.filter(
+        empresa = Empresa.objects.filter(
             telefone=telefone
         ).exclude(
             pk=usuario_id
-        ).exists():
+        )
+
+        if empresa.exists():
+
             raise forms.ValidationError(
                 'Não é possível utilizar este número de telefone.'
             )
+
         return telefone
 
     def save(self, commit=True):
 
         usuario = self.instance.usuario_responsavel
+
         usuario.username = self.cleaned_data.get('nome_empresa')
+
         usuario.email = self.cleaned_data.get('email')
+
         usuario.telefone = self.cleaned_data.get('telefone')
 
         empresa = self.instance
+
         empresa.nome_empresa = self.cleaned_data.get('nome_empresa')
+
         empresa.usuario_responsavel = usuario
 
         if commit:
+
             usuario.save()
             empresa.save()
+
         return empresa
