@@ -1,11 +1,10 @@
 from django.contrib import messages
+from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import (get_list_or_404, get_object_or_404, redirect,
-                              render)
-from django.urls import reverse_lazy
-from django.views import View
+from django.shortcuts import get_object_or_404
+
+from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, ListView, UpdateView
-from django.views.generic.detail import SingleObjectMixin
 
 from cadastros.empresas.models import Empresa
 from core.mixins import GroupRequiredMixin
@@ -64,6 +63,16 @@ class FuncionarioCadastrarView(
         )
         return super().form_invalid(form)
 
+    def get_success_url(self):
+
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:funcionarios:listar')
+
 
 class FuncionarioListarView(
     LoginRequiredMixin,
@@ -75,6 +84,7 @@ class FuncionarioListarView(
     template_name = 'funcionarios/lista.html'
     model = Funcionario
     context_object_name = 'funcionarios'
+    paginate_by = 6
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -83,19 +93,15 @@ class FuncionarioListarView(
 
         if usuario_logado.is_empresa():
 
-            queryset = get_list_or_404(Funcionario,
-                empresa__usuario_responsavel = usuario_logado
+            queryset = Funcionario.objects.filter(
+                empresa__usuario_responsavel=usuario_logado
             )
 
         else:
             usuario = Funcionario.objects.get(
                 user=self.request.user
             )
-            queryset = queryset.select_related(
-                'user',
-                'cargo',
-                'cargo__setor'
-            ).filter(
+            queryset = queryset.filter(
                 empresa=usuario.empresa
             )
 
@@ -105,7 +111,14 @@ class FuncionarioListarView(
         data_fim = self.request.GET.get('data_fim')
 
         if q:
-            queryset = queryset.filter(nome_funcionario__icontains=q)
+            queryset = queryset.filter(
+
+                Q(nome_funcionario__icontains=q) |
+
+                Q(cargo__nome_cargo__icontains=q) |
+
+                Q(setor__nome_setor__icontains=q)
+            )
         if data_inicio:
             queryset = queryset.filter(criado__gte=data_inicio)
         if data_fim:
@@ -141,8 +154,32 @@ class FuncionarioAtualizarView(
 
         initial['email'] = self.object.user.email
         initial['grupo'] = grupo.first()
+        initial['setor'] = self.object.setor
+        initial['cargo'] = self.object.cargo
         initial['status'] = self.object.ativo
         return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            kwargs['empresa'] = get_object_or_404(
+                Empresa,
+                usuario_responsavel=usuario_logado
+            )
+
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=self.request.user
+            )
+
+            kwargs['empresa'] = get_object_or_404(
+                Empresa,
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
+        return kwargs
 
     def form_valid(self, form):
         messages.success(
@@ -160,33 +197,12 @@ class FuncionarioAtualizarView(
         )
         return super().form_invalid(form)
 
+    def get_success_url(self):
 
-class FuncionarioInativarView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    EmpresaPermissionMixin,
-    SingleObjectMixin,
-    View
-):
-    model = Funcionario
-    group_required = ['gerente_geral', 'administradores']
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
 
-    def get(self, request, *args, **kwargs):
-        funcionario = self.get_object
-        return render(
-            request,
-            'funcionarios/form_inativar.html',
-            {'funcionario': funcionario}
-        )
+        if next_url:
 
-    def post(self, request, *args, **kwargs):
-        funcionario = self.get_object()
-        funcionario.ativo = False
-        funcionario.save()
+            return next_url
 
-        messages.success(
-            request,
-            f"""Funcionário(a) {funcionario.nome_funcionario}
-            foi deletado(a) com sucesso."""
-        )
-        return redirect('cadastros:funcionarios:listar')
+        return reverse('cadastros:funcionarios:listar')
