@@ -1,46 +1,60 @@
-{% extends 'base.html' %}
+{% extends 'home_template/pages/base.html' %}
 
 {% load static %}
+
+{% block title %} funcionários {% endblock  %}
+
+{% block head %}
+   <link rel="stylesheet" href="{% static 'funcionarios/css/forms.css' %}">
+{% endblock  %}
 
 
 {% block main %}
 
-    <form method="POST" action="{% url 'cadastros:funcionarios:cadastrar' %}" class="form">
-        {% csrf_token %}
+    <div class="form-espaco">
 
-        <div class="form__group">
-            {{ form.nome_funcionario.label_tag }} {{ form.nome_funcionario }}
-        </div>
+        <h2 class="form-titulo"> Cadastro de funcionário</h2>
 
-        <div class="form__group">
-            {{ form.email.label_tag }} {{ form.email }}
-        </div>
+        {% include 'home_template/partials/messages.html' %}
 
 
-        <div class="form__group">
-            {{ form.setor.label_tag }} {{ form.setor }}
-        </div>
+        <form method="POST" action="{% url 'cadastros:funcionarios:cadastrar' %}" class="form">
+            {% csrf_token %}
+            
 
-        <div class="form__group">
-            {{ form.cargo.label_tag }} {{ form.cargo }}
-        </div>
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
 
-        <div class="form__group">
-            {{ form.grupo.label_tag }} {{ form.grupo }}
-        </div>
+                    {{ field }}
+                    {% if field.errors %}
+                        {% for erro in field.errors %}
+                            <p class="messages-error">{{ erro }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
 
-        <div class="form__group">
-            {{ form.password1.label_tag }} {{ form.password1 }}
-        </div>
+            <input 
+                type="hidden"
+                name='next'
+                value="{{ request.GET.next }}"
+            >
+            
+            <div class="form-actions">
+                <button class="btn cadastrar" type="submit">Cadastrar</button>
 
-        <div class="form__group">
-            {{ form.password2.label_tag }} {{ form.password2 }}
-        </div>
 
-        <div class="form__actions">
-            <button class="form__button form__button__enviar" type="submit">Cadastrar</button>
-        </div>
-    </form>
+                <a 
+                    href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" class=" btn cancelar"
+                >
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
 
 
 {% endblock %}
