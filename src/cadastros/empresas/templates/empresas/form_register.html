@@ -1,29 +1,54 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="stylesheet" href="{% static 'gerenciamento_abastecimento/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'empresas/css/forms.css' %}">
 
+    <title>Casdastro</title>
+</head>
+<body>
+    <div class="form-espaco">
 
+        <form action="{% url 'cadastros:empresas:cadastrar' %}" method="POST" class="form">
+            <h2 class="form-titulo"> 
+                Cadastro de Empresa 
+            </h2>
+            
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
 
-{% block main %}
+                    {% if field.errors %}
+                        {% for erro in field.errors %}
+                            {{ erro }}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
 
-    <form action="" method="POST" class="form">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="form__group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-
-                {% if field.errors %}
-                    {% for erro in field.errors %}
-                        {{ erro }}
-                    {% endfor %}
-                {% endif %}
+            <div class="form-actions">
+                <button 
+                    class="btn cadastrar" 
+                    type="submit"
+                >
+                    Cadastrar
+                </button>
+                <a 
+                    href="{% url 'autenticacao:login_empresa' %}" 
+                    class="btn login"
+                    >
+                    Login
+                </a>
             </div>
-        {% endfor %}
-
-        <div class="form__actions">
-            <button class="form__button form__button__enviar" type="submit">Cadastrar</button>
-            <a href="{% url 'home:index' %}" class="form__button form__button__voltar">Voltar</a>
-        </div>
-    </form>
-
-{% endblock %}
+        </form>
+        
+        {% include 'home_template/partials/footer.html' %}
+    </div>
+</body>
+</html>
