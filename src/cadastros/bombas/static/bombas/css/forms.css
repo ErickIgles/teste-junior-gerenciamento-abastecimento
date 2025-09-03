@@ -187,6 +187,6 @@
     }
     .form-actions{
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
     }
 }
