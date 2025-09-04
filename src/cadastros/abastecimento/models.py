@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 
 from core.models import Base
@@ -56,16 +57,23 @@ class RegistroAbastecimento(Base):
         verbose_name_plural = 'Registros de Combustível'
 
     def save(self, *args, **kwargs):
-        self.valor_total_abastecimento = self.tipo_combustivel.valor_total * self.litros_abastecido
+
+        if not self.bomba:
+            raise ValidationError(
+                """Selecione uma bomba para o abastecimento."""
+            )
+        self.tanque = self.bomba.tanque
 
         if self.tanque.quantidade_disponivel < self.litros_abastecido:
-            raise ValueError(
-                """Quantidade insuficiente no tanque para o abastecimento."""
+            raise ValidationError(
+                "Quantidade insuficiente no tanque para o abastecimento."
             )
-
-        self.tanque.quantidade_disponivel = self.tanque.quantidade_disponivel - self.litros_abastecido
-
+        self.valor_total_abastecimento = (
+            self.tanque.tipo_combustivel.valor_total * self.litros_abastecido
+        )
+        self.tanque.quantidade_disponivel -= self.litros_abastecido
         self.tanque.save()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
