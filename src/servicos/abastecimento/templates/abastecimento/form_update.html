@@ -11,9 +11,13 @@
 {% block main %}
 
     <div class="form-espaco">
+
+        {% include 'home_template/partials/messages.html' %}
+
+        
         <h2 class="form-titulo">Atualizar Registro de Abatecimento</h2>
     
-        <form action="{% url 'cadastros:abastecimento:atualizar' abastecimento.pk %}" method="post" class="form">
+        <form action="{% url 'servicos:abastecimento:atualizar' abastecimento.pk %}" method="post" class="form">
             {% csrf_token %}
 
             {% if form.non_field_errors %}

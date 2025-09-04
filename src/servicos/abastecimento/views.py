@@ -8,6 +8,7 @@ from django.views.generic import (
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Q
+from django.core.exceptions import ValidationError
 
 from .models import RegistroAbastecimento
 from .forms import AbastecimentoForm, AbastecimentoUpdateForm
@@ -27,7 +28,7 @@ class RegistroAbastecimentoCadastroView(
     model = RegistroAbastecimento
     form_class = AbastecimentoForm
     template_name = 'abastecimento/form_register.html'
-    success_url = reverse_lazy('cadastros:abastecimento:listar')
+    success_url = reverse_lazy('servicos:abastecimento:listar')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -136,7 +137,7 @@ class RegistroAbastecimentoAtualizarView(
     form_class = AbastecimentoUpdateForm
     context_object_name = 'abastecimento'
     template_name = 'abastecimento/form_update.html'
-    success_url = reverse_lazy('cadastros:abastecimento:listar')
+    success_url = reverse_lazy('servicos:abastecimento:listar')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -156,11 +157,17 @@ class RegistroAbastecimentoAtualizarView(
         return kwargs
 
     def form_valid(self, form):
-        messages.success(
-            self.request,
-            'Dados atualizados com suceso.'
-        )
-        return super().form_valid(form)
+        try:
+            form.save()
+            messages.success(
+                self.request,
+                'Dados atualizados com suceso.'
+            )
+            return super().form_valid(form)
+
+        except ValidationError as error:
+            messages.error(self.request, str(error))
+            return self.form_invalid(form)
 
     def form_invalid(self, form):
         messages.error(
@@ -190,4 +197,4 @@ class RegistroAbastecimentoDeletarView(
     model = RegistroAbastecimento
     context_object_name = 'abastecimento'
     template_name = 'abastecimento/form_delete.html'
-    success_url = reverse_lazy('cadastros:abastecimento:listar')
+    success_url = reverse_lazy('servicos:abastecimento:listar')

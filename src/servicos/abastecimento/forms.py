@@ -1,8 +1,8 @@
 from django import forms
 
 from .models import RegistroAbastecimento
-from ..tanques.models import Tanque, Combustivel
-from ..bombas.models import Bomba
+from cadastros.tanques.models import Tanque, Combustivel
+from cadastros.bombas.models import Bomba
 
 
 class AbastecimentoForm(forms.ModelForm):

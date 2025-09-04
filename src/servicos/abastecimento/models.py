@@ -3,9 +3,9 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 
 from core.models import Base
-from ..tanques.models import Tanque, Combustivel
-from ..bombas.models import Bomba
-from ..empresas.models import Empresa
+from cadastros.tanques.models import Tanque, Combustivel
+from cadastros.bombas.models import Bomba
+from cadastros.empresas.models import Empresa
 
 
 class RegistroAbastecimento(Base):

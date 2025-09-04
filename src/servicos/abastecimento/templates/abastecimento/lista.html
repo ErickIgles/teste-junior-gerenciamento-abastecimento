@@ -11,9 +11,6 @@
 {% block main %}
     <div class="campo-pagina">
         <h2 class="titulo-listagem">Listagem de Abastecimentos Veicular</h2>
-
-        {% include 'home_template/partials/messages.html' %}
-
             
         <nav class="nav-pesquisa">
             <form method="GET" class="form">
@@ -34,7 +31,7 @@
 
                 <a 
                     class="novo-registro" 
-                    href="{% url 'cadastros:abastecimento:cadastrar' %}?next={{ request.get_full_path }}"
+                    href="{% url 'servicos:abastecimento:cadastrar' %}?next={{ request.get_full_path }}"
             
                 >
                     Novo registro
@@ -109,14 +106,14 @@
                                 <th>Ações</th>
                                 <td class="acoes-buttons">
                                     <a  
-                                        href="{% url 'cadastros:abastecimento:atualizar' abastecimento.pk %}?next={{ request.get_full_path }}" 
+                                        href="{% url 'servicos:abastecimento:atualizar' abastecimento.pk %}?next={{ request.get_full_path }}" 
                                         class="btn atualizar"
                                     >
                                         Editar
                                     </a>
 
                                     <a 
-                                        href="{% url 'cadastros:abastecimento:deletar' abastecimento.pk %}"
+                                        href="{% url 'servicos:abastecimento:deletar' abastecimento.pk %}"
                                         class="btn deletar"
                                     >
                                         Apagar

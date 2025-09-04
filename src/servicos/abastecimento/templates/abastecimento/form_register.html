@@ -18,7 +18,7 @@
         {% include 'home_template/partials/messages.html' %}
 
 
-        <form method="POST" action="{% url 'cadastros:abastecimento:cadastrar' %}" class="form">
+        <form method="POST" action="{% url 'servicos:abastecimento:cadastrar' %}" class="form">
             {% csrf_token %}
             
 
