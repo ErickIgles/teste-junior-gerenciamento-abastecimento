@@ -1,30 +1,47 @@
-{% extends 'base.html' %}
+{% extends 'home_template/pages/base.html' %}
 {% load static %}
 
+{% block title %}
+    Relatórios
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'relatorios/css/detalhe.css' %}">
+{% endblock %}
 
 {% block main %}
+<div class="campo-pagina">
     <h1 class="titulo">Detalhes do Tanque: {{ tanque.identificador_tanque }}</h1>
 
-    <table class="tabela-detalhes">
-        <thead>
-            <tr>
-                <th class="tabela-cabecalho">Data</th>
-                <th class="tabela-cabecalho">Combustível</th>
-                <th class="tabela-cabecalho">Quantidade (L)</th>
-                <th class="tabela-cabecalho">Valor Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for registro in registros_tanque %}
-                <tr class="tabela-linha">
-                    <td class="tabela-celula">{{ registro.criado }}</td>
-                    <td class="tabela-celula">{{ registro.tipo_combustivel }}</td>
-                    <td class="tabela-celula">{{ registro.litros_abastecido }}</td>
-                    <td class="tabela-celula">R$ {{ registro.valor_total_abastecimento|floatformat:2 }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if registros_tanque %}
+        <div class="lista">
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Combustível</th>
+                        <th>Quantidade (L)</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in registros_tanque %}
+                        <tr>
+                            <td>{{ registro.criado }}</td>
+                            <td>{{ registro.tipo_combustivel }}</td>
+                            <td>{{ registro.litros_abastecido }}</td>
+                            <td>R$ {{ registro.valor_total_abastecimento|floatformat:2 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <h3 class="total-abastecimento">Total de Abastecimento: R$ {{ soma_valores|floatformat:2 }}</h3>
+        <h3 class="total-abastecimento">
+            Total de Abastecimento: R$ {{ soma_valores|floatformat:2 }}
+        </h3>
+    {% else %}
+        <h2>Não há registros para este tanque.</h2>
+    {% endif %}
+</div>
 {% endblock %}
