@@ -1,24 +1,64 @@
-{% extends 'base.html' %}
+{% extends 'home_template/pages/base.html' %}
+{% load static %}
+
+{% block title %} Atualizar {% endblock %}
+
+{% block head %}
+      <link rel="stylesheet" href="{% static 'abastecimento/css/forms.css' %}">
+{% endblock  %}
 
 
 {% block main %}
 
-    <h2 class="form__titulo">Atualizar Registro de Abatecimento</h2>
+    <div class="form-espaco">
+        <h2 class="form-titulo">Atualizar Registro de Abatecimento</h2>
+    
+        <form action="{% url 'cadastros:abastecimento:atualizar' abastecimento.pk %}" method="post" class="form">
+            {% csrf_token %}
 
-    <form action="{% url 'cadastros:abastecimento:atualizar' abastecimento.pk %}" method="post" class="form">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="form__group">
-                <label for="{{ field.id_for_label }}" class="form__label">{{ field.label }}</label>
-                {{ field }}
+            {% if form.non_field_errors %}
+                <div class="messages-error">
+                    {% for erro in form.non_field_errors %}
+                        <p>{{ erro }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        {% for erro in field.errors %}
+                            <p class="messages-error">{{ erro }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <input 
+                type="hidden"
+                name='next'
+                value="{{ request.GET.next }}"
+            >
+    
+            <div class="form-actions">
+                <button 
+                    class="btn atualizar" 
+                    type="submit"
+                >
+                    Atualizar
+                </button>
+                <a 
+                    href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" 
+                    class="btn cancelar"
+                >
+                    Cancelar
+                </a>
             </div>
-        {% endfor %}
+        </form>
+    </div>
 
-        <div class="form__actions">
-            <button class="form__button form__button__enviar" type="submit">Atualizar</button>
-            <a href="{% url 'cadastros:abastecimento:listar'%}" class="form__button form__button__voltar">Voltar</a>
-        </div>
-    </form>
 
 
 
