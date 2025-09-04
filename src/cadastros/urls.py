@@ -6,7 +6,6 @@ app_name='cadastros'
 urlpatterns = [
     path('bombas/', include('cadastros.bombas.urls')),
     path('tanques/', include('cadastros.tanques.urls')),
-    path('abastecimentos/', include('cadastros.abastecimento.urls')),
     path('funcionarios/', include('cadastros.funcionarios.urls')),
     path('empresas/', include('cadastros.empresas.urls')),
 ]
