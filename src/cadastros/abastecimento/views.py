@@ -1,4 +1,4 @@
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     CreateView,
     ListView,
@@ -7,6 +7,7 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.db.models import Q
 
 from .models import RegistroAbastecimento
 from .forms import AbastecimentoForm, AbastecimentoUpdateForm
@@ -59,6 +60,16 @@ class RegistroAbastecimentoCadastroView(
         )
         return super().form_invalid(form)
 
+    def get_success_url(self):
+
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:abastecimento:listar')
+
 
 class RegitroAbastecimentoListaView(
     LoginRequiredMixin,
@@ -94,7 +105,14 @@ class RegitroAbastecimentoListaView(
         data_fim = self.request.GET.get('data_fim')
 
         if q:
-            queryset = queryset.filter(bomba__nome_bomba__icontains=q)
+            queryset = queryset.filter(
+
+                Q(bomba__nome_bomba__icontains=q) |
+
+                Q(tanque__identificador_tanque__icontains=q) |
+
+                Q(tipo_combustivel__nome_combustivel__icontains=q)
+            )
         if data_inicio:
             queryset = queryset.filter(criado__gte=data_inicio)
         if data_fim:
@@ -150,6 +168,16 @@ class RegistroAbastecimentoAtualizarView(
             'Erro ao atualizar os dados. Confira às informações.'
         )
         return super().form_invalid(form)
+
+    def get_success_url(self):
+
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:abastecimento:listar')
 
 
 class RegistroAbastecimentoDeletarView(
