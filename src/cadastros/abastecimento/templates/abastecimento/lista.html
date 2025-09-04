@@ -1,66 +1,151 @@
-{% extends 'base.html' %}
+{% extends 'home_template/pages/base.html' %}
+
+{% load static %}
+
+{% block title %} Abastecimento {% endblock %}
+    
+{% block head %}
+    <link rel="stylesheet" href="{% static 'abastecimento/css/lista_abastecimento.css' %}">
+{% endblock  %}
 
 {% block main %}
-    <nav>
-        <form method="get" style="display: flex; margin: 20px 20px 20px 0px; flex-direction: row; gap: 20px;">
-            <input style="padding: 8px;" type="text" placeholder="pesquisar..." name="q" value="{{ request.GET.q }}">
-            <div>
-                <label for="data_inicio">De:</label>
-                <input style="padding: 8px;" type="date" name="data_inicio" value="{{ request.GET.data_inicio }}">
-            </div>
-            <div>
-                <label for="data_fim">Até:</label>
-                <input style="padding: 8px;" type="date" name="data_fim" value="{{ request.GET.data_fim }}">
-            </div>
-            <button style="padding: 8px;" type="submit">🔍 Filtrar</button>
-        </form>
+    <div class="campo-pagina">
+        <h2 class="titulo-listagem">Listagem de Abastecimentos Veicular</h2>
 
-        <div style="margin: 20px 0; background-color: #ffffff; width: 320px; height: px; padding: 10px 0; text-align: center;">
-            <span>
+        {% include 'home_template/partials/messages.html' %}
+
+            
+        <nav class="nav-pesquisa">
+            <form method="GET" class="form">
+
+                <div>
+                    <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
+                </div>
+                <div class="espaco-datas">
+                    <input type="date" name="data_inicio" class="form-data">
+                    <input type="date" name="data_fim" class="form-data">
+                </div>
+                <button type="submit" class="button-pesquisa">
+                    🔍
+                </button>
+            </form>
+
+            <div class="acoes-buttons">
+
+                <a 
+                    class="novo-registro" 
+                    href="{% url 'cadastros:abastecimento:cadastrar' %}?next={{ request.get_full_path }}"
+            
+                >
+                    Novo registro
+                </a>
+
+            </div>
+
+
+        </nav>
+
+
+        {% if page_obj %}
+            <div class="lista">
+                {% for abastecimento in page_obj %}
+                    <table class="tabela">
+                        <tbody class="tabela-body">
+                            <tr>
+                                <th>Funcionário</th>
+                                <td>
+                                    {{ abastecimento.funcionario.username }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Tanque</th>
+                                {% if abastecimento.tanque %}
+                                    <td>
+                                        {{ abastecimento.tanque.identificador_tanque }}
+                                    </td>
+                                {% else %}
+                                    <td>
+                                       Não há cargo registrado
+                                    </td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <th>Bomba</th>
+                                {% if abastecimento.bomba %}
+                                    <td>
+                                        {{ abastecimento.bomba.nome_bomba }}
+                                    </td>
+                                {% else %}
+                                    <td>
+                                       Não há bomba registrada
+                                    </td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <th>Tipo</th>
+                                {% if abastecimento.tanque %}
+                                    <td>
+                                        {{ abastecimento.tanque.tipo_combustivel }}
+                                    </td>
+                                {% else %}
+                                    <td>
+                                       Não há tipo de combustível registrado
+                                    </td>
+                                {% endif %}
+                            </tr>                            
+                            <tr>
+                                <th>Consumida L</th>
+                                <td>
+                                    {{ abastecimento.litros_abastecido }}
+                                </td>
+                            </tr>                            
+                            <tr>
+                                <th>Valor total R$</th>
+                                <td>
+                                    {{ abastecimento.valor_total_abastecimento }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ações</th>
+                                <td class="acoes-buttons">
+                                    <a  
+                                        href="{% url 'cadastros:abastecimento:atualizar' abastecimento.pk %}?next={{ request.get_full_path }}" 
+                                        class="btn atualizar"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <a 
+                                        href="{% url 'cadastros:abastecimento:deletar' abastecimento.pk %}"
+                                        class="btn deletar"
+                                    >
+                                        Apagar
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+
+            <div class="paginacao">
                 {% if page_obj.has_previous %}
-                    <a style="text-decoration: none; color: #000000;
-                    border: 2px solid rgba(34, 133, 255, 0.667); 
-                    padding: 3px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    " href="?page=1">&laquo; voltar</a>
+                    <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">«</a>
                 {% endif %}
 
-                <span class="current">
-                    Page {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
                 </span>
 
                 {% if page_obj.has_next %}
-                    <a style="
-                    text-decoration: none; 
-                    color: #000000; 
-                    border: 2px solid rgba(34, 133, 255, 0.667); 
-                    padding: 3px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    " 
-                    href="?page={{ page_obj.next_page_number }}">próxima</a>
+                    <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">»</a>
                 {% endif %}
-            </span>
-        </div>
-    </nav>
-
-    {% if abastecimentos %}
-        {% for abastecimento in page_obj %}
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
-                <p><strong>Identificador do tanque: </strong> {{ abastecimento.tanque.identificador_tanque }}</p>
-                <p><strong>Funcionário: </strong>{{ abastecimento.funcionario }}</p>
-                <p><strong>Valor total: R$</strong> {{ abastecimento.valor_total_abastecimento }} reais</p>
-                <p><strong>Data de criação: </strong>{{ abastecimento.criado }}</p>
-                <hr>
-                <div class="form__actions">
-                    <a href="{% url 'cadastros:abastecimento:atualizar' abastecimento.pk %}"><button type="button" class="form__button form__button__enviar">Atualizar</button></a>
-                    <a href="{% url 'cadastros:abastecimento:deletar' abastecimento.pk %}" class="form__button form__button__deletar">Deletar</a>
-                </div>
             </div>
-        {% endfor %}
-    {% else %}
-        <h2>Ainda não há registros no sistema</h2>
-    {% endif %}
-{% endblock %}
 
+        {% else %}
+            <h2>Não há registros de Abastecimentos</h2>
+        {% endif %}
+
+
+    </div>
+{% endblock %}
