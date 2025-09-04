@@ -69,7 +69,7 @@ class RegistroAbastecimentoCadastroView(
 
             return next_url
 
-        return reverse('cadastros:abastecimento:listar')
+        return reverse('servicos:abastecimento:listar')
 
 
 class RegitroAbastecimentoListaView(
@@ -184,7 +184,7 @@ class RegistroAbastecimentoAtualizarView(
 
             return next_url
 
-        return reverse('cadastros:abastecimento:listar')
+        return reverse('servicos:abastecimento:listar')
 
 
 class RegistroAbastecimentoDeletarView(
