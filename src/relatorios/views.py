@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from core.mixins import GroupRequiredMixin
 from cadastros.funcionarios.models import Funcionario
 from cadastros.tanques.models import Tanque
-from cadastros.abastecimento.models import RegistroAbastecimento
+from servicos.abastecimento.models import RegistroAbastecimento
 from cadastros.empresas.models import Empresa
 
 
