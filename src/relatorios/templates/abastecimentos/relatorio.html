@@ -1,21 +1,53 @@
-{% extends 'base.html' %}
+{% extends 'home_template/pages/base.html' %}
+
+{% load static %}
+
+{% block title %}
+    Relatórios
+{% endblock  %}
+
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'relatorios/css/lista.css' %}">
+{% endblock  %}
 
 {% block main %}
 
-    {% if tanques_com_registro %}
-        {% for tanque in tanques_com_registro %}
-            <div style="display: flex; flex-direction: column; gap: 10px; margin: 40px 0;">
-                <p><strong>Identificador do tanque: </strong> {{ tanque.identificador_tanque }}</p>
-                <p><strong>Tipo de combustível: </strong>{{ tanque.tipo_combustivel }}</p>
-                <p><strong>Data de cadastro do tanque: </strong>{{ tanque.criado }}</p>
-                <hr>
-                <div class="form__actions">
-                    <a href="{% url 'relatorios:detalhe' tanque.pk %}"><button type="button" class="form__button form__button__enviar">Visualizar</button></a>
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>Ainda não há relatórios</p>
-    {% endif %}
-  
+    <div class="lista">
+        <h2 class="titulo-listagem">Listagem de relatórios</h2>
+        {% if tanques_com_registro %}
+            {% for tanque in tanques_com_registro %}
+                <table class="tabela">
+                    <tbody class="tabela-body">
+                        <tr>
+                            <th>Identificador do tanque</th>
+                            <td>{{ tanque.identificador_tanque }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tipo de combustível</th>
+                            <td>{{ tanque.tipo_combustivel }}</td>
+                        </tr>
+                        <tr>
+                            <th>Data de cadastro do tanque</th>
+                            <td>{{ tanque.criado }}</td>
+                        </tr>
+                        <tr>
+                            <th>Ações</th>
+                            <td class="acoes-buttons">
+                                <a 
+                                    href="{% url 'relatorios:detalhe' tanque.pk %}" 
+                                    class="btn visualizar"
+                                >
+                                    Visualizar
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% endfor %}
+        {% else %}
+            <h2>Ainda não há relatórios</h2>
+        {% endif %}
+    </div>
+
 {% endblock %}
