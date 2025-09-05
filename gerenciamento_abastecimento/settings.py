@@ -30,6 +30,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'rest_framework',
+    'django_filters',
+
     'cadastros.bombas.apps.BombasConfig',
     'cadastros.tanques.apps.TanquesConfig',
     'cadastros.funcionarios.apps.FuncionariosConfig',
@@ -131,3 +134,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'home:index'
 LOGIN_URL = 'autenticacao:login'
+
+
+# CONFIGURAÇÕES DE DRF
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication'
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticationOrReadOnly',
+    )
+}
