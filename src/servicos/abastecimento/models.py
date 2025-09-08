@@ -6,6 +6,7 @@ from core.models import Base
 from cadastros.tanques.models import Tanque, Combustivel
 from cadastros.bombas.models import Bomba
 from cadastros.empresas.models import Empresa
+from cadastros.funcionarios.models import Funcionario
 
 
 class RegistroAbastecimento(Base):
@@ -78,3 +79,53 @@ class RegistroAbastecimento(Base):
 
     def __str__(self):
         return f'{self.tipo_combustivel} - {self.litros_abastecido}L - R$ {self.valor_total_abastecimento}'
+
+
+class RegistroReabastecimento(Base):
+
+    tanque = models.ForeignKey(
+        Tanque,
+        on_delete=models.CASCADE,
+        verbose_name='Tanque'
+    )
+
+    quantidade = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Valor do reabastecimento'
+    )
+
+    empresa = models.ForeignKey(
+        Empresa,
+        on_delete=models.CASCADE,
+        verbose_name='Empresa'
+    )
+
+    funcionario = models.ForeignKey(
+        Funcionario,
+        on_delete=models.SET_NULL,
+        verbose_name='Funcionário',
+        null=True,
+        blank=True
+    )
+
+    class Meta:
+
+        verbose_name = 'Reabastecimento'
+        verbose_name_plural = 'Reabastecimentos'
+
+    def __str__(self):
+
+        return f'{self.tanque} - {self.quantidade}'
+
+    def aplicar_reabastecimento(self):
+
+        tanque = self.tanque
+
+        if (tanque.quantidade_disponivel + self.quantidade) > tanque.capacidade_maxima:
+            raise ValueError(
+                'Não pode exceder a capacidade máxima do tanque.'
+            )
+
+        tanque.quantidade_disponivel += self.quantidade
+        tanque.save()
