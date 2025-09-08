@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import RegistroAbastecimento
+from .models import RegistroAbastecimento, RegistroReabastecimento
 from cadastros.tanques.models import Tanque, Combustivel
 from cadastros.bombas.models import Bomba
 
@@ -325,3 +325,95 @@ class AbastecimentoUpdateForm(forms.ModelForm):
         if commit:
             registro_abastecimento.save()
         return registro_abastecimento
+
+
+class ReabastecimentoTanqueForm(forms.ModelForm):
+
+    tanque = forms.ModelChoiceField(
+        required=True,
+        queryset=Tanque.objects.none(),
+        widget=forms.Select(
+            attrs={
+                'class': 'form-input',
+            }
+        ),
+        label='Tanque'
+    )
+
+    quantidade = forms.DecimalField(
+        required=True,
+        widget=forms.NumberInput(
+            attrs={
+                'class': 'form-input'
+            }
+        )
+    )
+
+    class Meta:
+
+        model = RegistroReabastecimento
+        fields = [
+            'tanque',
+            'quantidade'
+        ]
+
+    def __init__(self, *args, **kwargs):
+
+        self.empresa = kwargs.pop('empresa', None)
+        self.funcionario = kwargs.pop('usuario_funcionario', None)
+        super().__init__(*args, **kwargs)
+
+        if self.empresa:
+            self.fields['tanque'].queryset = Tanque.objects.filter(
+                empresa=self.empresa,
+                ativo=True
+            )
+
+    def clean_tanque(self):
+
+        tanque = self.cleaned_data.get('tanque')
+
+        if tanque and not tanque.ativo:
+            raise forms.ValidationError('Este tanque está desativado.')
+
+        return tanque
+
+    def clean_quantidade(self):
+
+        tanque = self.cleaned_data.get('tanque')
+
+        quantidade = self.cleaned_data.get('quantidade')
+
+        if quantidade is None:
+            self.add_error(
+                'quantidade',
+                'Este campo não pode ficar vazio.'
+            )
+
+        if quantidade < 0:
+            self.add_error(
+                'quantidade',
+                'O valor não pode ser negativo.'
+            )
+
+        if (tanque.quantidade_disponivel + quantidade) > tanque.capacidade_maxima:
+            self.add_error(
+                'quantidade_reabastecimento',
+                """
+                    O valor a ser reabastecido não
+                    pode exceder a capacidade do tanque.
+                """
+                )
+
+        return quantidade
+
+    def save(self, commit=True):
+        registro = super().save(commit=False)
+
+        registro.empresa = self.empresa
+        registro.funcionario = self.funcionario
+
+        if commit:
+            registro.save()
+
+        return registro
