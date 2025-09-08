@@ -32,6 +32,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
 
     'cadastros.bombas.apps.BombasConfig',
     'cadastros.tanques.apps.TanquesConfig',
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'servicos.abastecimento.apps.AbastecimentoConfig',
 
     'autenticacao.apps.AutenticacaoConfig',
+    'dois_fator.apps.DoisFatorConfig',
     'relatorios.apps.RelatoriosConfig',
 ]
 
@@ -53,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_otp.middleware.OTPMiddleware',
 ]
 
 ROOT_URLCONF = 'gerenciamento_abastecimento.urls'
