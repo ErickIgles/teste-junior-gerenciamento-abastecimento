@@ -173,7 +173,6 @@ class TanqueUpdateForm(forms.ModelForm):
             'tipo_combustivel',
             'identificador_tanque',
             'capacidade_maxima',
-            'quantidade_disponivel'
         ]
         widgets = {
             'tipo_combustivel': forms.Select(
@@ -191,17 +190,11 @@ class TanqueUpdateForm(forms.ModelForm):
                     'class': 'form-input'
                 }
             ),
-            'quantidade_disponivel': forms.NumberInput(
-                attrs={
-                    'class': 'form-input'
-                }
-            ),
         }
         labels = {
             'tipo_combustivel': 'Tipo de Combustível',
             'identificador_tanque': 'Identificador',
             'capacidade_maxima': 'Capacidade do Tanque',
-            'quantidade_disponivel': 'Quantidade Disponível',
         }
 
     def __init__(self, *args, **kwargs):
@@ -251,42 +244,6 @@ class TanqueUpdateForm(forms.ModelForm):
             )
 
         return capacidade_maxima
-
-    def clean_quantidade_disponivel(self):
-
-        quantidade_disponivel = self.cleaned_data.get(
-            'quantidade_disponivel'
-        )
-
-        if quantidade_disponivel < 0:
-
-            raise forms.ValidationError(
-                """A quantidade disponível não
-                pode ser negativo."""
-            )
-
-        return quantidade_disponivel
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        quantidade = self.cleaned_data.get(
-            'quantidade_disponivel'
-        )
-        capacidade = self.cleaned_data.get(
-            'capacidade_maxima'
-        )
-
-        if quantidade is not None and capacidade is not None:
-
-            if quantidade > capacidade:
-
-                self.add_error(
-                    "quantidade_disponivel",
-                    "A quantidade não pode exceder a capacidade máxima."
-                )
-
-        return cleaned_data
 
     def save(self, commit=True):
 
@@ -378,6 +335,7 @@ class CombustivelForm(forms.ModelForm):
                 O valor base não pode ser negativo.
                 """
             )
+
         return valor_base
 
     def clean_imposto(self):
@@ -395,24 +353,12 @@ class CombustivelForm(forms.ModelForm):
 
     def save(self, commit=True):
 
-        valor_base = self.cleaned_data.get(
-            'valor_base'
-        )
+        combustivel = super().save(commit=False)
 
-        nome_combustivel = self.cleaned_data.get(
-            'nome_combustivel'
-        )
-
-        imposto = self.cleaned_data.get(
-            'imposto'
-        )
-
-        combustivel = self.instance
-        combustivel.nome_combustivel = nome_combustivel
-        combustivel.valor_base = valor_base
-        combustivel.imposto = imposto
         combustivel.empresa = self.empresa
 
         if commit:
+
             combustivel.save()
+
         return combustivel
