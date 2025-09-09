@@ -87,7 +87,7 @@ class RegitroAbastecimentoListaView(
     model = RegistroAbastecimento
     context_object_name = 'abastecimentos'
     template_name = 'abastecimento/lista.html'
-    paginate_by = 9
+    paginate_by = 6
 
     def get_queryset(self):
 
@@ -248,7 +248,14 @@ class RegistroReabastecimentoCadastrarView(
             'tanque_id': form.cleaned_data['tanque'].id,
             'quantidade': str(form.cleaned_data['quantidade']),
         }
-        return redirect('dois_fator:validacao_token_criar')
+
+        next_url = self.request.POST.get('next')
+
+        self.request.session['next'] = next_url
+
+        return redirect(
+            'servicos:abastecimento:validacao_token_cadastrar_reabastecimento'
+        )
 
     def form_invalid(self, form):
 
@@ -258,16 +265,6 @@ class RegistroReabastecimentoCadastrarView(
         )
 
         return super().form_invalid(form)
-
-    def get_success_url(self):
-
-        next_url = self.request.GET.get('next') or self.request.POST.get('next')
-
-        if next_url:
-
-            return next_url
-
-        return reverse('servicos:abastecimento:listar_reabastecimento')
 
 
 class RegistroReabastecimentoListarView(
@@ -280,7 +277,7 @@ class RegistroReabastecimentoListarView(
     model = RegistroReabastecimento
     context_object_name = 'reabastecimentos'
     template_name = 'reabastecimento/lista.html'
-    paginate_by = 9
+    paginate_by = 6
 
     def get_queryset(self):
 
@@ -307,11 +304,9 @@ class RegistroReabastecimentoListarView(
         if q:
             queryset = queryset.filter(
 
-                Q(bomba__nome_bomba__icontains=q) |
-
                 Q(tanque__identificador_tanque__icontains=q) |
 
-                Q(tipo_combustivel__nome_combustivel__icontains=q)
+                Q(tanque__tipo_combustivel__nome_combustivel__icontains=q)
             )
         if data_inicio:
             queryset = queryset.filter(criado__gte=data_inicio)
@@ -341,5 +336,8 @@ class RegistroReabastecimentoDeletarView(
         obj = self.get_object()
 
         request.session['registro_a_deletar'] = obj.pk
+        request.session['next'] = request.POST.get('next')
 
-        return redirect('dois_fator:validacao_token_deletar')
+        return redirect(
+            'servicos:abastecimento:validacao_token_deletar_reabastecimento'
+        )
