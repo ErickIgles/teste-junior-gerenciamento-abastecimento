@@ -1,10 +1,15 @@
 from django.urls import path
+
 from .views import (
 
     RegistroAbastecimentoCadastroView,
     RegitroAbastecimentoListaView,
     RegistroAbastecimentoAtualizarView,
     RegistroAbastecimentoDeletarView,
+
+    RegistroReabastecimentoCadastrarView,
+    RegistroReabastecimentoListarView,
+    RegistroReabastecimentoDeletarView,
     )
 
 
@@ -12,7 +17,7 @@ app_name = 'abastecimento'
 urlpatterns = [
 
     path(
-        'cadastrar/',
+        'saida/',
         RegistroAbastecimentoCadastroView.as_view(),
         name='cadastrar'
     ),
@@ -31,4 +36,19 @@ urlpatterns = [
         RegistroAbastecimentoDeletarView.as_view(),
         name='deletar'
     ),
+    path(
+        'entrada/',
+        RegistroReabastecimentoCadastrarView.as_view(),
+        name='cadastrar_reabastecimento'
+    ),
+    path(
+        'entrada/listar/',
+        RegistroReabastecimentoListarView.as_view(),
+        name='listar_reabastecimento'
+    ),
+    path(
+        'entrada/deletar/<int:pk>/',
+        RegistroReabastecimentoDeletarView.as_view(),
+        name='deletar_reabastecimento'
+    )
 ]
