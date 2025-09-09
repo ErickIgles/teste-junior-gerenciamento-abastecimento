@@ -1,0 +1,119 @@
+{% extends 'home_template/pages/base.html' %}
+
+{% load static %}
+
+{% block title %} Rebastecimento {% endblock %}
+    
+{% block head %}
+    <link rel="stylesheet" href="{% static 'abastecimento/css/lista_abastecimento.css' %}">
+{% endblock  %}
+
+{% block main %}
+    <div class="campo-pagina">
+        <h2 class="titulo-listagem">Listagem de Rebastecimento</h2>
+        
+        {% include 'home_template/partials/messages.html' %}
+
+        <nav class="nav-pesquisa">
+            <form method="GET" class="form">
+
+                <div>
+                    <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
+                </div>
+                <div class="espaco-datas">
+                    <input type="date" name="data_inicio" class="form-data">
+                    <input type="date" name="data_fim" class="form-data">
+                </div>
+                <button type="submit" class="button-pesquisa">
+                    🔍
+                </button>
+            </form>
+
+            <div class="acoes-buttons">
+
+                <a 
+                    class="novo-registro" 
+                    href="{% url 'servicos:abastecimento:cadastrar_reabastecimento' %}"
+            
+                >
+                    Novo reabastecimento
+                </a>
+
+            </div>
+
+
+        </nav>
+
+
+        {% if page_obj %}
+            <div class="lista">
+                {% for reabastecimento in page_obj %}
+                    <table class="tabela">
+                        <tbody class="tabela-body">
+                            <tr>
+                                <th>Funcionário</th>
+                                <td>
+                                    {{ reabastecimento.funcionario.username }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Tanque</th>
+                                {% if reabastecimento.tanque %}
+                                    <td>
+                                        {{ reabastecimento.tanque.identificador_tanque }}
+                                    </td>
+                                {% else %}
+                                    <td>
+                                       Não há tanque registrado
+                                    </td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <th>Quantidade reabastecido</th>
+                                <td>
+                                    {{ reabastecimento.quantidade }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Data de registro</th>
+                                <td>
+                                    {{ reabastecimento.criado }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ações</th>
+                                <td class="acoes-buttons">
+                                    <a 
+                                        href="{% url 'servicos:abastecimento:deletar_reabastecimento' reabastecimento.pk %}"
+                                        class="btn deletar"
+                                    >
+                                        Apagar
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+
+            <div class="paginacao">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">«</a>
+                {% endif %}
+
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">»</a>
+                {% endif %}
+            </div>
+
+        {% else %}
+            <h2>Não há registros de Rebastecimentos</h2>
+        {% endif %}
+
+
+    </div>
+{% endblock %}
