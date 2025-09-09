@@ -7,7 +7,6 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 import qrcode
