@@ -1,0 +1,75 @@
+{% extends 'home_template/pages/base.html' %}
+{% load static %}
+
+{% block title %}
+Deletar Registro
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'abastecimento/css/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'abastecimento/css/lista_abastecimento.css' %}">
+
+{% endblock %}
+
+
+{% block main %}
+
+    <form 
+        method="POST" 
+        style="gap: 20px;" 
+        class="form" 
+        action="{% url 'servicos:abastecimento:deletar_reabastecimento' registro.pk %}"
+    >
+        {% csrf_token %}
+
+        <h2 class="form-titulo">Deseja apagar esse registro Abastecimento?</h2>
+        <table class="tabela">
+            <tbody class="tabela-body">
+                <tr>
+                    <th>Funcionário</th>
+                    <td>
+                        {% if registro.funcionario %}
+                            {{ reabastecimento.funcionario.username }}
+                        {% else %}
+                            <p>Offline</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Tanque</th>
+                    {% if registro.tanque %}
+                        <td>
+                            {{ registro.tanque.identificador_tanque }}
+                        </td>
+                    {% else %}
+                        <td>
+                            Não há tanque registrado
+                        </td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <th>Quantidade reabastecido</th>
+                    <td>
+                        {{ registro.quantidade }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Data de registro</th>
+                    <td>
+                        {{ registro.criado }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <input type="hidden" name='next' value="{{ request.GET.next }}">
+
+        <div class="form-action-deletar">
+            <button class="btn deletar" type="submit">
+                Deletar
+            </button>
+            <a href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" class="btn cancelar">
+                Cancelar
+            </a>
+        </div>
+    </form>
+{% endblock %}
