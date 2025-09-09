@@ -1,4 +1,5 @@
 from django.urls import reverse_lazy, reverse
+from django.shortcuts import redirect
 from django.views.generic import (
     CreateView,
     ListView,
@@ -10,12 +11,17 @@ from django.contrib import messages
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 
-from .models import RegistroAbastecimento
-from .forms import AbastecimentoForm, AbastecimentoUpdateForm
+from .models import RegistroAbastecimento, RegistroReabastecimento
+from .forms import (
+    AbastecimentoForm,
+    AbastecimentoUpdateForm,
+    ReabastecimentoTanqueForm
+)
 
 from core.mixins import GroupRequiredMixin
 from cadastros.funcionarios.models import Funcionario
 from cadastros.empresas.models import Empresa
+
 from .utils.mixins import EmpresaAbastecimentoPermissionMixin
 
 
@@ -198,3 +204,142 @@ class RegistroAbastecimentoDeletarView(
     context_object_name = 'abastecimento'
     template_name = 'abastecimento/form_delete.html'
     success_url = reverse_lazy('servicos:abastecimento:listar')
+
+
+class RegistroReabastecimentoCadastrarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    CreateView
+):
+    group_required = ['gerente_geral', 'administradores']
+    model = RegistroReabastecimento
+    form_class = ReabastecimentoTanqueForm
+    template_name = 'reabastecimento/form_register.html'
+    success_url = reverse_lazy('servicos:abastecimento:listar_reabastecimento')
+
+    def get_form_kwargs(self):
+
+        kwargs = super().get_form_kwargs()
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+            )
+
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
+
+            kwargs['usuario_funcionario'] = usuario_logado
+
+        return kwargs
+
+    def form_valid(self, form):
+
+        self.request.session['abastecimento_tanque_form'] = {
+            'tanque_id': form.cleaned_data['tanque'].id,
+            'quantidade': str(form.cleaned_data['quantidade']),
+        }
+        return redirect('dois_fator:validacao_token_criar')
+
+    def form_invalid(self, form):
+
+        messages.error(
+            self.request,
+            'Erro ao realizar o cadastro. Confira às informações.'
+        )
+
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+
+        if next_url:
+
+            return next_url
+
+        return reverse('servicos:abastecimento:listar_reabastecimento')
+
+
+class RegistroReabastecimentoListarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    ListView
+):
+
+    group_required = ['gerente_geral', 'administradores']
+    model = RegistroReabastecimento
+    context_object_name = 'reabastecimentos'
+    template_name = 'reabastecimento/lista.html'
+    paginate_by = 9
+
+    def get_queryset(self):
+
+        queryset = super().get_queryset()
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            queryset = queryset.filter(
+                empresa__usuario_responsavel=usuario_logado
+            )
+
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+            queryset = queryset.filter(
+                empresa=usuario_funcionario.empresa
+            )
+
+        q = self.request.GET.get('q')
+        data_inicio = self.request.GET.get('data_inicio')
+        data_fim = self.request.GET.get('data_fim')
+
+        if q:
+            queryset = queryset.filter(
+
+                Q(bomba__nome_bomba__icontains=q) |
+
+                Q(tanque__identificador_tanque__icontains=q) |
+
+                Q(tipo_combustivel__nome_combustivel__icontains=q)
+            )
+        if data_inicio:
+            queryset = queryset.filter(criado__gte=data_inicio)
+        if data_fim:
+            queryset = queryset.filter(criado__lte=data_fim)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class RegistroReabastecimentoDeletarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    DeleteView,
+):
+    group_required = ['gerente_geral', 'administradores']
+    model = RegistroReabastecimento
+    template_name = 'reabastecimento/form_delete.html'
+    context_object_name = 'registro'
+    success_url = reverse_lazy('servicos:abastecimento:listar_reabastecimento')
+
+    def post(self, request, *args, **kwargs):
+
+        obj = self.get_object()
+
+        request.session['registro_a_deletar'] = obj.pk
+
+        return redirect('dois_fator:validacao_token_deletar')
