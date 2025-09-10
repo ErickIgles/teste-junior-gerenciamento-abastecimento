@@ -1,19 +1,38 @@
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
+from django.db.models import Q
 from django.shortcuts import redirect, render, get_object_or_404
 
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.views.generic import CreateView, UpdateView, View
+from django.views.generic import (
+    CreateView,
+    UpdateView,
+    ListView,
+    DeleteView,
+    View
+)
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.http import Http404
 
-from .models import Empresa
-
-from .forms import EmpresaModelForm, EmpresaUpdateModelForm
 from core.mixins import GroupRequiredMixin
-from .utils.mixins import UserPermissionMixin, EmpresaPermissionMixin
-from django.contrib.auth.models import User
+
+from cadastros.funcionarios.models import Funcionario
+
+from .utils.mixins import (
+    UserPermissionMixin,
+    EmpresaPermissionMixin,
+    EmpresaSetorPermissionMixin
+)
+
+from .models import Empresa, Setor
+
+from .forms import (
+    EmpresaModelForm,
+    EmpresaUpdateModelForm,
+    SetorModelForm,
+)
 
 
 class EmpresaCriarView(CreateView):
@@ -129,3 +148,227 @@ class EmpresaInativarView(
             return redirect('home:index')
 
         return redirect('autenticacao:login')
+
+
+class SetorCadastrarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    CreateView
+):
+
+    group_required = ['gerente_geral', 'administradores']
+    model = Setor
+    form_class = SetorModelForm
+    template_name = 'setor/form_register.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+             )
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
+        return kwargs
+
+    def form_valid(self, form):
+
+        messages.success(
+            self.request,
+            'Setor cadatrado com sucesso.'
+        )
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+
+        messages.error(
+            self.request,
+            'Erro ao realizar o cadastro. Confira às informações.'
+        )
+
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+
+        next_url = (
+            self.request.GET.get('next')
+            or
+            self.request.POST.get('next')
+        )
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:empresas:listar_setor')
+
+
+class SetorListarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    ListView
+):
+    group_required = ['gerente_geral', 'admistradores']
+    model = Setor
+    template_name = 'setor/lista.html'
+    paginate_by = 6
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+
+            empresa = Empresa.objects.select_related(
+                'usuario_responsavel'
+            ).get(
+                usuario_responsavel=usuario_logado
+            )
+
+        else:
+
+            funcionario = Funcionario.objects.select_related(
+                'user'
+            ).get(
+                user=usuario_logado
+            )
+
+            empresa = Empresa.objects.get(
+                usuario_responsavel=funcionario.empresa.usuario_responvel
+            )
+
+        queryset = queryset.filter(
+            empresa=empresa
+        )
+
+        q = self.request.GET.get('q')
+
+        data_inicio = self.request.GET.get('data_inicio')
+
+        data_fim = self.request.GET.get('data_fim')
+
+        if q:
+
+            queryset = queryset.filter(
+                Q(nome_setor__icontains=q)
+            )
+
+        if data_inicio:
+
+            queryset = queryset.filter(criado__gte=data_inicio)
+
+        if data_fim:
+
+            queryset = queryset.filter(criado__lte=data_fim)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context['setor'] = self.get_queryset()
+
+        return context
+
+
+class SetorAtualizarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    EmpresaSetorPermissionMixin,
+    UpdateView
+):
+
+    group_required = ['gerente_geral', 'administradores']
+
+    model = Setor
+    form_class = SetorModelForm
+    template_name = 'setor/form_atualizar.html'
+    context_object_name = 'setor'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+             )
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
+        return kwargs
+
+    def form_valid(self, form):
+
+        messages.success(
+            self.request,
+            'Setor atualizado com sucesso.'
+        )
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+
+        messages.error(
+            self.request,
+            'Erro ao atualizar os dados. Confira às informações.'
+        )
+
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+
+        next_url = (
+            self.request.GET.get('next')
+            or
+            self.request.POST.get('next')
+        )
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:empresas:listar_setor')
+
+
+class SetorDeletarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    EmpresaSetorPermissionMixin,
+    DeleteView
+):
+
+    group_required = ['gerente_geral', 'administradores']
+    model = Setor
+    template_name = 'setor/form_delete.html'
+
+    def get_success_url(self):
+
+        next_url = (
+            self.request.GET.get('next')
+            or
+            self.request.POST.get('next')
+        )
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:empresas:listar_setor')
