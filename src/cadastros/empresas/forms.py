@@ -2,7 +2,7 @@ from django import forms
 
 
 from django.contrib.auth.models import User, Group
-from .models import Empresa
+from .models import Empresa, Setor
 
 
 class EmpresaModelForm(forms.ModelForm):
@@ -251,3 +251,52 @@ class EmpresaUpdateModelForm(forms.ModelForm):
             empresa.save()
 
         return empresa
+
+
+class SetorModelForm(forms.ModelForm):
+
+    nome_setor = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-input',
+                'placeholder': 'Setor'
+            }
+        ),
+        label='Setor'
+    )
+
+    class Meta:
+
+        model = Setor
+
+        fields = [
+            'nome_setor'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        self.empresa = kwargs.pop('empresa', None)
+        super().__init__(*args, **kwargs)
+
+    def clean_nome_setor(self):
+
+        setor = self.cleaned_data.get('nome_setor')
+
+        if len(setor) < 5:
+
+            self.add_error(
+                'nome_setor',
+                'O nome do setor não pode ser menor que 5 letras.'
+            )
+
+        return setor
+
+    def save(self, commit=True):
+        setor = super().save(commit=False)
+
+        setor.empresa = self.empresa
+
+        if setor:
+            setor.save()
+
+        return setor
