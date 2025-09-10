@@ -22,14 +22,14 @@ Deletar Registro
     >
         {% csrf_token %}
 
-        <h2 class="form-titulo">Deseja apagar esse registro Abastecimento?</h2>
+        <h2 class="form-titulo">Deseja apagar esse registro de Reabastecimento?</h2>
         <table class="tabela">
             <tbody class="tabela-body">
                 <tr>
                     <th>Funcionário</th>
                     <td>
                         {% if registro.funcionario %}
-                            {{ reabastecimento.funcionario.username }}
+                            {{ registro.funcionario.username }}
                         {% else %}
                             <p>Offline</p>
                         {% endif %}
