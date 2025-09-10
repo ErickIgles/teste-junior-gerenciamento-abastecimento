@@ -40,7 +40,7 @@
             <input 
                 type="hidden"
                 name='next'
-                value="{{ request.GET.next }}"
+                value="{{ request.GET.next|default:request.META.HTTP_REFERER }}"
             >
             
             <div class="form-actions">
