@@ -1,0 +1,61 @@
+{% extends 'home_template/pages/base.html' %}
+
+{% load static %}
+
+{% block title %} Validação {% endblock  %}
+
+{% block head %}
+   <link rel="stylesheet" href="{% static 'abastecimento/css/forms.css' %}">
+{% endblock  %}
+
+{% block main %}
+
+
+
+
+    <div class="form-espaco">
+
+        {% if error %}
+        <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        
+        <h1 class="form-titulo">Autenticação Requerida</h1>
+        <form method="post" class="form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="token">
+                    Digite o código do autenticador
+                </label>
+                <input 
+                    type="text" 
+                    id="token" 
+                    name="token"
+                    class="form-input" 
+                    required
+                >
+            </div>
+        
+            <div class="form-actions">
+                <button 
+                    type="submit"
+                    class="btn confirmar"
+                >
+                    Confirmar
+                </button>
+            </div>
+        </form>
+        
+        <p  class="messages-qrcode">
+            Não tem código configurado?
+            <a 
+                href="{% url 'servicos:abastecimento:pagina_qr' %}" 
+                target="_blank"
+                class=""
+            >
+            Clique aqui para gerar QRCode
+            </a>
+        </p>
+    </div>
+
+
+{% endblock %}
