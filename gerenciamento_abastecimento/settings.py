@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'servicos.abastecimento.apps.AbastecimentoConfig',
 
     'autenticacao.apps.AutenticacaoConfig',
-    'dois_fator.apps.DoisFatorConfig',
     'relatorios.apps.RelatoriosConfig',
 ]
 
