@@ -1,0 +1,40 @@
+.espaco-qrcode{
+    height: 100%;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.titulo{
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.espaco-qrcode-informacoes{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px
+}
+
+.espaco-qrcode-informacoes a{
+    text-decoration: none;
+    color: #2980b9;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.espaco-qrcode-informacoes a:hover{
+    text-decoration: underline;
+}
+
+img{
+    width: 200px;
+}
