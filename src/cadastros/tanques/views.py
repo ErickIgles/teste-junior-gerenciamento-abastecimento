@@ -108,18 +108,26 @@ class TanqueListarView(
 
         if usuario_logado.is_empresa():
 
+            empresa = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+            )
+
             queryset = queryset.filter(
-                empresa__usuario_responsavel=usuario_logado
+                empresa=empresa
             )
 
         else:
 
-            usuario_funcionario = Funcionario.objects.get(
+            funcionario = Funcionario.objects.get(
                 user=usuario_logado
             )
 
+            empresa = Empresa.objects.get(
+                usuario_responsavel=funcionario.empresa.usuario_responsavel
+            )
+
             queryset = queryset.filter(
-                empresa__usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+                empresa__usuario_responsavel=empresa
             )
 
         q = self.request.GET.get("q")
