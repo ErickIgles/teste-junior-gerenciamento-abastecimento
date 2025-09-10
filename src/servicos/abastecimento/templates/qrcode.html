@@ -1,0 +1,36 @@
+{% extends 'home_template/pages/base.html' %}
+{% load static %}
+
+{% block title %}
+    QRCode
+{% endblock  %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'abastecimento/css/qrcode.css' %}">
+{% endblock  %}
+
+
+{% block main %}
+
+    <div class="espaco-qrcode">
+
+        <div class="espaco-qrcode-informacoes">
+            <h1>Configuração do autenticador</h1>
+            <p>Escaneie este QRCode no app (Google Authenticator, Authy, etc.)</p>
+            
+            <p>Depois de configurar, volte e insira o código na tela de validação.</p>
+            <a 
+            href="{{ request.GET.next|default:request.META.HTTP_REFERER }}"
+            >
+            Ir para validação
+        </a>
+    </div>
+    <img src="{% url 'servicos:abastecimento:gerador_qr' %}" alt="QRCode de configuração">
+    <p>
+        Novos token são gerados a cada 30s no aplicativo de Autenticação (Google Authenticator).
+        Cada token só pode ser utilizado uma única vez.
+    </p>
+</div>
+
+{% endblock  %}
+
