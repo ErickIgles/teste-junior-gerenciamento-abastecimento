@@ -1,7 +1,9 @@
 from django.contrib import messages
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import ProtectedError
 from django.urls import reverse
+from django.shortcuts import redirect
 from django.views.generic import (
     CreateView,
     ListView,
@@ -440,6 +442,20 @@ class CombustivelDeletarView(
     model = Combustivel
     template_name = 'combustiveis/form_delete.html'
     context_object_name = 'combustivel'
+
+    def post(self, request, *args, **kwargs):
+
+        self.object = self.get_object()
+
+        try:
+            return super().delete(request, *args, **kwargs)
+
+        except ProtectedError:
+            messages.error(
+                request,
+                'Este combustível não pode ser excluído porque já foi usado em abastecimento.'
+            )
+            return redirect(self.get_success_url())
 
     def get_success_url(self):
 
