@@ -1,0 +1,61 @@
+{% extends 'home_template/pages/base.html' %}
+
+{% load static %}
+
+{% block title %} Bombas {% endblock %}
+    
+{% block head %}
+    <link rel="stylesheet" href="{% static 'cargo/css/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'cargo/css/lista.css' %}">
+
+{% endblock  %}
+
+
+{% block main %}
+
+    <div class="form-espaco">
+        <h2 class="form-titulo">
+            Deleção de Setor
+        </h2>
+
+        {% include 'home_template/partials/messages.html' %}
+
+        <form method="POST" action="{% url 'cadastros:empresas:deletar_cargo' cargo.pk %}" class="form">
+            {% csrf_token %}
+
+            {% if cargo %}
+                <table class="tabela">
+                    <tbody class="tabela-body">
+                        <tr>
+                            <th>Cargo</th>
+                                    
+                            <td>
+                                {{ cargo.nome_cargo }}
+                            </td>
+                            </tr>
+                    </tbody>
+                </table>
+
+            {% endif %}
+
+            <input 
+                type="hidden"
+                name='next'
+                value="{{ request.GET.next }}"
+            >
+
+                        
+            <div class="form-actions">
+                <button class="btn deletar" type="submit">
+                    Deletar
+                </button>
+                
+                <a href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" class="btn cancelar">
+                    Cancelar
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+{% endblock %}
