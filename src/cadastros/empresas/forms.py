@@ -2,7 +2,7 @@ from django import forms
 
 
 from django.contrib.auth.models import User, Group
-from .models import Empresa, Setor
+from .models import Empresa, Setor, Cargo
 
 
 class EmpresaModelForm(forms.ModelForm):
@@ -300,3 +300,82 @@ class SetorModelForm(forms.ModelForm):
             setor.save()
 
         return setor
+
+
+class CargoModelForm(forms.ModelForm):
+
+    nome_cargo = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-input',
+                'placeholder': 'Cargo'
+            }
+        ),
+        label='Cargo'
+    )
+    setor = forms.ModelChoiceField(
+        required=True,
+        queryset=Setor.objects.none(),
+        widget=forms.Select(
+            attrs={
+                'class': 'form-select'
+            }
+        ),
+        label='Setor'
+    )
+
+    class Meta:
+
+        model = Cargo
+        fields = [
+            'nome_cargo',
+            'setor'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        self.empresa = kwargs.pop('empresa', None)
+        super().__init__(*args, **kwargs)
+
+        if self.empresa:
+
+            self.fields['setor'].queryset = Setor.objects.select_related(
+                'empresa'
+            ).filter(
+                empresa=self.empresa
+            )
+
+        if self.instance and self.instance.pk:
+
+            setor_atual = self.instance.setor
+
+            if setor_atual and setor_atual not in self.fields['setor'].queryset:
+
+                self.fields['setor'].queryset = Setor.objects.filter(
+                    empresa=setor_atual.empresa
+                )
+
+    def clean_nome_cargo(self):
+
+        nome_cargo = self.cleaned_data.get('nome_cargo')
+
+        if len(nome_cargo) < 7:
+
+            self.add_error(
+                'nome_cargo',
+                'O nome do cargo não pode ser menor que 7 letras'
+            )
+
+        return nome_cargo
+
+    def save(self, commit=True):
+
+        cargo = super().save(commit=False)
+
+        cargo.empresa = self.empresa
+
+        if commit:
+
+            cargo.save()
+
+        return cargo
