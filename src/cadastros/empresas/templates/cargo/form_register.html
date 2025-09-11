@@ -1,0 +1,58 @@
+{% extends 'home_template/pages/base.html' %}
+{% load static %}
+
+{% block title %} Setor {% endblock %}
+
+{% block head %} 
+    <link rel="stylesheet" href="{% static 'cargo/css/forms.css'%}">
+{% endblock %}
+
+
+{% block main %}
+   <div class="form-espaco">
+        <form method="POST" action="{% url 'cadastros:empresas:cadastrar_cargo' %}">
+            {% csrf_token %}
+            
+            <h2 class="form-titulo">Registro de Cargo</h2>
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+                    {% if field.errors %}
+                        {% for erro in field.errors %}
+                            <p class="messages-error">{{ erro }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <input 
+                type="hidden"
+                name='next'
+                value="{{ request.GET.next }}"
+            >
+            
+            <div class="form-actions">
+                <button 
+                    class="btn cadastrar" 
+                    type="submit"
+                >
+                    Cadastrar
+                </button>
+
+
+                <a 
+                    href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" class=" btn cancelar"
+                >
+                    Cancelar
+                </a>
+            </div>
+
+        </form>
+
+   </div>
+{% endblock  %}
