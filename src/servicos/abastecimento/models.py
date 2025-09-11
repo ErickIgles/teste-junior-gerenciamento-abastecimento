@@ -92,7 +92,14 @@ class RegistroReabastecimento(Base):
     quantidade = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        verbose_name='Valor do reabastecimento'
+        verbose_name='Volume'
+    )
+
+    valor_total_reabastecimento = models.DecimalField(
+        verbose_name='Valor total do reabastecimento',
+        max_digits=10,
+        decimal_places=2,
+        default=0.0
     )
 
     empresa = models.ForeignKey(
@@ -113,6 +120,19 @@ class RegistroReabastecimento(Base):
 
         verbose_name = 'Reabastecimento'
         verbose_name_plural = 'Reabastecimentos'
+
+    def save(self, *args, **kwargs):
+        if (self.tanque.quantidade_disponivel + self.quantidade) > self.tanque.capacidade_maxima:
+
+            raise ValidationError(
+                'Não pode exceder a capacidade máxima do tanque.'
+            )
+
+        self.valor_total_reabastecimento = (
+            self.tanque.tipo_combustivel.valor_compra * self.quantidade
+        )
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
 
