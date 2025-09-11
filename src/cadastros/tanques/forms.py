@@ -289,7 +289,18 @@ class CombustivelForm(forms.ModelForm):
                 'class': 'form-input'
             }
         ),
-        label='Valor do imposto: %'
+        label='Percentual do imposto: %'
+    )
+
+    valor_compra = forms.DecimalField(
+        localize=True,
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-input'
+            }
+        ),
+        label='Valor de compra: R$'
     )
 
     class Meta:
@@ -297,7 +308,8 @@ class CombustivelForm(forms.ModelForm):
         fields = [
             'nome_combustivel',
             'valor_base',
-            'imposto'
+            'imposto',
+            'valor_compra'
         ]
 
     def __init__(self, *args, **kwargs):
