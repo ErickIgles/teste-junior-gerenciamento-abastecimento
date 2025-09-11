@@ -69,7 +69,7 @@
                                 {% endif %}
                             </tr>
                             <tr>
-                                <th>Quantidade reabastecido</th>
+                                <th>Quantidade reabastecido L</th>
                                 <td>
                                     {{ reabastecimento.quantidade }}
                                 </td>
@@ -78,6 +78,12 @@
                                 <th>Data de registro</th>
                                 <td>
                                     {{ reabastecimento.criado }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Valor do reabastecimento R$</th>
+                                <td>
+                                    {{ reabastecimento.valor_total_reabastecimento }}
                                 </td>
                             </tr>
                             <tr>
