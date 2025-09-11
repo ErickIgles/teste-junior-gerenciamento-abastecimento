@@ -60,20 +60,24 @@ class RegistroAbastecimento(Base):
     def save(self, *args, **kwargs):
 
         if not self.bomba:
+
             raise ValidationError(
                 """Selecione uma bomba para o abastecimento."""
             )
+
         self.tanque = self.bomba.tanque
 
         if self.tanque.quantidade_disponivel < self.litros_abastecido:
+
             raise ValidationError(
                 "Quantidade insuficiente no tanque para o abastecimento."
             )
+
         self.valor_total_abastecimento = (
+
             self.tanque.tipo_combustivel.valor_total * self.litros_abastecido
+
         )
-        self.tanque.quantidade_disponivel -= self.litros_abastecido
-        self.tanque.save()
 
         super().save(*args, **kwargs)
 
@@ -128,8 +132,10 @@ class RegistroReabastecimento(Base):
                 'Não pode exceder a capacidade máxima do tanque.'
             )
 
+        valor_compra = self.tanque.tipo_combustivel.valor_compra
+
         self.valor_total_reabastecimento = (
-            self.tanque.tipo_combustivel.valor_compra * self.quantidade
+            valor_compra * self.quantidade
         )
 
         super().save(*args, **kwargs)
