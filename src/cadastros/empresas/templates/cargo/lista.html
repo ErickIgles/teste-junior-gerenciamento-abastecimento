@@ -1,0 +1,117 @@
+{% extends 'home_template/pages/base.html' %}
+
+{% load static %}
+
+{% block title %} Bombas {% endblock %}
+    
+{% block head %}
+    <link rel="stylesheet" href="{% static 'cargo/css/lista.css' %}">
+
+{% endblock  %}
+
+
+{% block main %}
+    <div class="campo-pagina">
+        <h2 class="">Listagem de Cargos</h2>
+
+        {% include 'home_template/partials/messages.html' %}
+
+            
+        <nav class="nav-pesquisa">
+            <form method="GET" class="form">
+
+                <div>
+                    <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
+                </div>
+                <div class="espaco-datas">
+                    <input type="date" name="data_inicio" class="form-data">
+                    <input type="date" name="data_fim" class="form-data">
+                </div>
+                <button type="submit" class="button-pesquisa">
+                    🔍
+                </button>
+            </form>
+
+            <div class="acoes-buttons">
+
+                <a 
+                    class="novo-registro" 
+                    href="{% url 'cadastros:empresas:cadastrar_cargo' %}"
+            
+                >
+                    Novo registro
+                </a>
+
+            </div>
+
+
+        </nav>
+
+
+        {% if page_obj %}
+            <div class="lista">
+                {% for cargo in page_obj %}
+                    <table class="tabela">
+                        <tbody class="tabela-body">
+                            <tr>
+                                <th>Cargo</th>
+                                <td>
+                                    {{ cargo.nome_cargo }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Data de registro</th>
+                                <td>
+                                    {{ cargo.criado }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Data de alteração</th>
+                                <td>
+                                    {{ cargo.modificado }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ações</th>
+                                <td class="acoes-buttons">
+                                    <a 
+                                        a href="{% url 'cadastros:empresas:atualizar_cargo' cargo.pk %}?next={{ request.get_full_path }}" 
+                                        class="btn atualizar"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <a 
+                                        href="{% url 'cadastros:empresas:deletar_cargo' cargo.pk %}?next={{ request.get_full_path }}"
+                                        class="btn deletar"
+                                    >
+                                        Deletar
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+
+            <div class="paginacao">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">«</a>
+                {% endif %}
+
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">»</a>
+                {% endif %}
+            </div>
+
+        {% else %}
+            <h2>Não há registros</h2>
+        {% endif %}
+
+
+    </div>
+{% endblock %}
