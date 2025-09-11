@@ -13,6 +13,7 @@ from ..models import RegistroAbastecimento, RegistroReabastecimento
 
 @receiver(pre_save, sender=RegistroAbastecimento)
 def guardar_valor_antigo_abastecimento(sender, instance, **kwargs):
+    print("🚀 Signal de guardar executado!")
 
     if instance.pk:
 
@@ -27,7 +28,7 @@ def guardar_valor_antigo_abastecimento(sender, instance, **kwargs):
 
 @receiver(post_save, sender=RegistroAbastecimento)
 def atualizar_estoque_abastecimento(sender, instance, created, **kwargs):
-    print("🚀 Signal de abastecimento executado!")
+    print("🚀 Signal de atualizar abastecimento executado!")
     tanque = instance.tanque
 
     if created:
@@ -45,17 +46,28 @@ def atualizar_estoque_abastecimento(sender, instance, created, **kwargs):
 
 @receiver(post_delete, sender=RegistroAbastecimento)
 def devolver_estoque_abastecimento(sender, instance, **kwargs):
+    print("🚀 Signal de devolver abastecimento executado!")
 
     tanque = instance.tanque
 
-    tanque.quantidade_disponivel += instance.listros_abstecido
+    tanque.quantidade_disponivel += instance.litros_abastecido
 
     tanque.save()
 
 
 # Reabastecimento
+@receiver(pre_save, sender=RegistroReabastecimento)
+def guardar_valor_antigo_reabastecimento(sender, instance, **kwargs):
+    if instance.pk:
+        antigo = sender.objects.get(pk=instance.pk)
+        instance._antiga_quantidade = antigo.quantidade
+    else:
+        instance._antiga_quantidade = 0
+
+
 @receiver(post_save, sender=RegistroReabastecimento)
 def atualizar_estoque_reabastecimento(sender, instance, created, **kwargs):
+    print("🚀 Signal de atualizar reabastecimento executado!")
 
     tanque = instance.tanque
 
@@ -63,11 +75,18 @@ def atualizar_estoque_reabastecimento(sender, instance, created, **kwargs):
 
         tanque.quantidade_disponivel += instance.quantidade
 
+    else:
+
+        diferenca = instance.quantidade - instance._antiga_quantidade
+
+        tanque.quantidade_disponivel += diferenca
+
         tanque.save()
 
 
 @receiver(post_delete, sender=RegistroReabastecimento)
 def remover_estoque_reabastecimento(sender, instance, **kwargs):
+    print("🚀 Signal de remover estoque de reabastecimento executado!")
 
     tanque = instance.tanque
 
