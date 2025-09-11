@@ -23,15 +23,17 @@ from cadastros.funcionarios.models import Funcionario
 from .utils.mixins import (
     UserPermissionMixin,
     EmpresaPermissionMixin,
-    EmpresaSetorPermissionMixin
+    EmpresaSetorPermissionMixin,
+    EmpresaCargoPermissionMixin
 )
 
-from .models import Empresa, Setor
+from .models import Empresa, Setor, Cargo
 
 from .forms import (
     EmpresaModelForm,
     EmpresaUpdateModelForm,
     SetorModelForm,
+    CargoModelForm
 )
 
 
@@ -372,3 +374,227 @@ class SetorDeletarView(
             return next_url
 
         return reverse('cadastros:empresas:listar_setor')
+
+
+class CargoCadastrarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    CreateView
+):
+
+    group_required = ['gerente_geral', 'administradores']
+    model = Cargo
+    form_class = CargoModelForm
+    template_name = 'cargo/form_register.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+             )
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
+        return kwargs
+
+    def form_valid(self, form):
+
+        messages.success(
+            self.request,
+            'Cargo cadatrado com sucesso.'
+        )
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+
+        messages.error(
+            self.request,
+            'Erro ao realizar o cadastro. Confira às informações.'
+        )
+
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+
+        next_url = (
+            self.request.GET.get('next')
+            or
+            self.request.POST.get('next')
+        )
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:empresas:listar_cargo')
+
+
+class CargoListarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    ListView
+):
+
+    group_required = ['gerente_geral', 'administradores']
+    model = Cargo
+    template_name = 'cargo/lista.html'
+    paginate_by = 6
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+
+            empresa = Empresa.objects.select_related(
+                'usuario_responsavel'
+            ).get(
+                usuario_responsavel=usuario_logado
+            )
+
+        else:
+
+            funcionario = Funcionario.objects.select_related(
+                'user'
+            ).get(
+                user=usuario_logado
+            )
+
+            empresa = Empresa.objects.get(
+                usuario_responsavel=funcionario.empresa.usuario_responvel
+            )
+
+        queryset = queryset.filter(
+            empresa=empresa
+        )
+
+        q = self.request.GET.get('q')
+
+        data_inicio = self.request.GET.get('data_inicio')
+
+        data_fim = self.request.GET.get('data_fim')
+
+        if q:
+
+            queryset = queryset.filter(
+                Q(nome_cargo__icontains=q) |
+                Q(setor__nome_setor__icontains=q)
+            )
+
+        if data_inicio:
+
+            queryset = queryset.filter(criado__gte=data_inicio)
+
+        if data_fim:
+
+            queryset = queryset.filter(criado__lte=data_fim)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context['cargo'] = self.get_queryset()
+
+        return context
+
+
+class CargoAtualizarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    EmpresaCargoPermissionMixin,
+    UpdateView
+):
+
+    group_required = ['gerente_geral', 'administradores']
+    model = Cargo
+    form_class = CargoModelForm
+    template_name = 'cargo/form_atualizar.html'
+    context_object_name = 'cargo'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_logado
+             )
+        else:
+            usuario_funcionario = Funcionario.objects.get(
+                user=usuario_logado
+            )
+
+            kwargs['empresa'] = Empresa.objects.get(
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
+        return kwargs
+
+    def form_valid(self, form):
+
+        messages.success(
+            self.request,
+            'Cargo atualizado com sucesso.'
+        )
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+
+        messages.error(
+            self.request,
+            'Erro ao atualizar os dados. Confira às informações.'
+        )
+
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+
+        next_url = (
+            self.request.GET.get('next')
+            or
+            self.request.POST.get('next')
+        )
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:empresas:listar_cargo')
+
+
+class CargoDeletarView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    EmpresaCargoPermissionMixin,
+    DeleteView
+):
+    group_required = ['gerente_geral', 'administradores']
+    model = Cargo
+    template_name = 'cargo/form_delete.html'
+
+    def get_success_url(self):
+
+        next_url = (
+            self.request.GET.get('next')
+            or
+            self.request.POST.get('next')
+        )
+        if next_url:
+
+            return next_url
+
+        return reverse('cadastros:empresas:listar_cargo')
