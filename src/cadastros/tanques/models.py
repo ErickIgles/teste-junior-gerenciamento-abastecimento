@@ -28,6 +28,12 @@ class Combustivel(Base):
         decimal_places=2,
         default=0
     )
+    valor_compra = models.DecimalField(
+        verbose_name='Preço de compra',
+        max_digits=10,
+        decimal_places=2,
+        default=0.0
+    )
     empresa = models.ForeignKey(
         Empresa,
         verbose_name='Empresa',
