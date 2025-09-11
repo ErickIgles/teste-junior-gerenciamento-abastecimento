@@ -19,10 +19,19 @@ class RegistroAbastecimentoAdmin(admin.ModelAdmin):
         'modificado',
         'ativo'
     ]
+
     list_display_links = [
         'id',
         'tanque'
     ]
+
+    list_filter = [
+        'funcionario',
+        'empresa',
+        'tanque',
+        'bomba'
+    ]
+
     ordering = (
         'id',
         'criado',
@@ -37,6 +46,7 @@ class RegistroReabastecimentoAdmin(admin.ModelAdmin):
         'tanque',
         'quantidade',
         'funcionario',
+        'valor_total_reabastecimento',
         'empresa',
         'criado',
         'modificado',
@@ -46,6 +56,17 @@ class RegistroReabastecimentoAdmin(admin.ModelAdmin):
     list_display_links = [
         'id',
         'tanque',
+    ]
+
+    search_fields = [
+        'tanque',
+        'empresa'
+    ]
+
+    list_filter = [
+        'empresa',
+        'funcionario',
+        'tanque'
     ]
 
     ordering = (
