@@ -191,7 +191,7 @@ body{
     background-color: #e74c3c;
 }
 
-.messages li.warning {
+.messages li.info {
     background-color: #f39c12;
 }
 
