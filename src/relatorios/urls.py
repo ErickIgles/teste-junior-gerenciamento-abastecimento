@@ -5,7 +5,11 @@ from .views import (
     RelatorioAbastecimentosPDF,
 
     RelatorioReabastecimentos,
-    RelatorioReabastecimentosPDF
+    RelatorioReabastecimentosPDF,
+
+    RelatorioTanqueAbastecimentoDetalhado,
+
+    RelatorioTanqueAbastecimentoDetalhadoPDF,
 )
 
 app_name = 'relatorios'
@@ -34,6 +38,18 @@ urlpatterns = [
         'relatorios/reabastecimentos/pdf/',
         RelatorioReabastecimentosPDF.as_view(),
         name='relatorios_reabastecimentos_pdf'
+    ),
+
+    path(
+        'relatorios/tanques/detalhado/<int:pk>/',
+        RelatorioTanqueAbastecimentoDetalhado.as_view(),
+        name='tanque_detalhes'
+    ),
+
+    path(
+        'relatorios/abastecimentos/tanques/pdf/<int:pk>/',
+        RelatorioTanqueAbastecimentoDetalhadoPDF.as_view(),
+        name='tanque_detalhes_pdf'
     )
 
 ]
