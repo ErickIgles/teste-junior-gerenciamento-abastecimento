@@ -1,0 +1,50 @@
+{% extends 'home_template/pages/base.html' %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'relatorios/css/detalhes.css' %}">
+{% endblock  %}
+
+
+
+{% block main %}
+    <div class="relatorio-tanque">
+        <h2>Relatório do Tanque: {{ tanque.nome }}</h2>
+        
+        {% for bomba in bombas %}
+            <h3>Bomba: {{ bomba.nome }}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Valor</th>
+                        <th>Responsável</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for abastecimento in bomba.registroabastecimento_set.all %}
+                    <tr>
+                        <td data-label="Data">
+                            {{ abastecimento.criado|date:"d/m/Y" }}
+                        </td>
+                        <td data-label="Hora">
+                            {{ abastecimento.criado|time:"H:i" }}
+                        </td>
+                        <td data-label="Valor">
+                            R$ {{ abastecimento.valor_total_abastecimento|floatformat:2 }}
+                        </td>
+                        <td data-label="Responsavel">
+                            {{ abastecimento.funcionario }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4">Nenhum abastecimento</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+
+
+{% endblock  %}
