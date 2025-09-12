@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 
 from django.views.generic import ListView
 from django.db.models import Q, Sum
+from django.views.generic import TemplateView
 
 from servicos.abastecimento.models import (
     RegistroAbastecimento,
@@ -364,5 +365,93 @@ class RelatorioReabastecimentosPDF(
 
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['content-Disposition'] = 'attachment; filename="relatorio_reabastecimento.pdf"'
+
+        return response
+
+
+class RelatorioTanqueAbastecimentoDetalhado(
+    LoginRequiredMixin,
+    TemplateView
+):
+    template_name = 'relatorios/tanque_detalhado.html'
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        tanque_id = self.kwargs['pk']
+
+        usuario = self.request.user
+
+        if usuario.is_empresa():
+
+            empresa = Empresa.objects.get(usuario_responsavel=usuario)
+
+        else:
+
+            empresa = Funcionario.objects.get(user=usuario).empresa
+
+        data_inicio = self.request.GET.get('data_inicio')
+
+        data_fim = self.request.GET.get('data_fim')
+
+        abastecimentos = RegistroAbastecimento.objects.filter(
+            tanque_id=tanque_id,
+
+            empresa=empresa
+        ).select_related(
+            'bomba',
+            'funcionario'
+        )
+
+        if data_inicio and data_fim:
+
+            abastecimentos = abastecimentos.filter(
+
+                criado__range=[data_inicio, data_fim]
+            )
+
+        bombas = {}
+        for abastecimento in abastecimentos:
+
+            bombas.setdefault(abastecimento.bomba, []).append(abastecimento)
+
+        context['tanque'] = Tanque.objects.get(pk=tanque_id)
+
+        context['bombas'] = bombas
+
+        context['total_litros'] = abastecimentos.aggregate(
+            Sum(
+                'litros_abastecido'
+            )
+        )['litros_abastecido__sum'] or 0
+
+        context['total_valor'] = abastecimentos.aggregate(
+
+            Sum(
+                'valor_total_abastecimento'
+            )
+        )['valor_total_abastecimento__sum'] or 0
+
+        return context
+
+
+class RelatorioTanqueAbastecimentoDetalhadoPDF(
+    RelatorioTanqueAbastecimentoDetalhado
+):
+
+    def get(self, request, *args, **kwargs):
+
+        context = self.get_context_data(**kwargs)
+
+        html_string = render_to_string(
+            'relatorios/tanque_detalhado_pdf.html', context
+        )
+
+        pdf_file = HTML(string=html_string).write_pdf()
+
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+
+        response['Content-Disposition'] = f'attachment; filename="relatorio_tanque_{context["tanque"].id}.pdf"'
 
         return response
