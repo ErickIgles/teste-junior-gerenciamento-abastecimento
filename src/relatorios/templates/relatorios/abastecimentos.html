@@ -1,0 +1,134 @@
+{% extends 'home_template/pages/base.html' %}
+{% load static %}
+
+{% block title %} Relátios {% endblock  %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'relatorios/css/lista.css' %}">
+{% endblock  %}
+
+
+
+{% block main %}
+
+    <div class="campo-pagina">
+        <h2 class="titulo-listagem">Página de relatórios de abastecimento</h2>
+
+        <nav class="nav-pesquisa">
+            <form method="GET" class="form">
+
+                <div class="filtros-primarios">
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        placeholder="Pesquisar..." 
+                        name="q"
+                        value="{{ request.GET.q }}"
+                    >
+
+                    <input 
+                        type="date"
+                        name="data_inicio"
+                        class="form-data"
+                        value="{{ request.GET.data_inicio }}"
+                    >
+                    <input 
+                        type="date"
+                        name="data_fim"
+                        class="form-data"
+                        value="{{ request.GET.data_fim }}"
+                    >
+                </div>
+                <div class="filtros-secundarios">
+                    <select name="funcionario" id="funcionario" class="form-select">
+                        <option value="">Funcionários</option>
+                        
+                        {% for funcionario in funcionarios %}
+                            <option 
+                                value="{{ funcionario.id }}"
+                                {% if request.GET.funcionario == funcionario.id|stringformat:"s" %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ funcionario.nome_funcionario }}
+                            </option>
+                        {% endfor %}
+                            
+                    </select>
+                    <select name="tipo_combustivel" id="tipo_combustivel" class="form-select">
+                        <option value="">Combustíveis</option>
+                        {% for tipo in tipos_combustivel %}
+                            <option 
+                                value="{{ tipo.id}}"
+                                {% if request.GET.tipo_combustivel == tipo.id|stringformat:"s" %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{tipo.nome_combustivel}}
+                            </option>
+                        {% endfor %}
+                            
+                    </select>
+                    <select name="forma_pagamento" id="forma_pagamento" class="form-select">
+                        <option value="">
+                            Formas de pagamento
+                        </option>
+                    </select>
+                </div>
+                <button type="submit" class="button-pesquisa">
+                    🔍
+                </button>
+
+            </form>
+
+            <a 
+                href="{% url 'relatorios:relatorios_abastecimentos_pdf' %}?{{ request.GET.urlencode }}" class="btn pdf"
+            >
+                📄 Baixar PDF
+            </a>
+
+        </nav>
+
+        
+        {% for abastecimento in registros %}
+            
+            <table class="tabela">
+                <tbody class="tabela-body">
+                    <tr>
+                        <th>Data</th>
+                        <td>{{ abastecimento.criado }}</td>
+                    </tr>
+                    <tr>
+                        <th>Funcionário</th>
+                        <td>{{ abastecimento.funcionario }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tanque</th>
+                        <td>{{ abastecimento.tanque.identificador_tanque }}</td>
+                    </tr>
+                    <tr>
+                        <th>Combustível</th>
+                        <td>{{ abastecimento.tanque.tipo_combustivel }}</td>
+                    </tr>
+                    <tr>
+                        <th>Litros</th>
+                        <td>{{ abastecimento.litros_abastecido }}</td>
+                    </tr>
+                    <tr>
+                        <th>Valor</th>
+                        <td>{{ abastecimento.valor_total_abastecimento }}</td>
+                    </tr>
+                    <tr>
+                        <th>Forma de pagamento</th>
+                        <td>{{ abastecimento.get_forma_pagamento_display }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        {% endfor %}
+            
+        <p><strong>Total de litros:</strong> {{ total_litros }}</p>
+        <p><strong>Total em reais:</strong> R$ {{ total_valor|floatformat:2 }}</p>
+
+    </div>
+{% endblock  %}
