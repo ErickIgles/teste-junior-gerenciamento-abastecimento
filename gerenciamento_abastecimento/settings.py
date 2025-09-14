@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'cadastros.tanques.apps.TanquesConfig',
     'cadastros.funcionarios.apps.FuncionariosConfig',
     'cadastros.empresas.apps.EmpresasConfig',
-    'cadastros.fornecedore.apps.FornecedoresConfig'
+    'cadastros.fornecedores.apps.FornecedoresConfig',
 
     'servicos.abastecimento.apps.AbastecimentoConfig',
 
