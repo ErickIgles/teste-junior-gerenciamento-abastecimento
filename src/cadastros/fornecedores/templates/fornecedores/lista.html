@@ -1,0 +1,127 @@
+{% extends 'home_template/pages/base.html' %}
+
+{% load static %}
+
+{% block title %} Fornecedores {% endblock %}
+    
+{% block head %}
+    <link rel="stylesheet" href="{% static 'fornecedores/css/lista.css' %}">
+
+{% endblock  %}
+
+
+{% block main %}
+    <div class="campo-pagina-fornecedor">
+        <h2 class="titulo-fornecedor-listagem">Listagem de Fornecedores</h2>
+
+        {% include 'home_template/partials/messages.html' %}
+
+            
+        <nav class="nav-pesquisa">
+            <form method="GET" class="form">
+
+                <div>
+                    <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
+                </div>
+                <div class="espaco-datas">
+                    <input type="date" name="data_inicio" class="form-data">
+                    <input type="date" name="data_fim" class="form-data">
+                </div>
+                <button type="submit" class="button-pesquisa">
+                    🔍
+                </button>
+            </form>
+
+            <div class="acoes-buttons">
+
+                <a 
+                    class="novo-registro" 
+                    href="{% url 'cadastros:fornecedores:cadastrar' %}?next={{ request.get_full_path }}"
+                >
+                    Novo registro
+                </a>
+
+            </div>
+
+
+        </nav>
+
+
+        {% if page_obj %}
+            <div class="lista-fornecedor">
+                {% for fornecedor in page_obj %}
+                    <table class="tabela-fornecedor">
+                        <tbody class="tabela-body">
+                            <tr>
+                                <th>Nome Fantasia</th>
+                                <td>
+                                    {{ fornecedor.nome_fantasia }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>CNPJ</th>
+                                <td>
+                                    {{ fornecedor.cnpj }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Contato</th>
+                                <td>
+                                    {{ fornecedor.contato_principal }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Telefone</th>
+                                <td>
+                                    {{ fornecedor.telefone }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>E-mail</th>
+                                <td>
+                                    {{ fornecedor.email }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ações</th>
+                                <td class="acoes-buttons">
+                                    <a 
+                                        href="{% url 'cadastros:fornecedores:editar' fornecedor.pk %}?next={{ request.get_full_path }}" 
+                                        class="btn atualizar"
+                                    >
+                                        Editar
+                                    </a>
+                                    <a
+                                        href="{% url 'cadastros:fornecedores:deletar' fornecedor.pk %}?next{{ request.get_full_path }}"
+                                        class="btn deletar"
+                                    >
+                                        Apagar
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+
+            <div class="paginacao">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">«</a>
+                {% endif %}
+
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">»</a>
+                {% endif %}
+            </div>
+
+        {% else %}
+            <h2>Não há registros de fornecedores</h2>
+        {% endif %}
+
+
+    </div>
+{% endblock %}
