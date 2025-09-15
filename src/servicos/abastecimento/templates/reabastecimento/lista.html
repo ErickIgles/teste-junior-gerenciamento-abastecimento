@@ -69,6 +69,19 @@
                                 {% endif %}
                             </tr>
                             <tr>
+                                <th>Fornecedor</th>
+                                {% if reabastecimento.fornecedor %}
+                                    <td>
+                                        {{ reabastecimento.fornecedor.nome_fantasia }}
+                                    </td>
+                                {% else %}
+                                    <td>
+                                       Não há fornecedor registrado
+                                    </td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                            <tr>
                                 <th>Quantidade reabastecido L</th>
                                 <td>
                                     {{ reabastecimento.quantidade }}
