@@ -45,7 +45,7 @@ INSTALLED_APPS = [
 
     'autenticacao.apps.AutenticacaoConfig',
     'relatorios.apps.RelatoriosConfig',
-    'dashboard.apps.Dashboard',
+    'dashboard.apps.DashboardConfig',
 ]
 
 MIDDLEWARE = [
