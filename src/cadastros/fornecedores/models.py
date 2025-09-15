@@ -2,6 +2,8 @@ from django.db import models
 
 
 from core.models import Base
+
+from cadastros.empresas.models import Empresa
 # Create your models here.
 
 
@@ -49,6 +51,14 @@ class Fornecedor(Base):
         blank=True,
         null=True,
         verbose_name="Observações"
+    )
+
+    empresa = models.ForeignKey(
+        Empresa,
+        on_delete=models.CASCADE,
+        related_name='fornecedores',
+        null=True,
+        blank=True
     )
 
     def __str__(self):
