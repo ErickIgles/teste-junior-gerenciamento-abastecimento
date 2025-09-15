@@ -46,6 +46,7 @@ class RegistroReabastecimentoAdmin(admin.ModelAdmin):
         'tanque',
         'quantidade',
         'funcionario',
+        'fornecedor',
         'valor_total_reabastecimento',
         'empresa',
         'criado',
