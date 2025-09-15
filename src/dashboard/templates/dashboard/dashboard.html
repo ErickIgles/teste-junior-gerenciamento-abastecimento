@@ -1,0 +1,131 @@
+{% extends 'home_template/pages/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="dashboard-wrapper">
+        
+        <div class="dashboard-header">
+            <h1>📊 Painel de Controle</h1>
+            <p>Resumo de vendas, abastecimentos e fornecedores</p>
+        </div>
+          
+          <!-- Filtros -->
+        <form method="get" class="dashboard-filters">
+            <div class="filter-item">
+                <label>📅 Período:</label>
+                <select name="filtro" onchange="this.form.submit()">
+                    <option value="dia" {% if filtro == 'dia' %}selected{% endif %}>Dia</option>
+                    <option value="mes" {% if filtro == 'mes' %}selected{% endif %}>Mês</option>
+                    <option value="ano" {% if filtro == 'ano' %}selected{% endif %}>Ano</option>
+                </select>
+            </div>
+              
+            <div class="filter-item">
+                <label>⛽ Combustível:</label>
+                <select name="combustivel" onchange="this.form.submit()">
+                    <option value="">Todos</option>
+                    {% for c in todos_combustiveis %}
+                        <option value="{{ c.id }}" {% if combustivel_id|default:'' == c.id|stringformat:"s" %}selected{% endif %}>
+                            {{ c.nome_combustivel }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+        <div class="dashboard-cards">
+            <div class="card-graph">
+                <h3>Abastecimento x Reabastecimento</h3>
+                <canvas id="grafico-comparacao"></canvas>
+                <div class="card-footer">💰 Total: R$ {{ abastecimentos_total }}</div>
+            </div>
+       
+            <div class="card-graph">
+                <h3>Combustíveis mais vendidos</h3>
+                <canvas id="grafico-combustiveis"></canvas>
+                <div class="card-footer">
+                    {% for c in combustiveis %}
+                        <p>{{ c.tipo_combustivel__nome_combustivel }}: {{ c.total }} L</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card-graph">
+                <h3>Fornecedores mais pedidos</h3>
+                <canvas id="grafico-fornecedores"></canvas>
+                <div class="card-footer">
+                    {% for f in fornecedores %}
+                        <p>{{ f.fornecedor__nome_fantasia }}: {{ f.total }} L</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cards de resumo -->
+    </div>
+    <div class="cards">
+        <div class="card card-abastecimento">💰 Abastecimentos: R$ {{ abastecimentos_total }}</div>
+        <div class="card card-reabastecimento">💸 Reabastecimentos: R$ {{ reabastecimentos_total }}</div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      // --- Comparação Abastecimento x Reabastecimento ---
+      new Chart(document.getElementById('grafico-comparacao'), {
+        type: 'bar',
+        data: {
+          labels: ['Abastecimento', 'Reabastecimento'],
+          datasets: [{
+            label: 'Valores',
+            data: [{{ abastecimentos_total }}, {{ reabastecimentos_total }}],
+            backgroundColor: ['blue', 'orange']
+          }]
+        },
+        options: { 
+          responsive: true,
+          maintainAspectRatio: false,
+        }
+      });
+
+      // --- Combustíveis mais vendidos ---
+      new Chart(document.getElementById('grafico-combustiveis'), {
+        type: 'doughnut',
+        data: {
+          labels: [{% for c in combustiveis %}"{{ c.tipo_combustivel__nome_combustivel }}",{% endfor %}],
+          datasets: [{
+            data: [{% for c in combustiveis %}{{ c.total }},{% endfor %}],
+            backgroundColor: ['red', 'blue', 'green', 'yellow', 'purple']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+
+      // --- Fornecedores mais pedidos ---
+      new Chart(document.getElementById('grafico-fornecedores'), {
+        type: 'bar',
+        data: {
+          labels: [{% for f in fornecedores %}"{{ f.fornecedor__nome_fantasia }}",{% endfor %}],
+          datasets: [{
+            label: 'Quantidade (litros)',
+            data: [{% for f in fornecedores %}{{ f.total }},{% endfor %}],
+            backgroundColor: 'teal'
+          }]
+        },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false}
+      });
+    </script>
+{% endblock %}
