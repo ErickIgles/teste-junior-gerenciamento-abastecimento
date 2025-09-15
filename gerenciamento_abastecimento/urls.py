@@ -12,6 +12,7 @@ urlpatterns = [
     path('servicos/', include('servicos.urls')),
     path('auth/', include('autenticacao.urls')),
     path('relatorios/', include('relatorios.urls')),
+    path('dashboard/', include('dashboard.urls')),
 
     path('api-auth/', include('rest_framework.urls')),
 ]
