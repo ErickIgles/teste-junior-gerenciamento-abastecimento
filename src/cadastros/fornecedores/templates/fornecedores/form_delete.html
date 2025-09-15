@@ -1,0 +1,69 @@
+{% extends 'home_template/pages/base.html' %}
+{% load static %}
+
+{% block title %}
+Deletar Fornecedor
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'fornecedores/css/forms.css' %}">
+{% endblock %}
+
+
+{% block main %}
+
+    <form 
+        method="POST" 
+        style="gap: 20px;" 
+        class="form" 
+        action="{% url 'cadastros:fornecedores:deletar' fornecedor.pk %}"
+    >
+        {% csrf_token %}
+
+        <h2 class="form-titulo">Deseja apagar o fornecedor {{ fornecedor.nome_fantasia }}?</h2>
+        <table class="tabela">
+            <tbody class="tabela-body">
+                <tr>
+                    <th>Nome Fantasia</th>
+                    <td>
+                        {{ fornecedor.nome_fantasia }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Razão Social</th>
+                    <td>
+                        {{ fornecedor.razao_social }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>CNPJ</th>
+                    <td>
+                        {{ fornecedor.cnpj }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Contato Principal</th>
+                    <td>
+                        {{ fornecedor.contato_principal }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Telefone</th>
+                    <td>
+                        {{ fornecedor.telefone }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <input type="hidden" name='next' value="{{ request.GET.next }}">
+
+        <div class="form-action-deletar">
+            <button class="btn deletar" type="submit">
+                Deletar
+            </button>
+            <a href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" class="btn cancelar">
+                Cancelar
+            </a>
+        </div>
+    </form>
+{% endblock %}
