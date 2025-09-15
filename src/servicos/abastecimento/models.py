@@ -7,7 +7,7 @@ from cadastros.tanques.models import Tanque, Combustivel
 from cadastros.bombas.models import Bomba
 from cadastros.empresas.models import Empresa
 from cadastros.funcionarios.models import Funcionario
-
+from cadastros.fornecedores.models import Fornecedor
 
 class RegistroAbastecimento(Base):
     funcionario = models.ForeignKey(
@@ -118,6 +118,13 @@ class RegistroReabastecimento(Base):
         verbose_name='Funcionário',
         null=True,
         blank=True
+    )
+
+    fornecedor = models.ForeignKey(
+        Fornecedor,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Fornecedor'
     )
 
     class Meta:
