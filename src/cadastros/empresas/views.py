@@ -14,6 +14,7 @@ from django.views.generic import (
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib.auth import login
 from django.http import Http404
 
 from core.mixins import GroupRequiredMixin
@@ -44,11 +45,17 @@ class EmpresaCriarView(CreateView):
     success_url = reverse_lazy('home:index')
 
     def form_valid(self, form):
+
+        response = super().form_valid(form)
+
+        login(self.request, self.object)
+
         messages.success(
             self.request,
             'Empresa cadastrada com sucesso.'
         )
-        return super().form_valid(form)
+
+        return response
 
     def form_invalid(self, form):
         messages.error(

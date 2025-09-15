@@ -75,6 +75,25 @@ class EmpresaModelForm(forms.ModelForm):
             'email'
         ]
 
+    def clean_usernem(self):
+
+        username = self.cleaned_data.get(
+            'username'
+        )
+
+        usuario = User.objects.select_related(
+            'username'
+        ).filter(
+            username=username
+        )
+
+        if usuario.exists():
+            raise forms.ValidationError(
+                'Este nome de usuário já está em uso.'
+            )
+
+        return username
+
     def clean_nome_empresa(self):
         nome_empresa = self.cleaned_data.get('nome_empresa')
 
