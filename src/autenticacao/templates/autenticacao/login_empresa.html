@@ -39,6 +39,14 @@
                     Cadastre-se
                 </a>
             </div>
+            <div class="campo-adicional">
+                <p>É funcionário?</p>
+                <a 
+                    href="{% url 'autenticacao:login' %}"
+                >
+                    Por aqui!
+                </a>
+            </div>
         </form>
         {% include 'home_template/partials/footer.html' %}
     </div>
