@@ -75,25 +75,6 @@ class EmpresaModelForm(forms.ModelForm):
             'email'
         ]
 
-    def clean_usernem(self):
-
-        username = self.cleaned_data.get(
-            'username'
-        )
-
-        usuario = User.objects.select_related(
-            'username'
-        ).filter(
-            username=username
-        )
-
-        if usuario.exists():
-            raise forms.ValidationError(
-                'Este nome de usuário já está em uso.'
-            )
-
-        return username
-
     def clean_nome_empresa(self):
         nome_empresa = self.cleaned_data.get('nome_empresa')
 
@@ -103,6 +84,7 @@ class EmpresaModelForm(forms.ModelForm):
             raise forms.ValidationError(
                 'Há uma empresa cadastrada com esse nome.'
             )
+
         return nome_empresa
 
     def clean_email(self):
@@ -117,11 +99,28 @@ class EmpresaModelForm(forms.ModelForm):
         return email
 
     def clean(self):
+
         password1 = self.cleaned_data.get('password1')
+
         password2 = self.cleaned_data.get('password2')
+
+        nome_empresa = self.cleaned_data.get('nome_empresa')
 
         if password1 and password2 and password1 != password2:
             self.add_error('password2', 'As senhas não coincidem.')
+
+        usuario = User.objects.select_related(
+            'username'
+        ).filter(
+            username=nome_empresa
+        )
+
+        if usuario.exists():
+
+            raise forms.ValidationError(
+                'Este nome de usuário já está em uso.'
+            )
+
         return self.cleaned_data
 
     def save(self, commit=True):
