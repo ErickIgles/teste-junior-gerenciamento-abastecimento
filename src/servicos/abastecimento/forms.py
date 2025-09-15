@@ -3,6 +3,7 @@ from django import forms
 from .models import RegistroAbastecimento, RegistroReabastecimento
 from cadastros.tanques.models import Tanque, Combustivel
 from cadastros.bombas.models import Bomba
+from cadastros.fornecedores.models import Fornecedor
 
 
 class AbastecimentoForm(forms.ModelForm):
@@ -349,12 +350,24 @@ class ReabastecimentoTanqueForm(forms.ModelForm):
         )
     )
 
+    fornecedor = forms.ModelChoiceField(
+        required=True,
+        queryset=Fornecedor.objects.none(),
+        widget=forms.Select(
+            attrs={
+                'class': 'form-input',
+            }
+        ),
+        label='Fornecedor'
+    )
+
     class Meta:
 
         model = RegistroReabastecimento
         fields = [
             'tanque',
-            'quantidade'
+            'quantidade',
+            'fornecedor'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -367,6 +380,12 @@ class ReabastecimentoTanqueForm(forms.ModelForm):
             self.fields['tanque'].queryset = Tanque.objects.filter(
                 empresa=self.empresa,
                 ativo=True
+            )
+
+            self.fields['fornecedor'].queryset = Fornecedor.objects.select_related(
+                'empresa'
+            ).filter(
+                empresa=self.empresa
             )
 
     def clean_tanque(self):
