@@ -1,9 +1,9 @@
 from django.urls import path
-
 from .views import (
     FuncionarioLoginView,
+    EmpresaLoginFormView,
     UsuarioLogoutView,
-    EmpresaLoginForm
+
 )
 app_name = 'autenticacao'
 
@@ -13,6 +13,7 @@ urlpatterns = [
         FuncionarioLoginView.as_view(),
         name='login'
     ),
+
     path(
         'logout/',
         UsuarioLogoutView.as_view(),
@@ -21,7 +22,7 @@ urlpatterns = [
 
     path(
         'login/empresa/',
-        EmpresaLoginForm.as_view(),
+        EmpresaLoginFormView.as_view(),
         name='login_empresa'
     ),
 ]
