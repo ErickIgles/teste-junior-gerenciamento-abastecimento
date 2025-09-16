@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from django.shortcuts import render, redirect
 
 from django.http import HttpResponse
 from django.contrib import messages
@@ -16,21 +15,23 @@ from servicos.abastecimento.models import (
     RegistroReabastecimento,
 )
 
-from weasyprint import HTML
+from pydf import generate_pdf
 
 from cadastros.empresas.models import Empresa
 from cadastros.funcionarios.models import Funcionario
 from cadastros.tanques.models import Combustivel, Tanque
+from .utils.mixins import EmpresaRelatorioPermissionMixin
+from core.mixins import GroupRequiredMixin
 
 
 class RelatorioAbastecimentos(
     LoginRequiredMixin,
-
+    GroupRequiredMixin,
     ListView
 ):
-
+    group_required = ['gerente_geral', 'administradores']
     model = RegistroAbastecimento
-    template_name = 'relatorios/abastecimentos.html'
+    template_name = 'relatorios/abastecimento/abastecimentos.html'
 
     def get_user(self):
 
@@ -151,59 +152,108 @@ class RelatorioAbastecimentos(
         return context
 
 
-class RelatorioAbastecimentosPDF(RelatorioAbastecimentos):
+class RelatorioAbastecimentoDetalhado(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    EmpresaRelatorioPermissionMixin,
+    TemplateView
+):
+    group_required = ['gerente_geral', 'administradores']
+
+    template_name = 'relatorios/abastecimento/abastecimento_detalhado.html'
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        tanque_id = self.kwargs['pk']
+
+        usuario = self.request.user
+
+        if usuario.is_empresa():
+
+            empresa = Empresa.objects.get(usuario_responsavel=usuario)
+
+        else:
+
+            empresa = Funcionario.objects.get(user=usuario).empresa
+
+        data_inicio = self.request.GET.get('data_inicio')
+
+        data_fim = self.request.GET.get('data_fim')
+
+        abastecimentos = RegistroAbastecimento.objects.filter(
+            tanque_id=tanque_id,
+
+            empresa=empresa
+        ).select_related(
+            'bomba',
+            'funcionario'
+        )
+
+        if data_inicio and data_fim:
+
+            abastecimentos = abastecimentos.filter(
+
+                criado__range=[data_inicio, data_fim]
+            )
+
+        bombas = {}
+        for abastecimento in abastecimentos:
+
+            bombas.setdefault(abastecimento.bomba, []).append(abastecimento)
+
+        context['tanque'] = Tanque.objects.get(pk=tanque_id)
+
+        context['bombas'] = bombas
+
+        context['total_litros'] = abastecimentos.aggregate(
+            Sum(
+                'litros_abastecido'
+            )
+        )['litros_abastecido__sum'] or 0
+
+        context['total_valor'] = abastecimentos.aggregate(
+
+            Sum(
+                'valor_total_abastecimento'
+            )
+        )['valor_total_abastecimento__sum'] or 0
+
+        return context
+
+
+class RelatorioAbastecimentoDetalhadoPDF(
+    RelatorioAbastecimentoDetalhado
+):
 
     def get(self, request, *args, **kwargs):
 
-        usuario = self.get_user()
-        queryset = self.apply_filters(usuario=usuario)
-
-        totais = queryset.aggregate(
-            total_litros=Sum('litros_abastecido'),
-            total_valor=Sum('valor_total_abastecimento')
-        )
-
-        data_inicio_str = request.GET.get('data_inicio')
-        data_fim_str = request.GET.get('data_fim')
-
-        if data_inicio_str:
-            data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%d').date()
-        else:
-            data_inicio = None
-
-        if data_fim_str:
-            data_fim = datetime.strptime(data_fim_str, '%Y-%m-%d').date()
-
-        else:
-            data_fim = None
+        context = self.get_context_data(**kwargs)
 
         html_string = render_to_string(
-            'relatorios/abastecimentos_pdf.html',
-            {
-                'abastecimentos': queryset,
-                'total_litros': totais['total_litros'] or 0,
-                'total_valor': totais['total_valor'] or 0,
-                'data_inicio': data_inicio,
-                'data_fim': data_fim
-            }
+            'relatorios/abastecimento/abastecimento_detalhado_pdf.html',
+            context
         )
 
-        pdf_file = HTML(string=html_string).write_pdf()
+        pdf_file = generate_pdf(source=html_string)
 
         response = HttpResponse(pdf_file, content_type='application/pdf')
-        response['content-Disposition'] = 'attachment; filename="relatorio_abastecimento.pdf"'
+
+        response['Content-Disposition'] = f'attachment;filename="relatorio_tanque_{context["tanque"].id}.pdf"'
 
         return response
 
 
 class RelatorioReabastecimentos(
     LoginRequiredMixin,
-
+    GroupRequiredMixin,
     ListView
 ):
 
+    group_required = ['gerente_geral', 'administradores']
     model = RegistroReabastecimento
-    template_name = 'relatorios/reabastecimentos.html'
+    template_name = 'relatorios/reabastecimento/reabastecimentos.html'
 
     def get_user(self):
 
@@ -322,7 +372,73 @@ class RelatorioReabastecimentos(
         return context
 
 
-class RelatorioReabastecimentosPDF(
+class RelatorioReabastecimentoDetalhado(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    EmpresaRelatorioPermissionMixin,
+    TemplateView
+):
+    group_required = ['gerente_geral', 'administradores']
+    template_name = 'relatorios/reabastecimento/reabastecimento_detalhado.html'
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        tanque_id = self.kwargs['pk']
+
+        usuario = self.request.user
+
+        if usuario.is_empresa():
+
+            empresa = Empresa.objects.select_related(
+                'usuario_responsavel'
+            ).get(usuario_responsavel=usuario)
+
+        else:
+            empresa = Funcionario.objects.select_related(
+                'user', 'empresa'
+            ).get(user=usuario).empresa
+
+        data_inicio = self.request.GET.get('data_inicio')
+        data_fim = self.request.GET.get('data_fim')
+
+        reabastecimentos = RegistroReabastecimento.objects.select_related(
+            'fornecedor', 'tanque', 'funcionario', 'empresa'
+        ).filter(
+            tanque_id=tanque_id,
+            empresa=empresa
+        )
+
+        if data_inicio and data_fim:
+
+            reabastecimentos = reabastecimentos.filter(
+                criado__range=[data_inicio, data_fim]
+            )
+
+        fornecedores = {}
+        for reabastecimento in reabastecimentos:
+
+            fornecedores.setdefault(
+                reabastecimento.fornecedor, []
+            ).append(reabastecimento)
+
+        context['tanque'] = Tanque.objects.get(pk=tanque_id)
+
+        context['fornecedores'] = fornecedores
+
+        context['total_litros'] = reabastecimentos.aggregate(
+            Sum('quantidade')
+        )['quantidade__sum'] or 0
+
+        context['total_valor'] = reabastecimentos.aggregate(
+            Sum('valor_total_reabastecimento')
+        )['valor_total_reabastecimento__sum'] or 0
+
+        return context
+
+
+class RelatorioReabastecimentoDetalhadoPDF(
     RelatorioReabastecimentos
 ):
 
@@ -351,7 +467,7 @@ class RelatorioReabastecimentosPDF(
             data_fim = None
 
         html_string = render_to_string(
-            'relatorios/reabastecimentos_pdf.html',
+            'relatorios/reabastecimento/reabastecimentos_detalhado_pdf.html',
             {
                 'reabastecimentos': queryset,
                 'total_litros': totais['total_litros'] or 0,
@@ -361,97 +477,9 @@ class RelatorioReabastecimentosPDF(
             }
         )
 
-        pdf_file = HTML(string=html_string).write_pdf()
+        pdf_file = generate_pdf(source=html_string)
 
         response = HttpResponse(pdf_file, content_type='application/pdf')
-        response['content-Disposition'] = 'attachment; filename="relatorio_reabastecimento.pdf"'
-
-        return response
-
-
-class RelatorioTanqueAbastecimentoDetalhado(
-    LoginRequiredMixin,
-    TemplateView
-):
-    template_name = 'relatorios/tanque_detalhado.html'
-
-    def get_context_data(self, **kwargs):
-
-        context = super().get_context_data(**kwargs)
-
-        tanque_id = self.kwargs['pk']
-
-        usuario = self.request.user
-
-        if usuario.is_empresa():
-
-            empresa = Empresa.objects.get(usuario_responsavel=usuario)
-
-        else:
-
-            empresa = Funcionario.objects.get(user=usuario).empresa
-
-        data_inicio = self.request.GET.get('data_inicio')
-
-        data_fim = self.request.GET.get('data_fim')
-
-        abastecimentos = RegistroAbastecimento.objects.filter(
-            tanque_id=tanque_id,
-
-            empresa=empresa
-        ).select_related(
-            'bomba',
-            'funcionario'
-        )
-
-        if data_inicio and data_fim:
-
-            abastecimentos = abastecimentos.filter(
-
-                criado__range=[data_inicio, data_fim]
-            )
-
-        bombas = {}
-        for abastecimento in abastecimentos:
-
-            bombas.setdefault(abastecimento.bomba, []).append(abastecimento)
-
-        context['tanque'] = Tanque.objects.get(pk=tanque_id)
-
-        context['bombas'] = bombas
-
-        context['total_litros'] = abastecimentos.aggregate(
-            Sum(
-                'litros_abastecido'
-            )
-        )['litros_abastecido__sum'] or 0
-
-        context['total_valor'] = abastecimentos.aggregate(
-
-            Sum(
-                'valor_total_abastecimento'
-            )
-        )['valor_total_abastecimento__sum'] or 0
-
-        return context
-
-
-class RelatorioTanqueAbastecimentoDetalhadoPDF(
-    RelatorioTanqueAbastecimentoDetalhado
-):
-
-    def get(self, request, *args, **kwargs):
-
-        context = self.get_context_data(**kwargs)
-
-        html_string = render_to_string(
-            'relatorios/tanque_detalhado_pdf.html', context
-        )
-
-        pdf_file = HTML(string=html_string).write_pdf()
-
-        response = HttpResponse(pdf_file, content_type='application/pdf')
-
-        response['Content-Disposition'] = f'attachment; filename="relatorio_tanque_{context["tanque"].id}.pdf"'
+        response['content-Disposition'] = 'attachment;filename="relatorio_reabastecimento.pdf"'
 
         return response
