@@ -3,7 +3,6 @@ from django.contrib.auth import login
 from django.views.generic import FormView
 from django.urls import reverse_lazy
 
-
 from .forms import FuncionarioLoginForm, EmpresaLoginForm
 
 
@@ -14,10 +13,16 @@ class FuncionarioLoginView(LoginView):
 
 
 class UsuarioLogoutView(LogoutView):
-    next_page = 'home:index'
+    next_page = 'autenticacao:login'
+
+    def dispatch(self, request, *args, **kwargs):
+
+        # logout(request)
+
+        return super().post(request, *args, **kwargs)
 
 
-class EmpresaLoginForm(FormView):
+class EmpresaLoginFormView(FormView):
     template_name = 'autenticacao/login_empresa.html'
     form_class = EmpresaLoginForm
     success_url = reverse_lazy('home:index')
