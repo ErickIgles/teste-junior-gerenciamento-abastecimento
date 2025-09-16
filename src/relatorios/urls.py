@@ -2,14 +2,13 @@ from django.urls import path
 
 from .views import (
     RelatorioAbastecimentos,
-    RelatorioAbastecimentosPDF,
+    RelatorioAbastecimentoDetalhado,
+    RelatorioAbastecimentoDetalhadoPDF,
 
     RelatorioReabastecimentos,
-    RelatorioReabastecimentosPDF,
-
-    RelatorioTanqueAbastecimentoDetalhado,
-
-    RelatorioTanqueAbastecimentoDetalhadoPDF,
+    RelatorioReabastecimentoDetalhado,
+    RelatorioReabastecimentoDetalhadoPDF,
+    
 )
 
 app_name = 'relatorios'
@@ -23,9 +22,15 @@ urlpatterns = [
     ),
 
     path(
-        'relatorios/abastecimentos/pdf/',
-        RelatorioAbastecimentosPDF.as_view(),
-        name="relatorios_abastecimentos_pdf"
+        'abastecimento/detalhado/<int:pk>/',
+        RelatorioAbastecimentoDetalhado.as_view(),
+        name='relatorio_abstecimento_detalhes'
+    ),
+
+    path(
+        'relatorios/abastecimentos/tanques/pdf/<int:pk>/',
+        RelatorioAbastecimentoDetalhadoPDF.as_view(),
+        name='relatorio_abastecimento_detalhes_pdf'
     ),
 
     path(
@@ -35,21 +40,15 @@ urlpatterns = [
     ),
 
     path(
-        'relatorios/reabastecimentos/pdf/',
-        RelatorioReabastecimentosPDF.as_view(),
-        name='relatorios_reabastecimentos_pdf'
+        'relatorios/reabastecimentos/<int:pk>/',
+        RelatorioReabastecimentoDetalhado.as_view(),
+        name='relatorio_reabastecimento_detalhes'
     ),
 
+
     path(
-        'relatorios/tanques/detalhado/<int:pk>/',
-        RelatorioTanqueAbastecimentoDetalhado.as_view(),
-        name='tanque_detalhes'
+        'relatorios/reabastecimentos/tanques/pdf/<int:pk>/',
+        RelatorioReabastecimentoDetalhadoPDF.as_view(),
+        name='relatorio_reabastecimento_detalhes_pdf'
     ),
-
-    path(
-        'relatorios/abastecimentos/tanques/pdf/<int:pk>/',
-        RelatorioTanqueAbastecimentoDetalhadoPDF.as_view(),
-        name='tanque_detalhes_pdf'
-    )
-
 ]
