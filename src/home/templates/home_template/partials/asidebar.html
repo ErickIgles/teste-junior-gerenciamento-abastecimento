@@ -5,12 +5,6 @@
             <ul class="navegacao-lista-menu">
                 <li>
                     <a 
-                        href="{% url 'home:index' %}">
-                        Início
-                    </a>
-                </li>
-                <li>
-                    <a 
                         href="{% url 'dashboard:dashboard' %}">
                         Painel de controle
                     </a>
@@ -20,43 +14,51 @@
                     <a
                         class="button"
                     > 
-                        cadastros 
+                        <i class="fa-solid fa-address-card"></i>
+                        Cadastros 
                     </a>
                     <ul class="submenu">
                         <li>
                             <a
                                 href="{% url 'cadastros:tanques:listar' %}"
                             >
+                                <i class="fa-solid fa-oil-can"></i>
                                 Tanque
                             </a>
                             <a  
                                 href="{% url 'cadastros:bombas:listar' %}"
                             >
+                                <i class="fa-solid fa-gas-pump"></i>
                                 Bomba
                             </a>
                             <a 
                                 href="{% url 'cadastros:tanques:listar_combustivel' %}"
                             >
+                                <i class="fa-solid fa-droplet"></i>
                                 Combustivel
                             </a>
                             <a 
                                 href="{% url 'cadastros:fornecedores:listar' %}"
                             >
+                                <i class="fa-solid fa-handshake"></i>
                                 Fornecedor
                             </a>
                             <a 
                                 href="{% url 'cadastros:funcionarios:listar' %}"
                             >
+                                <i class="fa-solid fa-user-tie"></i> 
                                 Funcionários
                             </a>                            
                             <a 
                                 href="{% url 'cadastros:empresas:listar_setor' %}"
                             >
+                                <i class="fa-solid fa-diagram-project"></i>
                                 Setor
                             </a>
                             <a 
                                 href="{% url 'cadastros:empresas:listar_cargo' %}"
                             >
+                                <i class="fa-solid fa-briefcase"></i> 
                                 Cargo
                             </a>
                                                         
@@ -67,6 +69,7 @@
                     <a
                         class="button"
                     > 
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
                         Serviços 
                     </a>
                     <ul class="submenu">
@@ -74,6 +77,7 @@
                             <a 
                                 href="{% url 'servicos:abastecimento:listar' %}"
                             >
+                                <i class="fa-solid fa-gas-pump"></i>
                                 Saída de Combustível
                             </a>
                         </li>
@@ -81,6 +85,7 @@
                             <a 
                                 href="{% url 'servicos:abastecimento:listar_reabastecimento' %}"
                             >
+                                <i class="fa-solid fa-gas-pump"></i>
                                 Entrada de combustível
                             </a>
                         </li>
@@ -91,18 +96,21 @@
                     <a
                         class="button"
                     >
+                        <i class="fa-solid fa-chart-line"></i> 
                         Relatórios
                     </a>
                     <ul class="submenu">
                         <li>
                             <a 
                                 href="{% url 'relatorios:relatorios_abastecimentos' %}">
+                                <i class="fa-solid fa-file-export"></i>
                                 Saida de combustível
                             </a>
                         </li>
                         <li>
                             <a 
                                 href="{% url 'relatorios:relatorios_reabastecimentos' %}">
+                                <i class="fa-solid fa-file-export"></i>
                                 Entrada de combustível
                             </a>
                         </li>
