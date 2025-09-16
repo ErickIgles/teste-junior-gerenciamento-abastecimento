@@ -28,14 +28,18 @@
                         <td data-label="Data">
                             {{ abastecimento.criado|date:"d/m/Y" }}
                         </td>
-                        <td data-label="Hora">
-                            {{ abastecimento.criado|time:"H:i" }}
-                        </td>
                         <td data-label="Valor">
                             R$ {{ abastecimento.valor_total_abastecimento|floatformat:2 }}
                         </td>
                         <td data-label="Responsavel">
-                            {{ abastecimento.funcionario }}
+                            {% if abastecimento.funcionario %}
+                                
+                                {{ abastecimento.funcionario }}
+                            
+                            {% else %}
+                                {{ abastecimento.empresa }}
+                            
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}

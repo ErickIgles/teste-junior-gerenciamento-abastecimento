@@ -80,31 +80,50 @@
                 </button>
 
             </form>
-
-            <a 
-                href="{% url 'relatorios:relatorios_reabastecimentos_pdf' %}?{{ request.GET.urlencode }}" class="btn pdf"
-            >
-                📄 Baixar PDF
-            </a>
-
         </nav>
 
         
         {% for reabastecimento in registros %}
             
             <table class="tabela">
+                 <a 
+                    href="{% url 'relatorios:relatorio_reabastecimento_detalhes' reabastecimento.tanque.pk %}?{{request.GET.urlencode }}" 
+                    class="btn pdf"
+                >
+                    📄 Detalhar
+                </a>
+                <a 
+                    href="{% url 'relatorios:relatorio_reabastecimento_detalhes_pdf' reabastecimento.tanque.pk%}?{{request.GET.urlencode }}" 
+                    class="btn pdf"
+                >
+                    📥 PDF
+                </a>
                 <tbody class="tabela-body">
                     <tr>
                         <th>Data</th>
                         <td>{{ reabastecimento.criado }}</td>
                     </tr>
                     <tr>
-                        <th>Funcionário</th>
-                        <td>{{ reabastecimento.funcionario }}</td>
+                        <th>Responsável</th>
+                        <td>
+                            {% if reabastecimento.funcionario %}
+                            
+                                {{ reabastecimento.funcionario }}
+                                
+                            {% else %}
+                                
+                                {{ reabastecimento.empresa }}
+
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <th>Tanque</th>
                         <td>{{ reabastecimento.tanque.identificador_tanque }}</td>
+                    </tr>
+                    <tr>
+                        <th>Fornecedor</th>
+                        <td>{{ reabastecimento.fornecedor.nome_fantasia }}</td>
                     </tr>
                     <tr>
                         <th>Tipo Combustível</th>

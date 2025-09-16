@@ -28,12 +28,23 @@
                 </tr>
             </thead>
             <tbody>
-                {% for ab in registros %}
+                {% for abastecimento in registros %}
                 <tr>
-                    <td>{{ ab.criado|date:"d/m/Y" }}</td>
-                    <td>{{ ab.criado|time:"H:i" }}</td>
-                    <td>R$ {{ ab.valor_total_abastecimento|floatformat:2 }}</td>
-                    <td>{{ ab.funcionario }}</td>
+                    <td>{{ abastecimemto.criado|date:"d/m/Y" }}</td>
+                    <td>{{ abastecimento.criado|time:"H:i" }}</td>
+                    <td>R$ {{ abastecimento.valor_total_abastecimento|floatformat:2 }}</td>
+                    <td>
+
+                        {% if abastecimento.funcionario %}
+                        
+                            {{ abastecimento.funcionario }}
+                        
+                        {% else %}
+
+                            {{ abastecimento.empresa }}
+                        
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

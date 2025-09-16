@@ -4,6 +4,7 @@
 {% block title %} Relátios {% endblock  %}
 
 {% block head %}
+    <link rel="stylesheet" href="{% static 'gerenciamento_abastecimento/css/base.css' %}">
     <link rel="stylesheet" href="{% static 'relatorios/css/lista.css' %}">
 {% endblock  %}
 
@@ -80,37 +81,46 @@
                 </button>
 
             </form>
-
-            <a 
-                href="{% url 'relatorios:relatorios_abastecimentos_pdf' %}?{{ request.GET.urlencode }}" class="btn pdf"
-            >
-                📄 Baixar PDF
-            </a>
-
         </nav>
 
         
         {% for abastecimento in registros %}
             
             <table class="tabela">
+                <div class="opcoes-impressao">
+                    <a 
+                        href="{% url 'relatorios:relatorio_abstecimento_detalhes' abastecimento.tanque.id %}?{{ request.GET.urlencode }}" 
+                        class="btn pdf"
+                    >
+                        📄 Detalhar
+                    </a>
+                    <a  
+                        href="{% url 'relatorios:relatorio_abastecimento_detalhes_pdf' abastecimento.tanque.id %}?{{ request.GET.urlencode }}" 
+                        class="btn pdf"
+                    >
+                        📥 PDF
+                    </a>                
+                </div>
+                
                 <tbody class="tabela-body">
                     <tr>
                         <th>Data</th>
                         <td>{{ abastecimento.criado }}</td>
                     </tr>
                     <tr>
-                        <th>Funcionário</th>
-                        <td>{{ abastecimento.funcionario }}</td>
+                        <th>Responsável</th>
+                        <td>
+                            {% if abastecimento.funcionario %}
+                                {{ abastecimento.funcionario }}
+                            {% else %}
+                                {{ abastecimento.empresa }}
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <th>Tanque</th>
                         <td>{{ abastecimento.tanque.identificador_tanque }}</td>
-                        <a href="{% url 'relatorios:tanque_detalhes' abastecimento.tanque.id %}?{{ request.GET.urlencode }}" class="btn pdf">
-                            📄 Detalhar
-                        </a>
-                        <a href="{% url 'relatorios:tanque_detalhes_pdf' abastecimento.tanque.id %}?{{ request.GET.urlencode }}" class="btn pdf">
-                            📥 PDF
-                        </a>
+
                     </tr>
                     <tr>
                         <th>Combustível</th>

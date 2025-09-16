@@ -77,7 +77,7 @@
 </head>
 <body>
     <header>
-        <h2>Relatório de Abastecimentos</h2>
+        <h2>Relatório de Reabastecimentos</h2>
         {% if data_inicio and data_fim %}
             <div class="periodo">
                 Período: {{ data_inicio|date:"d/m/Y" }} a {{ data_fim|date:"d/m/Y" }}
@@ -89,7 +89,8 @@
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Funcionário</th>
+                <th>Responsável</th>
+                <th>Fornecedor</th>
                 <th>Tanque</th>
                 <th>Combustível</th>
                 <th>Litros</th>
@@ -98,15 +99,27 @@
             </tr>
         </thead>
         <tbody>
-            {% for abastecimento in abastecimentos %}
+            {% for reabastecimento in reabastecimentos %}
             <tr>
-                <td>{{ abastecimento.criado|date:"d/m/Y" }}</td>
-                <td>{{ abastecimento.funcionario }}</td>
-                <td>{{ abastecimento.tanque.identificador_tanque }}</td>
-                <td>{{ abastecimento.tanque.tipo_combustivel }}</td>
-                <td>{{ abastecimento.litros_abastecido }}</td>
-                <td>R$ {{ abastecimento.valor_total_abastecimento|floatformat:2 }}</td>
-                <td>{{ abastecimento.get_forma_pagamento_display }}</td>
+                <td>{{ reabastecimento.criado|date:"d/m/Y" }}</td>
+                <td>
+                    {% if reabastecimento.funcionario %}
+    
+                        {{ reabastecimento.funcionario }}
+                    
+                    {% else %}
+
+                        {{ reabastecimento.empresa }}
+
+                    {% endif %}
+
+                </td>
+                <td>{{ reabastecimento.fornecedor }}</td>
+                <td>{{ reabastecimento.tanque.identificador_tanque }}</td>
+                <td>{{ reabastecimento.tanque.tipo_combustivel }}</td>
+                <td>{{ reabastecimento.quantidade }}</td>
+                <td>R$ {{ reabastecimento.valor_total_reabastecimento|floatformat:2 }}</td>
+                <td>{{ reabastecimento.get_forma_pagamento_display }}</td>
             </tr>
             {% endfor %}
         </tbody>
