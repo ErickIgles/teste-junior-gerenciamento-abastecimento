@@ -72,7 +72,7 @@ body {
 .main {
   flex: 1;
   height: 100%;
-  padding: var(--espacamento-padrao);
+  padding: 9px
 }
 
 .footer {
