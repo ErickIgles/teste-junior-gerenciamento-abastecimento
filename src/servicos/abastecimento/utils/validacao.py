@@ -14,6 +14,7 @@ import qrcode
 from cadastros.tanques.models import Tanque
 from cadastros.empresas.models import Empresa
 from cadastros.funcionarios.models import Funcionario
+from cadastros.fornecedores.models import Fornecedor
 
 from ..models import RegistroReabastecimento
 from .helpers import reverter_reabastecimento, ajustar_next_url
@@ -79,6 +80,12 @@ def validacao_token_criar_reabastecimento(request):
 
                     quantidade = Decimal(dados['quantidade'])
 
+                    fornecedor_id = dados['fornecedor_id']
+
+                    fornecedor = Fornecedor.objects.get(
+                        pk=fornecedor_id
+                    )
+
                     if usuario.is_empresa():
 
                         empresa = Empresa.objects.get(
@@ -88,7 +95,8 @@ def validacao_token_criar_reabastecimento(request):
                         reabastecimento = RegistroReabastecimento.objects.create(
                             tanque=tanque,
                             quantidade=quantidade,
-                            empresa=empresa
+                            empresa=empresa,
+                            fornecedor=fornecedor
                         )
 
                     else:
@@ -100,7 +108,8 @@ def validacao_token_criar_reabastecimento(request):
                             tanque=tanque,
                             quantidade=quantidade,
                             funcionario=funcionario,
-                            empresa=funcionario.empresa
+                            empresa=funcionario.empresa,
+                            fornecedor=fornecedor
                         )
 
                     reabastecimento.aplicar_reabastecimento()
