@@ -30,10 +30,7 @@
             
             <main class="main">
 
-                <h3>Seja bem-vindo, {{ request.user.username }}!</h3>
-    
                 {% block main %}
-    
                 {% endblock %}
             </main>
             {% include 'home_template/partials/footer.html' %}
