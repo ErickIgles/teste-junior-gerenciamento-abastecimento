@@ -13,7 +13,8 @@ class FuncionarioLoginForm(AuthenticationForm):
         widget=forms.TextInput(
             attrs={
                 "autofocus": True,
-                'class': 'form-input'
+                'class': 'form-input',
+                'placeholder': 'Usuário'
             }
         ),
         label='Nome de usuário'
@@ -23,7 +24,8 @@ class FuncionarioLoginForm(AuthenticationForm):
         widget=forms.PasswordInput(
             attrs={
                 "autocomplete": "current-password",
-                'class': 'form-input'
+                'class': 'form-input',
+                'placeholder': 'Senha'
             }
         ),
     )
@@ -72,10 +74,14 @@ class FuncionarioLoginForm(AuthenticationForm):
 
 class EmpresaLoginForm(forms.Form):
     cnpj = forms.CharField(
+        max_length=18,
         required=True,
         widget=forms.TextInput(
             attrs={
-                'class':'form-input'
+                'class': 'form-input',
+                'placeholder': 'CNPJ',
+                'pattern': r'\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2}',
+                'inputmode': 'numeric'
             }
         ),
         label='CNPJ'
@@ -85,7 +91,8 @@ class EmpresaLoginForm(forms.Form):
         required=True,
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form-input'
+                'class': 'form-input',
+                'placeholder': 'Senha'
             }
         ),
         label='Senha'
