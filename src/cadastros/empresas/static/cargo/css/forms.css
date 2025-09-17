@@ -38,8 +38,7 @@
     border: 1px solid #cccccc;
 }
 
-
-.form-select{
+.form-select {
     width: 100%;
     padding: 8px;
     font-size: 16px;
@@ -63,12 +62,17 @@
     width: 100%;
 }
 
-
-.form-actions{
-    display: flex;
+.form-select {
     width: 100%;
-    padding: 0px 10px;
-    gap: 20px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.form-select option {
+    white-space: nowrap;       
+    overflow: hidden;          
+    text-overflow: ellipsis;   
+    max-width: 100%;           
 }
 
 #id_info_combustivel{
@@ -184,5 +188,13 @@
     .form-actions{
         display: flex;
         flex-direction: row;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .form-select {
+        font-size: 14px;
+        padding: 8px;
     }
 }
