@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'gerenciamento_abastecimento/css/base.css' %}">
     <link rel="stylesheet" href="{% static 'empresas/css/forms.css' %}">
 
-    <title>Casdastro</title>
+    <title>Cadastro</title>
 </head>
 <body>
     <div class="form-espaco">
@@ -19,6 +19,15 @@
             </h2>
             
             {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {% for erro in form.non_field_errors %}
+                        <p class="error">{{ erro }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             {% for field in form %}
                 <div class="form-group">
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -26,7 +35,7 @@
 
                     {% if field.errors %}
                         {% for erro in field.errors %}
-                            {{ erro }}
+                            <span class="error">{{ erro }}</span>
                         {% endfor %}
                     {% endif %}
                 </div>
@@ -42,7 +51,8 @@
                 <a 
                     href="{% url 'autenticacao:login_empresa' %}" 
                     class="btn login"
-                    >
+                    role="button"
+                >
                     Login
                 </a>
             </div>
