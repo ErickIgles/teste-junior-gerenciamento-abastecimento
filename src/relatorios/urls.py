@@ -28,7 +28,7 @@ urlpatterns = [
     ),
 
     path(
-        'relatorios/abastecimentos/tanques/pdf/<int:pk>/',
+        'relatorios/abastecimentos/pdf/<int:pk>/',
         RelatorioAbastecimentoDetalhadoPDF.as_view(),
         name='relatorio_abastecimento_detalhes_pdf'
     ),
@@ -47,7 +47,7 @@ urlpatterns = [
 
 
     path(
-        'relatorios/reabastecimentos/tanques/pdf/<int:pk>/',
+        'relatorios/reabastecimentos/pdf/<int:pk>/',
         RelatorioReabastecimentoDetalhadoPDF.as_view(),
         name='relatorio_reabastecimento_detalhes_pdf'
     ),
