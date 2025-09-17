@@ -89,13 +89,13 @@
             <table class="tabela">
                 <div class="opcoes-impressao">
                     <a 
-                        href="{% url 'relatorios:relatorio_abstecimento_detalhes' abastecimento.tanque.id %}?{{ request.GET.urlencode }}" 
+                        href="{% url 'relatorios:relatorio_abstecimento_detalhes' abastecimento.id %}?{{ request.GET.urlencode }}" 
                         class="btn pdf"
                     >
                         📄 Detalhar
                     </a>
                     <a  
-                        href="{% url 'relatorios:relatorio_abastecimento_detalhes_pdf' abastecimento.tanque.id %}?{{ request.GET.urlencode }}" 
+                        href="{% url 'relatorios:relatorio_abastecimento_detalhes_pdf' abastecimento.id %}?{{ request.GET.urlencode }}" 
                         class="btn pdf"
                     >
                         📥 PDF
@@ -116,11 +116,6 @@
                                 {{ abastecimento.empresa }}
                             {% endif %}
                         </td>
-                    </tr>
-                    <tr>
-                        <th>Tanque</th>
-                        <td>{{ abastecimento.tanque.identificador_tanque }}</td>
-
                     </tr>
                     <tr>
                         <th>Combustível</th>
