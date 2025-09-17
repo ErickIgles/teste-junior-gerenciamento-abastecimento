@@ -15,43 +15,32 @@
 <body>
     <h2>Relatório Detalhado - Tanque {{ tanque.identificador_tanque }}</h2>
 
-    {% for bomba, registros in bombas.items %}
-        <h3>Bomba: {{ bomba.nome_bomba }}</h3>
+    <h3>Bomba: {{ bomba.nome_bomba }}</h3>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Hora</th>
-                    <th>Valor</th>
-                    <th>Responsável</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for abastecimento in registros %}
-                <tr>
-                    <td>{{ abastecimemto.criado|date:"d/m/Y" }}</td>
-                    <td>{{ abastecimento.criado|time:"H:i" }}</td>
-                    <td>R$ {{ abastecimento.valor_total_abastecimento|floatformat:2 }}</td>
-                    <td>
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Valor</th>
+                <th>Responsável</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ abastecimento.criado|date:"d/m/Y" }}</td>
+                <td>R$ {{ abastecimento.valor_total_abastecimento|floatformat:2 }}</td>
+                <td>
+                    {% if abastecimento.funcionario %}
+                        {{ abastecimento.funcionario }}
+                    {% else %}
+                        {{ abastecimento.empresa }}
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-                        {% if abastecimento.funcionario %}
-                        
-                            {{ abastecimento.funcionario }}
-                        
-                        {% else %}
-
-                            {{ abastecimento.empresa }}
-                        
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endfor %}
-
-    <p><strong>Total de litros:</strong> {{ total_litros }}</p>
-    <p><strong>Total em reais:</strong> R$ {{ total_valor|floatformat:2 }}</p>
+    <p><strong>Total de litros:</strong> {{ abastecimento.litros }}</p>
+    <p><strong>Total em reais:</strong> R$ {{ abastecimento.valor_total_abastecimento|floatformat:2 }}</p>
 </body>
 </html>
