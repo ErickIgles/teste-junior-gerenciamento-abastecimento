@@ -10,7 +10,7 @@
 
 {% block main %}
     <div class="campo-pagina">
-        <h2 class="titulo-listagem">Listagem de Abastecimentos Veicular</h2>
+        <h2 class="titulo-listagem">Saída de combustível</h2>
             
         <nav class="nav-pesquisa">
             <form method="GET" class="form">
@@ -49,7 +49,7 @@
                     <table class="tabela">
                         <tbody class="tabela-body">
                             <tr>
-                                <th>Funcionário</th>
+                                <th>Responsável</th>
                                 <td>
                                     {{ abastecimento.funcionario.username }}
                                 </td>
@@ -95,6 +95,12 @@
                                 <td>
                                     {{ abastecimento.litros_abastecido }}
                                 </td>
+                            </tr>
+                            <tr>
+                                <th>Data</th>
+                                <td>
+                                    {{ abastecimento.criado }}
+                                </td>
                             </tr>                            
                             <tr>
                                 <th>Valor total R$</th>
@@ -102,12 +108,7 @@
                                     {{ abastecimento.valor_total_abastecimento }}
                                 </td>
                             </tr>
-                            <tr>
-                                <th>Data de registro</th>
-                                <td>
-                                    {{ abastecimento.criado }}
-                                </td>
-                            </tr>
+
                             <tr>
                                 <th>Ações</th>
                                 <td class="acoes-buttons">
