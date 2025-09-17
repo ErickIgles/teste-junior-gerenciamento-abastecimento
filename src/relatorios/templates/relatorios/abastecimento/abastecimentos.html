@@ -6,6 +6,55 @@
 {% block head %}
     <link rel="stylesheet" href="{% static 'gerenciamento_abastecimento/css/base.css' %}">
     <link rel="stylesheet" href="{% static 'relatorios/css/lista.css' %}">
+
+    <style>
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            page-break-inside: auto;
+        }
+
+        thead {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px 18px;
+            text-align: center;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tfoot td {
+            font-weight: bold;
+            background-color: #f1f1f1;
+        }
+
+
+        @media (max-width: 760px) {
+            table {
+                display: flex;
+                flex-direction: column;
+            }
+
+            thead {
+                display: flex;
+                flex-direction: column;
+            }
+
+            tbody{
+                display: flex;
+                flex-direction: column;
+            }
+        }
+    </style>
+
 {% endblock  %}
 
 
@@ -13,7 +62,7 @@
 {% block main %}
 
     <div class="campo-pagina">
-        <h2 class="titulo-listagem">Página de relatórios de abastecimento</h2>
+        <h2 class="titulo-listagem">Abastecimentos</h2>
 
         <nav class="nav-pesquisa">
             <form method="GET" class="form">
@@ -79,65 +128,58 @@
                 <button type="submit" class="button-pesquisa">
                     🔍
                 </button>
-
+                
             </form>
+            
+            <a 
+                class="opcao-pdf"
+                href="{% url 'relatorios:relatorio_abastecimento_detalhes_pdf' %}?{{ request.GET.urlencode }}"
+                >
+                BAIXAR RELATÓRIO
+            </a>
         </nav>
 
-        
-        {% for abastecimento in registros %}
+
+
+        {% if registros %}
             
             <table class="tabela">
-                <div class="opcoes-impressao">
-                    <a 
-                        href="{% url 'relatorios:relatorio_abstecimento_detalhes' abastecimento.id %}?{{ request.GET.urlencode }}" 
-                        class="btn pdf"
-                    >
-                        📄 Detalhar
-                    </a>
-                    <a  
-                        href="{% url 'relatorios:relatorio_abastecimento_detalhes_pdf' abastecimento.id %}?{{ request.GET.urlencode }}" 
-                        class="btn pdf"
-                    >
-                        📥 PDF
-                    </a>                
+                <div class="opcoes-impressao">          
                 </div>
-                
-                <tbody class="tabela-body">
+
+                <thead>
                     <tr>
                         <th>Data</th>
-                        <td>{{ abastecimento.criado }}</td>
-                    </tr>
-                    <tr>
                         <th>Responsável</th>
-                        <td>
-                            {% if abastecimento.funcionario %}
-                                {{ abastecimento.funcionario }}
-                            {% else %}
-                                {{ abastecimento.empresa }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Combustível</th>
-                        <td>{{ abastecimento.tanque.tipo_combustivel }}</td>
-                    </tr>
-                    <tr>
                         <th>Litros</th>
-                        <td>{{ abastecimento.litros_abastecido }}</td>
-                    </tr>
-                    <tr>
+                        <th>Combustível</th>
                         <th>Valor</th>
-                        <td>{{ abastecimento.valor_total_abastecimento }}</td>
-                    </tr>
-                    <tr>
                         <th>Forma de pagamento</th>
-                        <td>{{ abastecimento.get_forma_pagamento_display }}</td>
                     </tr>
-                </tbody>
+                </thead>
+                {% for abastecimento in registros %}
+                    <tbody>
+                        <tr>
+                            <td>{{ abastecimento.criado }}</td>
+                            <td>
+                                {% if abastecimento.funcionario %}
+                                    {{ abastecimento.funcionario }}
+                                {% else %}
+                                    {{ abastecimento.empresa }}
+                                {% endif %}
+                            </td>
+                            <td>{{ abastecimento.tanque.tipo_combustivel }}</td>
+                            <td>{{ abastecimento.litros_abastecido }}</td>
+                            <td>{{ abastecimento.valor_total_abastecimento }}</td>
+                            <td>{{ abastecimento.get_forma_pagamento_display }}</td>
+                        </tr>
+                    </tbody>
+                    
+                {% endfor %}
             </table>
 
-        {% endfor %}
-            
+        {% endif %}
+
         <p><strong>Total de litros:</strong> {{ total_litros }}</p>
         <p><strong>Total em reais:</strong> R$ {{ total_valor|floatformat:2 }}</p>
 
