@@ -9,21 +9,19 @@
 
 {% block main %}
     <div class="relatorio-tanque">
-        <h2>Relatório do Tanque: {{ tanque.nome }}</h2>
-        
-        {% for bomba in bombas %}
-            <h3>Bomba: {{ bomba.nome }}</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Hora</th>
-                        <th>Valor</th>
-                        <th>Responsável</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for abastecimento in bomba.registroabastecimento_set.all %}
+        <h2>Relatório do Tanque: {{ bomba.tanque.identificador_tanque }}</h2>
+            
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Valor</th>
+                    <th>Responsável</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if abastecimento %}
+
                     <tr>
                         <td data-label="Data">
                             {{ abastecimento.criado|date:"d/m/Y" }}
@@ -32,22 +30,26 @@
                             R$ {{ abastecimento.valor_total_abastecimento|floatformat:2 }}
                         </td>
                         <td data-label="Responsavel">
-                            {% if abastecimento.funcionario %}
                                 
+                            {% if abastecimento.funcionario %}
+                                    
                                 {{ abastecimento.funcionario }}
-                            
+                                
                             {% else %}
+                                    
                                 {{ abastecimento.empresa }}
-                            
+                                
                             {% endif %}
                         </td>
                     </tr>
-                    {% empty %}
-                    <tr><td colspan="4">Nenhum abastecimento</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endfor %}
+                
+                {% else %}
+                    <tr>
+                        <td colspan="4">Nenhum abastecimento</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
 
 
