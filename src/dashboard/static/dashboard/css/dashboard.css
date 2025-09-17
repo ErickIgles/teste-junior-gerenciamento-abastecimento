@@ -1,13 +1,12 @@
 
 .dashboard-wrapper {
-    padding: 1.5rem;
     background: #f9fafb;
 }
 
 
 .dashboard-header {
     text-align: center;
-    margin-bottom: 2rem;
+    padding: 16px;
 }
 
 .dashboard-header h1 {
