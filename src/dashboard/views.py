@@ -1,7 +1,8 @@
 from django.views.generic import TemplateView
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from django.utils.timezone import now
-from datetime import timedelta
 
 from cadastros.tanques.models import Combustivel
 
@@ -11,7 +12,10 @@ from servicos.abastecimento.models import (
 )
 
 
-class DashboardView(TemplateView):
+class DashboardView(
+    LoginRequiredMixin,
+    TemplateView
+):
     template_name = "dashboard/dashboard.html"
 
     def get_context_data(self, **kwargs):
