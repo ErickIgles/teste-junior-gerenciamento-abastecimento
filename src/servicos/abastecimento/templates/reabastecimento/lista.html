@@ -10,7 +10,7 @@
 
 {% block main %}
     <div class="campo-pagina">
-        <h2 class="titulo-listagem">Listagem de Rebastecimento</h2>
+        <h2 class="titulo-listagem">Entrada de Combustível</h2>
         
         {% include 'home_template/partials/messages.html' %}
 
@@ -36,7 +36,7 @@
                     href="{% url 'servicos:abastecimento:cadastrar_reabastecimento' %}"
             
                 >
-                    Novo reabastecimento
+                    Novo registro
                 </a>
 
             </div>
@@ -51,9 +51,17 @@
                     <table class="tabela">
                         <tbody class="tabela-body">
                             <tr>
-                                <th>Funcionário</th>
+                                <th>Responsável</th>
                                 <td>
-                                    {{ reabastecimento.funcionario.username }}
+                                    {% if reabastecimento.funcionario %}
+                                        
+                                        {{ reabastecimento.funcionario }}
+                                    
+                                    {% else %}
+
+                                        {{ reabastecimento.empresa }}
+                                    
+                                    {% endif %}
                                 </td>
                             </tr>
                             <tr>
@@ -70,31 +78,24 @@
                             </tr>
                             <tr>
                                 <th>Fornecedor</th>
-                                {% if reabastecimento.fornecedor %}
-                                    <td>
-                                        {{ reabastecimento.fornecedor.nome_fantasia }}
-                                    </td>
-                                {% else %}
-                                    <td>
-                                       Não há fornecedor registrado
-                                    </td>
-                                {% endif %}
+                                <td>
+                                    {{ reabastecimento.fornecedor.nome_fantasia }}
+                                </td>
                             </tr>
                             <tr>
-                            <tr>
-                                <th>Quantidade reabastecido L</th>
+                                <th>Volume L</th>
                                 <td>
                                     {{ reabastecimento.quantidade }}
                                 </td>
                             </tr>
                             <tr>
-                                <th>Data de registro</th>
+                                <th>Data</th>
                                 <td>
                                     {{ reabastecimento.criado }}
                                 </td>
                             </tr>
                             <tr>
-                                <th>Valor do reabastecimento R$</th>
+                                <th>Valor total R$</th>
                                 <td>
                                     {{ reabastecimento.valor_total_reabastecimento }}
                                 </td>
