@@ -8,56 +8,51 @@
 {% block main %}
 
     <div class="relatorio-tanque">
-        <h2>Relatório do Tanque: {{ tanque.identificador_tanque }}</h2>
-        
-        {% for fornecedor, reabastecimentos in fornecedores.items %}
-            <h3>Fornecedor: {{ fornecedor.nome }}</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Volume (L)</th>
-                        <th>Valor</th>
-                        <th>Responsável</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if reabastecimentos %}
-                        {% for reabastecimento in reabastecimentos %}
-                            <tr>
-                                <td data-label="Data">
-                                    {{ reabastecimento.criado|date:"d/m/Y" }}
-                                </td>
-                                <td data-label="Volume">
-                                    {{ reabastecimento.quantidade|floatformat:2 }}
-                                </td>
-                                <td data-label="Valor">
-                                    R$ {{ reabastecimento.valor_total_reabastecimento|floatformat:2 }}
-                                </td>
-                                <td data-label="Responsável">
+        <h2>Relatório do Reabastecimento</h2>
 
-                                    {% if reabastecimento.funcionario %}
-
-                                        {{ reabastecimento.funcionario }}
-                                    
-                                    {% else %}
-                                        {{ reabastecimento.empresa }}
-                                    
-                                    {% endif %}
-                                </td>
-                            </tr>
-
-                        {% endfor %}
-                    {% else %}
-                        <tr><td colspan="5">Nenhum reabastecimento</td></tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        {% endfor %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Tanque</th>
+                    <th>Fornecedor</th>
+                    <th>Volume (L)</th>
+                    <th>Valor</th>
+                    <th>Responsável</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Data">
+                        {{ reabastecimento.criado|date:"d/m/Y" }}
+                    </td>
+                    <td data-label="Tanque">
+                        {{ reabastecimento.tanque.identificador_tanque }}
+                    </td>
+                    <td data-label="Fornecedor">
+                        {{ reabastecimento.fornecedor.nome }}
+                    </td>
+                    <td data-label="Volume">
+                        {{ reabastecimento.quantidade|floatformat:2 }}
+                    </td>
+                    <td data-label="Valor">
+                        R$ {{ reabastecimento.valor_total_reabastecimento|floatformat:2 }}
+                    </td>
+                    <td data-label="Responsável">
+                        {% if reabastecimento.funcionario %}
+                            {{ reabastecimento.funcionario }}
+                        {% else %}
+                            {{ reabastecimento.empresa }}
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
         <div class="totais">
             <p><strong>Total de Litros:</strong> {{ total_litros|floatformat:2 }}</p>
             <p><strong>Total em Valor:</strong> R$ {{ total_valor|floatformat:2 }}</p>
         </div>
     </div>
-{% endblock  %}
+
+{% endblock %}
