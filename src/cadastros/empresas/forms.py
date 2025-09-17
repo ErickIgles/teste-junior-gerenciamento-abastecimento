@@ -21,7 +21,9 @@ class EmpresaModelForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-input',
-                'placeholder': 'CNPJ'
+                'placeholder': 'CNPJ',
+                'pattern': r'\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2}',
+                'inputmode': 'numeric'
             }
         ),
         label='CNPJ da empresa'
