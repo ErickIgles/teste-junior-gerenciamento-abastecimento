@@ -222,6 +222,7 @@ body {
   .layout {
     flex-direction: column;
     gap: 0;
+    width: 100%;
   }
 
   .asidebar {
@@ -251,10 +252,7 @@ body {
     display: none; /* Oculta os links de ação em telas menores para melhor visualização */
   }
 
-  .container {
-    margin-top: 60px;
-    padding: 10px;
-  }
+
 
   .footer {
     padding: 15px;
