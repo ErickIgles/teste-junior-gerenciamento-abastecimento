@@ -87,13 +87,13 @@
             
             <table class="tabela">
                  <a 
-                    href="{% url 'relatorios:relatorio_reabastecimento_detalhes' reabastecimento.tanque.pk %}?{{request.GET.urlencode }}" 
+                    href="{% url 'relatorios:relatorio_reabastecimento_detalhes' reabastecimento.pk %}?{{request.GET.urlencode }}" 
                     class="btn pdf"
                 >
                     📄 Detalhar
                 </a>
                 <a 
-                    href="{% url 'relatorios:relatorio_reabastecimento_detalhes_pdf' reabastecimento.tanque.pk%}?{{request.GET.urlencode }}" 
+                    href="{% url 'relatorios:relatorio_reabastecimento_detalhes_pdf' reabastecimento.pk %}?{{request.GET.urlencode }}" 
                     class="btn pdf"
                 >
                     📥 PDF
@@ -126,7 +126,7 @@
                         <td>{{ reabastecimento.fornecedor.nome_fantasia }}</td>
                     </tr>
                     <tr>
-                        <th>Tipo Combustível</th>
+                        <th>Combustível</th>
                         <td>{{ reabastecimento.tanque.tipo_combustivel }}</td>
                     </tr>
                     <tr>
