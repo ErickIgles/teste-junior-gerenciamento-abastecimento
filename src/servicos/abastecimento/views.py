@@ -30,7 +30,7 @@ class RegistroAbastecimentoCadastroView(
     GroupRequiredMixin,
     CreateView
 ):
-    group_required = ['gerente_geral', 'administradores']
+    group_required = ['funcionarios', 'gerente_geral', 'administradores']
     model = RegistroAbastecimento
     form_class = AbastecimentoForm
     template_name = 'abastecimento/form_register.html'
@@ -83,7 +83,7 @@ class RegitroAbastecimentoListaView(
     GroupRequiredMixin,
     ListView
 ):
-    group_required = ['gerente_geral', 'administradores']
+    group_required = ['funcionarios', 'gerente_geral', 'administradores']
     model = RegistroAbastecimento
     context_object_name = 'abastecimentos'
     template_name = 'abastecimento/lista.html'
@@ -138,7 +138,7 @@ class RegistroAbastecimentoAtualizarView(
     EmpresaAbastecimentoPermissionMixin,
     UpdateView
 ):
-    group_required = ['gerente_geral', 'administradores']
+    group_required = ['funcionarios','gerente_geral', 'administradores']
     model = RegistroAbastecimento
     form_class = AbastecimentoUpdateForm
     context_object_name = 'abastecimento'
@@ -247,6 +247,7 @@ class RegistroReabastecimentoCadastrarView(
         self.request.session['abastecimento_tanque_form'] = {
             'tanque_id': form.cleaned_data['tanque'].id,
             'quantidade': str(form.cleaned_data['quantidade']),
+            'fornecedor_id': form.cleaned_data['fornecedor'].id
         }
 
         next_url = self.request.POST.get('next')
