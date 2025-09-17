@@ -5,5 +5,9 @@ from .views import IndexTemplateView
 app_name = 'home'
 
 urlpatterns = [
-    path('', IndexTemplateView.as_view(), name='index')
+    path(
+        '',
+        IndexTemplateView.as_view(),
+        name='index'
+    )
 ]
