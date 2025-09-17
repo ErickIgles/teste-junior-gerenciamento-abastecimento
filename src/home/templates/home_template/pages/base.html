@@ -29,6 +29,8 @@
             {% include 'home_template/partials/header.html' %}
             
             <main class="main">
+
+                <h3>Seja bem-vindo, {{ request.user.username }}!</h3>
     
                 {% block main %}
     
