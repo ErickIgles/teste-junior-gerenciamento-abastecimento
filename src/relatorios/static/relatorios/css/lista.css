@@ -1,6 +1,5 @@
 .campo-pagina{
     height: 100%;
-    padding: 30px;
 }
 .nav-pesquisa{
     display: flex;
@@ -91,45 +90,17 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 10px;
+    gap: 40px
 }
 
-.opcoes-impressao{
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-}
-
-.tabela-body{
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    padding: 10px;
+.opcao-pdf{
+    text-decoration: none;
+    padding: 8px;
+    font-weight: bold;
+    background-color: #ffffff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+    cursor: pointer;
 }
-
-.tabela-body tr{
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-}
-
-.tabela-body th{
-    margin-top: 10px;
-    text-align: center;
-}
-
-.tabela-body td{
-    display: flex;
-    text-align: center;
-    flex-direction: row;
-    margin-bottom: 10px;
-    font-size: 13.5px;
-    text-wrap:unset;
-}
-
 
 .status{
     font-weight: bold;
