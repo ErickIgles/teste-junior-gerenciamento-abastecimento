@@ -67,6 +67,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 0px 0px 0px 4px;
 }
 
 .main {
@@ -77,9 +78,10 @@ body {
 
 .footer {
   background-color: var(--cor-principal);
-  padding: var(--espacamento-padrao) calc(var(--espacamento-padrao) * 2);
+  padding: 10px;
   color: var(--cor-texto-principal);
   text-align: center;
+  border-radius: 4px 4px 0px 0px;
 }
 
 /* ==================================== */
