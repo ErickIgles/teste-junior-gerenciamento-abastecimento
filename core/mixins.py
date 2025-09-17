@@ -14,19 +14,21 @@ class GroupRequiredMixin(AccessMixin):
 
     def dispatch(self, request, *args, **kwargs):
 
-        if not request.user.is_authenticated:
+        usuario = self.request.user
+
+        if not usuario.is_authenticated:
             return self.handle_no_permission()
 
-        if request.user.is_staff:
+        if usuario.is_staff:
             return super().dispatch(request, *args, **kwargs)
 
-        if request.user.is_empresa():
+        if usuario.is_empresa():
             return super().dispatch(request, *args, **kwargs)
 
         is_in_group = False
 
         for group_name in self.group_required:
-            if request.user.groups.filter(name=group_name).exists():
+            if usuario.groups.filter(name=group_name).exists():
                 is_in_group = True
                 break
 
