@@ -26,12 +26,12 @@ Deletar Registro
         <table class="tabela">
             <tbody class="tabela-body">
                 <tr>
-                    <th>Funcionário</th>
+                    <th>Responsável</th>
                     <td>
                         {% if registro.funcionario %}
-                            {{ registro.funcionario.username }}
+                            {{ registro.funcionario }}
                         {% else %}
-                            <p>Offline</p>
+                            {{ registro.empresa }}
                         {% endif %}
                     </td>
                 </tr>
@@ -54,7 +54,7 @@ Deletar Registro
                     </td>
                 </tr>
                 <tr>
-                    <th>Data de registro</th>
+                    <th>Data</th>
                     <td>
                         {{ registro.criado }}
                     </td>
