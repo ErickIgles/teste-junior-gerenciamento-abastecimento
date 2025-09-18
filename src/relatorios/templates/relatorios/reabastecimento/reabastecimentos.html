@@ -5,6 +5,37 @@
 
 {% block head %}
     <link rel="stylesheet" href="{% static 'relatorios/css/lista.css' %}">
+
+
+
+    <style>
+      table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            page-break-inside: auto;
+        }
+
+        thead {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: left;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tfoot td {
+            font-weight: bold;
+            background-color: #f1f1f1;
+        }
+    </style>
 {% endblock  %}
 
 
@@ -12,7 +43,7 @@
 {% block main %}
 
     <div class="campo-pagina">
-        <h2 class="titulo-listagem">Página de relatórios de reabastecimentos</h2>
+        <h2 class="titulo-listagem">Reabastecimentos</h2>
 
         <nav class="nav-pesquisa">
             <form method="GET" class="form">
@@ -69,6 +100,20 @@
                         {% endfor %}
                             
                     </select>
+                    <select name="tipo_combustivel" id="tipo_combustivel" class="form-select">
+                        <option value="">Combustíveis</option>
+                        {% for tipo in tipos_combustivel %}
+                            <option 
+                                value="{{ tipo.id}}"
+                                {% if request.GET.tipo_combustivel == tipo.id|stringformat:"s" %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{tipo.nome_combustivel}}
+                            </option>
+                        {% endfor %}
+                            
+                    </select>
                     <select name="forma_pagamento" id="forma_pagamento" class="form-select">
                         <option value="">
                             Formas de pagamento
@@ -78,73 +123,64 @@
                 <button type="submit" class="button-pesquisa">
                     🔍
                 </button>
-
-            </form>
+                
+                
+            </form>            
+            <a 
+                href="{% url 'relatorios:relatorio_reabastecimento_detalhes_pdf' %}?{{request.GET.urlencode }}" 
+                class="opcao-pdf"
+                >
+                    BAIXAR RELATÓRIO
+            </a>
         </nav>
 
         
-        {% for reabastecimento in registros %}
+        {% if registros %}
             
             <table class="tabela">
-                 <a 
-                    href="{% url 'relatorios:relatorio_reabastecimento_detalhes' reabastecimento.pk %}?{{request.GET.urlencode }}" 
-                    class="btn pdf"
-                >
-                    📄 Detalhar
-                </a>
-                <a 
-                    href="{% url 'relatorios:relatorio_reabastecimento_detalhes_pdf' reabastecimento.pk %}?{{request.GET.urlencode }}" 
-                    class="btn pdf"
-                >
-                    📥 PDF
-                </a>
-                <tbody class="tabela-body">
+
+                <thead>
                     <tr>
                         <th>Data</th>
-                        <td>{{ reabastecimento.criado }}</td>
-                    </tr>
-                    <tr>
                         <th>Responsável</th>
-                        <td>
-                            {% if reabastecimento.funcionario %}
-                            
-                                {{ reabastecimento.funcionario }}
-                                
-                            {% else %}
-                                
-                                {{ reabastecimento.empresa }}
-
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
                         <th>Tanque</th>
-                        <td>{{ reabastecimento.tanque.identificador_tanque }}</td>
-                    </tr>
-                    <tr>
                         <th>Fornecedor</th>
-                        <td>{{ reabastecimento.fornecedor.nome_fantasia }}</td>
-                    </tr>
-                    <tr>
                         <th>Combustível</th>
-                        <td>{{ reabastecimento.tanque.tipo_combustivel }}</td>
-                    </tr>
-                    <tr>
                         <th>Litros</th>
-                        <td>{{ reabastecimento.quantidade }}</td>
-                    </tr>
-                    <tr>
                         <th>Valor</th>
-                        <td>{{ reabastecimento.valor_total_reabastecimento }}</td>
-                    </tr>
-                    <tr>
                         <th>Forma de pagamento</th>
-                        <td>{{ reabastecimento.get_forma_pagamento_display }}</td>
                     </tr>
-                </tbody>
-            </table>
+                </thead>
 
-        {% endfor %}
+                {% for reabastecimento in registros %}
+                    <tbody>
+                        <tr>    
+                            <td>{{ reabastecimento.criado }}</td>
+                            <td>
+                                {% if reabastecimento.funcionario %}
+                                
+                                    {{ reabastecimento.funcionario }}
+                                    
+                                {% else %}
+                                    
+                                    {{ reabastecimento.empresa }}
+
+                                {% endif %}
+                            </td>
+                            <td>{{ reabastecimento.tanque.identificador_tanque }}</td>
+                            <td>{{ reabastecimento.fornecedor.nome_fantasia }}</td>
+                            <td>{{ reabastecimento.tanque.tipo_combustivel }}</td>
+                            <td>{{ reabastecimento.quantidade }}</td>
+                            <td>{{ reabastecimento.valor_total_reabastecimento }}</td>
+                            <td>{{ reabastecimento.get_forma_pagamento_display }}</td>
+                        </tr>
+                    </tbody>
+                {% endfor %}
+            </table>
+        {% endif %}
+            
+
+            
             
         <p><strong>Total de litros:</strong> {{ total_litros }}L</p>
         <p><strong>Total em reais:</strong> R$ {{ total_valor|floatformat:2 }}</p>
