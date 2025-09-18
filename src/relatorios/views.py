@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from django.shortcuts import get_object_or_404
+from django.views import View
 
 from django.http import HttpResponse
 from django.contrib import messages
@@ -21,7 +19,6 @@ from pydf import generate_pdf
 from cadastros.empresas.models import Empresa
 from cadastros.funcionarios.models import Funcionario
 from cadastros.tanques.models import Combustivel, Tanque
-from .utils.mixins import EmpresaRelatorioPermissionMixin
 from core.mixins import GroupRequiredMixin
 
 
@@ -73,14 +70,14 @@ class RelatorioAbastecimentos(
         q = self.request.GET.get('q')
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
-        funcionario = self.request.GET.get('funcionario')
+        funcionario_id = self.request.GET.get('funcionario')
         tipo_combustivel = self.request.GET.get('tipo_combustivel')
         forma_pagamento = self.request.GET.get('forma_pagamento')
 
         if q:
 
             abastecimentos = abastecimentos.filter(
-                Q(funcionario__nome_funcionario__icontains=q) |
+                Q(funcionario__username__icontains=q) |
                 Q(
                     tanque__tipo_combustivel__nome_combustivel__icontains=q
                 )
@@ -92,11 +89,16 @@ class RelatorioAbastecimentos(
                 criado__range=[data_inicio, data_fim]
             )
 
-        if funcionario:
+        if funcionario_id:
 
-            abastecimentos = abastecimentos.filter(
-                funcionario=funcionario
-            )
+            try:
+                abastecimentos = abastecimentos.filter(
+
+                    Q(funcionario=int(funcionario_id))
+                )
+            except ValueError:
+                        # Continua se o valor não for um número
+                pass
 
         if tipo_combustivel:
 
@@ -153,68 +155,110 @@ class RelatorioAbastecimentos(
         return context
 
 
-class RelatorioAbastecimentoDetalhado(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    EmpresaRelatorioPermissionMixin,
-    TemplateView
-):
-    group_required = ['gerente_geral', 'administradores']
-    template_name = 'relatorios/abastecimento/abastecimento_detalhado.html'
+class RelatorioAbastecimentoDetalhadoPDF(View):
 
-    def get_empresa_do_objeto(self):
-        reabastecimento = RegistroAbastecimento.objects.select_related("empresa").filter(
-            pk=self.kwargs["pk"]
-        ).first()
-        return reabastecimento.empresa if reabastecimento else None
+    def _get_empresa_do_usuario(self, usuario_logado):
+        """
+        Método privado para buscar a empresa associada ao usuário,
+        evitando múltiplas consultas.
+        """
+        try:
+            return usuario_logado.funcionario.empresa
+        except Funcionario.DoesNotExist:
+            pass
+        
+        try:
+            return Empresa.objects.select_related('usuario_responsavel').get(
+                usuario_responsavel=usuario_logado
+            )
+        except Empresa.DoesNotExist:
+            return None
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        usuario = self.request.user
-
-        if usuario.is_empresa():
-
-            empresa = Empresa.objects.get(usuario_responsavel=usuario)
-
-        else:
-            empresa = Funcionario.objects.select_related("empresa").get(user=usuario).empresa
-
-        abastecimento = get_object_or_404(
-            RegistroAbastecimento.objects.select_related('bomba', 'funcionario'),
-            id=self.kwargs['pk'],
-            empresa=empresa,
+    def _get_abastecimentos(self, request, empresa):
+        """
+        Encapsula a lógica de filtragem para a geração do PDF.
+        """
+        abastecimentos = RegistroAbastecimento.objects.select_related(
+            'empresa', 'funcionario', 'tipo_combustivel', 'tanque'
+        ).filter(
+            empresa=empresa
         )
+        
+        q = request.GET.get('q')
+        data_inicio = request.GET.get('data_inicio')
+        data_fim = request.GET.get('data_fim')
+        funcionario = request.GET.get('funcionario')
+        tipo_combustivel_id = request.GET.get('tipo_combustivel')
+        forma_pagamento = request.GET.get('forma_pagamento')
 
-        context.update({
-            'abastecimento': abastecimento,
-            'bomba': abastecimento.bomba,
-            'tanque': abastecimento.bomba.tanque,
-        })
+        if q:
+            abastecimentos = abastecimentos.filter(
+                Q(funcionario__username__icontains=q) |
+                Q(tanque__tipo_combustivel__nome_combustivel__icontains=q)
+            )
+        
+        if data_inicio and data_fim:
+            abastecimentos = abastecimentos.filter(
+                criado__range=[data_inicio, data_fim]
+            )
 
-        return context
+        if funcionario:
+            abastecimentos = abastecimentos.filter(
+                funcionario=funcionario
+            )
 
+        if tipo_combustivel_id:
+            abastecimentos = abastecimentos.filter(
+                tipo_combustivel_id=tipo_combustivel_id
+            )
 
-class RelatorioAbastecimentoDetalhadoPDF(
-    RelatorioAbastecimentoDetalhado
-):
+        if forma_pagamento:
+            abastecimentos = abastecimentos.filter(
+                forma_pagamento=forma_pagamento
+            )
+        
+        return abastecimentos.order_by('-criado')
 
     def get(self, request, *args, **kwargs):
-
-        context = self.get_context_data(**kwargs)
+        
+        empresa = self._get_empresa_do_usuario(request.user)
+        
+        if not empresa:
+        
+            return HttpResponse("Acesso negado.", status=403)
+        
+        # Chama o método interno para obter os dados filtrados
+        abastecimentos = self._get_abastecimentos(request, empresa)
+        
+        total_litros = abastecimentos.aggregate(
+            total=Sum('litros_abastecido')
+        )['total'] or 0
+        total_valor = abastecimentos.aggregate(
+            total=Sum('valor_total_abastecimento')
+        )['total'] or 0
+        
+        context = {
+            'registros': abastecimentos,
+            'total_litros': total_litros,
+            'total_valor': total_valor,
+            'funcionarios': Funcionario.objects.filter(empresa=empresa),
+            'tipos_combustivel': Combustivel.objects.filter(empresa=empresa),
+        }
 
         html_string = render_to_string(
             'relatorios/abastecimento/abastecimento_detalhado_pdf.html',
             context
         )
-
+        
+        # Sua lógica de geração de PDF
         pdf_file = generate_pdf(source=html_string)
 
+        filename = "relatorio_abastecimento_geral.pdf"
         response = HttpResponse(pdf_file, content_type='application/pdf')
-
-        response['Content-Disposition'] = f'attachment;filename="relatorio_tanque_{context["tanque"].id}.pdf"'
-
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
         return response
+
 
 
 class RelatorioReabastecimentos(
@@ -267,6 +311,8 @@ class RelatorioReabastecimentos(
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
         funcionario = self.request.GET.get('funcionario')
+        tanque = self.request.GET.get('tanque')
+        tipo_combustivel = self.request.GET.get('tipo_combustivel')
         forma_pagamento = self.request.GET.get('forma_pagamento')
 
         if q:
@@ -288,6 +334,18 @@ class RelatorioReabastecimentos(
 
             reabastecimentos = reabastecimentos.filter(
                 funcionario=funcionario
+            )
+
+        if tanque:
+
+            reabastecimentos = reabastecimentos.filter(
+                tanque=tanque
+            )
+
+        if tipo_combustivel:
+
+            reabastecimentos = reabastecimentos.filter(
+                tanque__tipo_combustivel=tipo_combustivel
             )
 
         if forma_pagamento:
@@ -331,6 +389,12 @@ class RelatorioReabastecimentos(
             empresa=self.get_user()
         )
 
+        context['tipos_combustivel'] = Combustivel.objects.select_related(
+            'empresa'
+        ).filter(
+            empresa=self.get_user()
+        )
+
         qs = context['registros']
 
         context['total_litros'] = qs.aggregate(
@@ -344,80 +408,119 @@ class RelatorioReabastecimentos(
         return context
 
 
-class RelatorioReabastecimentoDetalhado(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    EmpresaRelatorioPermissionMixin,
-    TemplateView
-):
-    group_required = ['gerente_geral', 'administradores']
-    template_name = 'relatorios/reabastecimento/reabastecimento_detalhado.html'
-
-    def get_empresa_do_objeto(self):
-        reabastecimento = RegistroReabastecimento.objects.select_related("empresa").filter(
-            pk=self.kwargs["pk"]
-        ).first()
-        return reabastecimento.empresa if reabastecimento else None
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        reabastecimento_id = self.kwargs["pk"]
-        usuario = self.request.user
-
-        if usuario.is_empresa():
-            empresa = Empresa.objects.get(usuario_responsavel=usuario)
-        else:
-            empresa = Funcionario.objects.select_related("empresa").get(user=usuario).empresa
-
-        reabastecimento = RegistroReabastecimento.objects.select_related(
-            "fornecedor", "tanque", "funcionario", "empresa"
-        ).get(pk=reabastecimento_id, empresa=empresa)
-
-        context["reabastecimento"] = reabastecimento
-        context["tanque"] = reabastecimento.tanque
-        context["total_litros"] = reabastecimento.quantidade
-        context["total_valor"] = reabastecimento.valor_total_reabastecimento
-
-        return context
-
-
 class RelatorioReabastecimentoDetalhadoPDF(
-    RelatorioReabastecimentoDetalhado
+    View
 ):
+
+    def _get_empresa_do_usuario(self, usuario_logado):
+        """
+        Método privado para buscar a empresa associada ao usuário,
+        evitando múltiplas consultas.
+        """
+        try:
+            return usuario_logado.funcionario.empresa
+        except Funcionario.DoesNotExist:
+            pass
+        
+        try:
+            return Empresa.objects.select_related('usuario_responsavel').get(
+                usuario_responsavel=usuario_logado
+            )
+        except Empresa.DoesNotExist:
+            return None
+
+    def _get_reabastecimento(self, request, empresa):
+
+        reabastecimentos = RegistroReabastecimento.objects.select_related(
+            'tanque',
+            'empresa',
+            'fornecedor',
+            'funcionario'
+        )
+
+
+        q = request.GET.get('q')
+        data_inicio = request.GET.get('data_inicio')
+        data_fim = request.GET.get('data_fim')
+        funcionario = request.GET.get('funcionario')
+        tanque = request.GET.get('tanque')
+        tipo_combustivel_id = request.GET.get('tipo_combustivel')
+        forma_pagamento = request.GET.get('forma_pagamento')
+
+        if q:
+
+            reabastecimentos = reabastecimentos.filter(
+                Q(furncionario__username__icontains=q) |
+                Q(tanque__identificador_tanque__icontains=q)
+            )
+
+        if data_inicio and data_fim:
+            reabastecimentos = reabastecimentos.filter(
+                criado__range=[data_inicio, data_fim]
+            )
+
+        if funcionario:
+            reabastecimentos = reabastecimentos.filter(
+                funcionario=funcionario
+            )
+        
+        if tanque:
+
+            reabastecimentos = reabastecimentos.filter(
+                tanque=tanque
+            )
+
+        if tipo_combustivel_id:
+            reabastecimentos = reabastecimentos.filter(
+                tipo_combustivel_id=tipo_combustivel_id
+            )
+
+        if forma_pagamento:
+            reabastecimentos = reabastecimentos.filter(
+                forma_pagamento=forma_pagamento
+            )
+        
+        return reabastecimentos.order_by('-criado')
+
+
 
     def get(self, request, *args, **kwargs):
         # pega o pk do reabastecimento
-        reabastecimento_id = self.kwargs.get("pk")
+        
+        empresa = self._get_empresa_do_usuario(request.user)
 
-        # busca apenas esse reabastecimento
-        reabastecimento = RegistroReabastecimento.objects.select_related(
-                'fornecedor',
-                'tanque',
-                'funcionario',
-                'empresa'
-            ).get(
-                pk=reabastecimento_id
-            )
 
-        total_litros = reabastecimento.quantidade
-        total_valor = reabastecimento.valor_total_reabastecimento
+        if not empresa:
+        
+            return HttpResponse("Acesso negado.", status=403)
+
+
+        reabastecimentos = self._get_reabastecimento(request, empresa)
+
+
+        total_litros = reabastecimentos.aggregate(
+            total=Sum('quantidade')
+        )['total'] or 0
+        total_valor = reabastecimentos.aggregate(
+            total=Sum('valor_total_reabastecimento')
+        )['total'] or 0
+        
+        context = {
+            'registros': reabastecimentos,
+            'total_litros': total_litros,
+            'total_valor': total_valor,
+        }
+
 
         # renderiza o template PDF
         html_string = render_to_string(
             'relatorios/reabastecimento/reabastecimento_detalhado_pdf.html',
-            {
-                'reabastecimento': reabastecimento,
-                'total_litros': total_litros,
-                'total_valor': total_valor,
-                'data_inicio': reabastecimento.criado,
-                'data_fim': reabastecimento.criado,
-            }
+            context
         )
 
         pdf_file = generate_pdf(source=html_string)
 
         response = HttpResponse(pdf_file, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="reabastecimento_{reabastecimento_id}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="reabastecimento_detalhe.pdf"'
 
         return response
