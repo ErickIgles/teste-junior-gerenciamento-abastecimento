@@ -14,7 +14,9 @@ class EmpresaRelatorioPermissionMixin:
 
     def get_empresa_usuario(self, usuario):
         if usuario.is_empresa():
-            return Empresa.objects.get(usuario_responsavel=usuario)
+            return Empresa.objects.get(
+                usuario_responsavel=usuario
+            )
         return Funcionario.objects.select_related("empresa").get(user=usuario).empresa
 
     def get_empresa_do_objeto(self):
