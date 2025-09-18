@@ -2,11 +2,9 @@ from django.urls import path
 
 from .views import (
     RelatorioAbastecimentos,
-    RelatorioAbastecimentoDetalhado,
     RelatorioAbastecimentoDetalhadoPDF,
 
     RelatorioReabastecimentos,
-    RelatorioReabastecimentoDetalhado,
     RelatorioReabastecimentoDetalhadoPDF,
     
 )
@@ -22,13 +20,7 @@ urlpatterns = [
     ),
 
     path(
-        'abastecimento/detalhado/<int:pk>/',
-        RelatorioAbastecimentoDetalhado.as_view(),
-        name='relatorio_abstecimento_detalhes'
-    ),
-
-    path(
-        'relatorios/abastecimentos/pdf/<int:pk>/',
+        'relatorios/abastecimentos/pdf/',
         RelatorioAbastecimentoDetalhadoPDF.as_view(),
         name='relatorio_abastecimento_detalhes_pdf'
     ),
@@ -40,14 +32,7 @@ urlpatterns = [
     ),
 
     path(
-        'relatorios/reabastecimentos/<int:pk>/',
-        RelatorioReabastecimentoDetalhado.as_view(),
-        name='relatorio_reabastecimento_detalhes'
-    ),
-
-
-    path(
-        'relatorios/reabastecimentos/pdf/<int:pk>/',
+        'relatorios/reabastecimentos/pdf/',
         RelatorioReabastecimentoDetalhadoPDF.as_view(),
         name='relatorio_reabastecimento_detalhes_pdf'
     ),
