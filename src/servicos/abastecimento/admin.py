@@ -38,7 +38,6 @@ class RegistroAbastecimentoAdmin(admin.ModelAdmin):
     )
 
 
-
 @admin.register(RegistroReabastecimento)
 class RegistroReabastecimentoAdmin(admin.ModelAdmin):
     list_display = [
