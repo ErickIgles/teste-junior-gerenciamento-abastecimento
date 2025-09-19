@@ -8,7 +8,7 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Sum, Count
 from django.core.exceptions import ValidationError
 
 from .models import RegistroAbastecimento, RegistroReabastecimento
@@ -33,7 +33,7 @@ class RegistroAbastecimentoCadastroView(
     group_required = ['funcionarios', 'gerente_geral', 'administradores']
     model = RegistroAbastecimento
     form_class = AbastecimentoForm
-    template_name = 'abastecimento/form_register.html'
+    template_name = 'abastecimento/lista.html'
     success_url = reverse_lazy('servicos:abastecimento:listar')
 
     def get_form_kwargs(self):
@@ -78,7 +78,7 @@ class RegistroAbastecimentoCadastroView(
         return reverse('servicos:abastecimento:listar')
 
 
-class RegitroAbastecimentoListaView(
+class RegistroAbastecimentoListaView(
     LoginRequiredMixin,
     GroupRequiredMixin,
     ListView
@@ -118,7 +118,9 @@ class RegitroAbastecimentoListaView(
 
                 Q(tanque__identificador_tanque__icontains=q) |
 
-                Q(tipo_combustivel__nome_combustivel__icontains=q)
+                Q(tipo_combustivel__nome_combustivel__icontains=q) |
+
+                Q(funcionario__nome_funcionario__icontains=q)
             )
         if data_inicio:
             queryset = queryset.filter(criado__gte=data_inicio)
@@ -129,6 +131,61 @@ class RegitroAbastecimentoListaView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+
+        usuario_logado = self.request.user
+
+
+        if usuario_logado.is_empresa():
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_logado)
+            usuario_funcionario = None
+        else:
+            usuario_funcionario = Funcionario.objects.get(user=usuario_logado)
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel)
+
+        form = AbastecimentoForm(
+            empresa=empresa,
+            usuario_funcionario=usuario_funcionario
+        )
+
+        context['form'] = form
+
+        abastecimentos = self.get_queryset()
+
+
+        page_obj = context['page_obj']  # já vem do ListView
+
+        forms_edicao = [
+            (abastecimento, AbastecimentoForm(
+                instance=abastecimento,
+                empresa=empresa,
+                usuario_funcionario=usuario_funcionario
+            ))
+            for abastecimento in page_obj.object_list
+        ]
+        context['forms_edicao'] = forms_edicao
+            
+        total_listros = context['abastecimentos'].aggregate(
+            total=Sum('litros_abastecido')
+        )['total'] or 0
+
+        total_valor = context['abastecimentos'].aggregate(
+            total=Sum('valor_total_abastecimento')
+        )['total'] or 0
+
+        combustivel_mais_pedido = (
+            abastecimentos
+            .values('tipo_combustivel__nome_combustivel')
+            .annotate(total=Count('id'))
+            .order_by('-total')
+            .first()
+        )
+
+        context['combustivel_mais_pedido'] = combustivel_mais_pedido
+
+        context['total_litros'] = total_listros
+        context['total_valor'] = total_valor
+
         return context
 
 
@@ -318,8 +375,62 @@ class RegistroReabastecimentoListarView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        return context
 
+
+        usuario_logado = self.request.user
+
+
+        if usuario_logado.is_empresa():
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_logado)
+            usuario_funcionario = None
+        else:
+            usuario_funcionario = Funcionario.objects.get(user=usuario_logado)
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel)
+
+        form = ReabastecimentoTanqueForm(
+            empresa=empresa,
+            usuario_funcionario=usuario_funcionario
+        )
+
+        context['form'] = form
+
+
+        reabastecimentos = self.get_queryset()
+
+        context['reabastecimentos'] = reabastecimentos
+
+        forms_edicao = [
+            (reabastecimento, ReabastecimentoTanqueForm(
+                instance=reabastecimento,
+                empresa=empresa,
+                usuario_funcionario=usuario_funcionario
+            ))
+            for reabastecimento in context['reabastecimentos']
+        ]
+        context['forms_edicao'] = forms_edicao
+            
+        total_listros = context['reabastecimentos'].aggregate(
+            total=Sum('quantidade')
+        )['total'] or 0
+
+        total_valor = context['reabastecimentos'].aggregate(
+            total=Sum('valor_total_reabastecimento')
+        )['total'] or 0
+
+        combustivel_mais_reabastecido = (
+            reabastecimentos
+            .values('tanque__tipo_combustivel__nome_combustivel')
+            .annotate(total=Count('id'))
+            .order_by('-total')
+            .first()
+        )
+
+        context['combustivel_mais_reabastecido'] = combustivel_mais_reabastecido
+
+        context['total_litros'] = total_listros
+        context['total_valor'] = total_valor
+
+        return context
 
 class RegistroReabastecimentoDeletarView(
     LoginRequiredMixin,
