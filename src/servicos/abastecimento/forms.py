@@ -4,6 +4,7 @@ from .models import RegistroAbastecimento, RegistroReabastecimento
 from cadastros.tanques.models import Tanque, Combustivel
 from cadastros.bombas.models import Bomba
 from cadastros.fornecedores.models import Fornecedor
+from cadastros.funcionarios.models import Funcionario
 
 
 class AbastecimentoForm(forms.ModelForm):
@@ -144,10 +145,13 @@ class AbastecimentoForm(forms.ModelForm):
 
     def save(self, commit=True):
 
+        funcionario = None
+
         if self.usuario_funcionario:
-            funcionario = self.usuario_funcionario
-        else:
-            funcionario = self.empresa.usuario_responsavel
+            funcionario = Funcionario.objects.get(
+                user__username=self.usuario_funcionario
+            )
+
 
         bomba = self.cleaned_data.get('bomba')
 
@@ -301,10 +305,11 @@ class AbastecimentoUpdateForm(forms.ModelForm):
 
     def save(self, commit=True):
 
+        funcionario = None
+
         if self.usuario_funcionario:
             funcionario = self.usuario_funcionario
-        else:
-            funcionario = self.empresa.usuario_responsavel
+
 
         registro_abastecimento = self.instance
 
