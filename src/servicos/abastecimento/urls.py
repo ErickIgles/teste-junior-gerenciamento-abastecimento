@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
 
     RegistroAbastecimentoCadastroView,
-    RegitroAbastecimentoListaView,
+    RegistroAbastecimentoListaView,
     RegistroAbastecimentoAtualizarView,
     RegistroAbastecimentoDeletarView,
 
@@ -30,7 +30,7 @@ urlpatterns = [
     ),
     path(
         'listar/',
-        RegitroAbastecimentoListaView.as_view(),
+        RegistroAbastecimentoListaView.as_view(),
         name='listar'
     ),
     path(
