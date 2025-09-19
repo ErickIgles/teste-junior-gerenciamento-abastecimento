@@ -11,11 +11,11 @@ from cadastros.fornecedores.models import Fornecedor
 
 class RegistroAbastecimento(Base):
     funcionario = models.ForeignKey(
-        User,
+        Funcionario,
         verbose_name='Funcionário',
         on_delete=models.CASCADE,
-        null=False,
-        blank=False
+        null=True,
+        blank=True
     )
     tanque = models.ForeignKey(
         Tanque,
