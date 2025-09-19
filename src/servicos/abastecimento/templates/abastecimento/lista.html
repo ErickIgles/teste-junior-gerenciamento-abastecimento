@@ -10,33 +10,55 @@
 
 {% block main %}
     <div class="campo-pagina">
-        <h2 class="titulo-listagem">Saída de combustível</h2>
+
+        <div style="display: flex; flex-direction: column; margin: 10px; gap: 20px;">
+            <div>
+                <h2 style="margin-top: 10px;">Saída de combustível</h2>
+            </div>
+
+
+            <!--CARS PARA QUANTIDADE CONSUMIDA/ VALOR TOTAL/ TIPO TANQUE COM MAIS SAIDA-->
+
+            <div class="cards-resumo">
+
+                <div class="card">
+                    <h4>Volume consumido</h4>
+                    {{ total_litros }}
+                </div>
+                <div class="card">
+                    <h4>Valor total de abastecimento</h4>
+                    {{ total_valor }}
+                </div>
+                <div class="card">
+                    <h4>Combustivel mais pedido</h4>
+                    {{ combustivel_mais_pedido.tipo_combustivel__nome_combustivel }}
+                </div>
+
+            </div>
+        </div>
+
             
         <nav class="nav-pesquisa">
             <form method="GET" class="form">
+                
+                <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
 
-                <div>
-                    <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
-                </div>
+                <button type="submit" class="button-pesquisa">
+                    🔍
+                </button>
                 <div class="espaco-datas">
                     <input type="date" name="data_inicio" class="form-data">
                     <input type="date" name="data_fim" class="form-data">
                 </div>
-                <button type="submit" class="button-pesquisa">
-                    🔍
-                </button>
             </form>
 
             <div class="acoes-buttons">
-
-                <a 
-                    class="novo-registro" 
-                    href="{% url 'servicos:abastecimento:cadastrar' %}?next={{ request.get_full_path }}"
-            
+                <button
+                    type="button"
+                    class="novo-registro"             
                 >
                     Novo registro
-                </a>
-
+                </button>
             </div>
 
 
@@ -45,106 +67,125 @@
 
         {% if page_obj %}
             <div class="lista">
-                {% for abastecimento in page_obj %}
-                    <table class="tabela">
+                <table class="tabela">
+                    
+                    <thead class="tabela-cabecalho">
+                        <tr>
+                            <th>Responsável</th>
+                            <th>Tanque</th>
+                            <th>Bomba</th>
+                            <th>Tipo</th>
+                            <th>Consumida L</th>
+                            <th>Data</th>
+                            <th>Valor total R$</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                        
+                        
+                    {% for abastecimento, form in forms_edicao %}
                         <tbody class="tabela-body">
                             <tr>
-                                <th>Responsável</th>
-                                <td>
-                                    {{ abastecimento.funcionario.username }}
+                                <td data-label="Responsvel">
+                                    {% if abastecimento.funcionario %}
+                                        {{ abastecimento.funcionario.username }}
+                                    {% else %}
+                                        {{ abastecimento.empresa }}
+                                    {% endif %}
                                 </td>
-                            </tr>
-                            <tr>
-                                <th>Tanque</th>
-                                {% if abastecimento.tanque %}
-                                    <td>
-                                        {{ abastecimento.tanque.identificador_tanque }}
-                                    </td>
-                                {% else %}
-                                    <td>
-                                       Não há cargo registrado
-                                    </td>
-                                {% endif %}
-                            </tr>
-                            <tr>
-                                <th>Bomba</th>
-                                {% if abastecimento.bomba %}
-                                    <td>
+
+                                <td data-label="Tanque">
+                                    {% if abastecimento.tanque %}
+                                            {{ abastecimento.tanque.identificador_tanque }}
+                                    {% else %}
+                                        Não há cargo registrado
+                                    {% endif %}
+                                </td>
+                                <td data-label="Bomba">
+                                    {% if abastecimento.bomba %}
                                         {{ abastecimento.bomba.nome_bomba }}
-                                    </td>
-                                {% else %}
-                                    <td>
-                                       Não há bomba registrada
-                                    </td>
-                                {% endif %}
-                            </tr>
-                            <tr>
-                                <th>Tipo</th>
-                                {% if abastecimento.tanque %}
-                                    <td>
+                                    {% else %}
+                                        Não há bomba registrada
+                                    {% endif %}
+                                </td>
+                                <td data-label="Tipo">
+                                    {% if abastecimento.tanque %}
                                         {{ abastecimento.tanque.tipo_combustivel }}
-                                    </td>
-                                {% else %}
-                                    <td>
-                                       Não há tipo de combustível registrado
-                                    </td>
-                                {% endif %}
-                            </tr>                            
-                            <tr>
-                                <th>Consumida L</th>
-                                <td>
+                                    {% else %}
+                                        Não há tipo de combustível registrado
+                                    {% endif %}
+                                </td>
+                                <td data-label="Consumida">
                                     {{ abastecimento.litros_abastecido }}
                                 </td>
-                            </tr>
-                            <tr>
-                                <th>Data</th>
-                                <td>
-                                    {{ abastecimento.criado }}
+                                <td data-label="Data">
+                                   {{ abastecimento.criado }}
                                 </td>
-                            </tr>                            
-                            <tr>
-                                <th>Valor total R$</th>
-                                <td>
+
+                                <td data-label="Valor total R$">
                                     {{ abastecimento.valor_total_abastecimento }}
                                 </td>
-                            </tr>
 
-                            <tr>
-                                <th>Ações</th>
-                                <td class="acoes-buttons">
-                                    <a  
-                                        href="{% url 'servicos:abastecimento:atualizar' abastecimento.pk %}?next={{ request.get_full_path }}" 
-                                        class="btn atualizar"
-                                    >
-                                        Editar
-                                    </a>
 
-                                    <a 
-                                        href="{% url 'servicos:abastecimento:deletar' abastecimento.pk %}"
-                                        class="btn deletar"
-                                    >
-                                        Apagar
-                                    </a>
+                                <td data-label="Ações" class="acoes-buttons">
+                                    <button 
+                                        type="button"
+                                        class="btn atualizar" 
+                                        onclick="abrirModal('modalEditar{{ abastecimento.id }}')">
+                                        <i class="fas fa-edit">
+                                        </i>
+                                    </button>
+
+                                    <form method="POST" action="{% url 'servicos:abastecimento:deletar' abastecimento.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn deletar">
+                                            <i class="fas fa-trash"></i>                                             
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         </tbody>
-                    </table>
-                {% endfor %}
+
+                        <div id="modalEditar{{ abastecimento.id }}" class="modal">
+                            <div class="modal-content">
+                                <span class="close" onclick="fecharModal('modalEditar{{ abastecimento.id }}')">&times;</span>
+                                <h2>Editar Abastecimento</h2>
+                                <form method="POST" action="{% url 'servicos:abastecimento:atualizar' abastecimento.id %}">
+                                        {% csrf_token %}
+                                    <div class="modal-form-grid">
+                                        {% for field in form %}
+                                             <div class="form-group">
+                                                {{ field.label_tag }}
+                                                {{ field }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button type="submit">Salvar Alterações</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </table>
             </div>
 
-            <div class="paginacao">
-                {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">«</a>
-                {% endif %}
 
-                <span>
-                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                </span>
+            {% if page_obj >= 2 %}
 
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">»</a>
-                {% endif %}
-            </div>
+                <div class="paginacao">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">«</a>
+                    {% endif %}
+
+                    <span>
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">»</a>
+                    {% endif %}
+                </div>
+
+            {% endif %}
 
         {% else %}
             <h2>Não há registros de Abastecimentos</h2>
@@ -152,4 +193,103 @@
 
 
     </div>
+    
+
+    <div id="modalCadastro" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Novo Abastecimento</h2>
+            <form method="POST" action="{% url 'servicos:abastecimento:cadastrar' %}">
+                {% csrf_token %}
+                <div class="modal-form-grid">
+
+                    
+                    {% for field in form %}
+                        
+                        <div class="form-group">
+
+                            {{ field.label_tag }}
+                            {{ field }}
+
+                            {% if field.errors %}
+
+                                {% for error in field.errors %}
+
+                                    <p class="messages-error">{{ error }}</p>
+
+                                {% endfor %}
+
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+                <button type="submit">Cadastrar</button>
+            </form>
+        </div>
+    </div>
+
+
+
+{% block script %}
+
+<script>
+    // --- Modal de cadastro ---
+    const modalCadastro = document.getElementById("modalCadastro");
+    const btnCadastro = document.querySelector(".novo-registro");
+    const spanCadastro = document.querySelector("#modalCadastro .close");
+
+    btnCadastro.addEventListener("click", function(event) {
+        event.preventDefault();
+        modalCadastro.style.display = "block";
+    });
+
+    spanCadastro.addEventListener("click", function() {
+        modalCadastro.style.display = "none";
+    });
+
+    window.addEventListener("click", function(event) {
+        if (event.target === modalCadastro) {
+            modalCadastro.style.display = "none";
+        }
+    });
+
+    // --- Funções genéricas para modais de edição ---
+    function abrirModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.style.display = "block";
+        }
+    }
+
+    function fecharModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // --- Fecha qualquer modal ao clicar no X ---
+    document.querySelectorAll(".modal .close").forEach(function(span) {
+        span.addEventListener("click", function() {
+            const modal = span.closest(".modal");
+            if (modal) {
+                modal.style.display = "none";
+            }
+        });
+    });
+
+    // --- Fecha modal ao clicar fora ---
+    window.addEventListener("click", function(event) {
+        if (event.target.classList.contains("modal")) {
+            event.target.style.display = "none";
+        }
+    });
+</script>
+
+
+    
+{% endblock  %}
+    
 {% endblock %}
