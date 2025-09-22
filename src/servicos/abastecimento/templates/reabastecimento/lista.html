@@ -16,7 +16,7 @@
         <div tyle="display: flex; flex-direction: column; margin: 10px; gap: 20px;">
 
             <div>
-                <h2 class="margin-top">Entrada de Combustível</h2>
+                <h2 style="margin-top: 15px">Reabastecimento</h2>
             </div>
 
 
@@ -32,7 +32,7 @@
                 </div>
                 <div class="card">
                     <h4>Combustivel mais reabastecido</h4>
-                    {{ combustivel_mais_reabastecido.tipo_combustivel__nome_combustivel }}
+                    {{ combustivel_mais_reabastecido.tanque__tipo_combustivel__nome_combustivel }}
                 </div>
 
             </div>
@@ -104,15 +104,13 @@
                                     {% endif %}
                                 </td>
 
-                                {% if reabastecimento.tanque %}
-                                    <td>
+                                <td>
+                                    {% if reabastecimento.tanque %}
                                         {{ reabastecimento.tanque.identificador_tanque }}
-                                    </td>
-                                {% else %}
-                                    <td>
-                                       Não há tanque registrado
-                                    </td>
-                                {% endif %}
+                                    {% else %}
+                                        Não há tanque registrado
+                                    {% endif %}
+                                </td>
 
                                 <td>
                                     {{ reabastecimento.fornecedor.nome_fantasia }}
