@@ -1,97 +1,105 @@
 {% extends 'home_template/pages/base.html' %}
-
 {% load static %}
 
 {% block title %} Bombas {% endblock %}
     
 {% block head %}
     <link rel="stylesheet" href="{% static 'bombas/css/lista_bombas.css' %}">
-
 {% endblock  %}
 
-
 {% block main %}
-    <div class="campo-pagina-bomba">
-        <h2 class="titulo-bomba-listagem">Listagem de Bombas</h2>
+    <div class="campo-pagina">
+
+        <div style="display: flex; flex-direction: column; margin: 10px; gap: 20px;">
+            <div>
+                <h2 style="margin-top: 18px;">Bombas</h2>
+            </div>
+        </div>
 
         {% include 'home_template/partials/messages.html' %}
 
-            
         <nav class="nav-pesquisa">
             <form method="GET" class="form">
+                <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
 
-                <div>
-                    <input type="text" class="form-input" placeholder="Pesquisar..." name="q">
-                </div>
+                <button type="submit" class="button-pesquisa">
+                    🔍
+                </button>
                 <div class="espaco-datas">
                     <input type="date" name="data_inicio" class="form-data">
                     <input type="date" name="data_fim" class="form-data">
                 </div>
-                <button type="submit" class="button-pesquisa">
-                    🔍
-                </button>
             </form>
 
             <div class="acoes-buttons">
-
-                <a 
-                    class="novo-registro" 
-                    href="{% url 'cadastros:bombas:cadastrar' %}?next={{ request.get_full_path }}"
-            
-                >
+                <button type="button" onclick="abrirModal('modalCadastro')" class="novo-registro">
                     Novo registro
-                </a>
-
+                </button>
             </div>
-
-
         </nav>
 
-
         {% if page_obj %}
-            <div class="lista-bomba">
-                {% for bomba in page_obj %}
-                    <table class="tabela-bomba">
+            <div class="lista">
+                <table class="tabela">
+                    <thead class="tabela-cabecalho">
+                        <tr>
+                            <th>Identificador</th>
+                            <th>Tanque</th>
+                            <th>Situação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    {% for bomba in page_obj %}
                         <tbody class="tabela-body">
                             <tr>
-                                <th>Identificador</th>
-                                <td>
-                                    {{ bomba.nome_bomba }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Tanque</th>
-                                {% if bomba.tanque %}
-                                    <td>
+                                <td data-label="Identificador">{{ bomba.nome_bomba }}</td>
+                                <td data-label="Tanque">
+                                    {% if bomba.tanque %}
                                         {{ bomba.tanque.identificador_tanque }}
-                                    </td>
-                                {% else %}
-                                    <td>
-                                       Não há tanque relacionado
-                                    </td>
-                                {% endif %}
-                            </tr>
-                            <tr>
-                                <th>Situação</th>
-                                <td>
+                                    {% else %}
+                                        Não há tanque relacionado
+                                    {% endif %}
+                                </td>
+                                <td data-label="Situação">
                                     {% if bomba.ativo %}
                                         <p class="status status-ativo">Ativo 🟢</p>
                                     {% else %}
                                         <p class="status status-desativado">Desativado 🔴</p>
                                     {% endif %}
                                 </td>
-                            </tr>
-                            <tr>
-                                <th>Ações</th>
-                                <td class="acoes-buttons">
-                                    <a a href="{% url 'cadastros:bombas:atualizar' bomba.pk %}?next={{ request.get_full_path }}" class="btn atualizar">
-                                        Editar
-                                    </a>
+                                <td data-label="Ações" class="acoes-buttons">
+                                    <button 
+                                        type="button" 
+                                        class="btn atualizar"
+                                        onclick="abrirModal('modalEditar{{ bomba.id }}')"
+                                    >
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
-                    </table>
-                {% endfor %}
+
+                        <div id="modalEditar{{ bomba.id }}" class="modal">
+                            <div class="modal-content">
+                                <span class="close" onclick="fecharModal('modalEditar{{ bomba.id }}')">&times;</span>
+                                <h2>Editar Bomba</h2>
+                                <form method="POST" action="{% url 'cadastros:bombas:atualizar' bomba.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-form-grid">
+                                        {% for field in bomba.form_edicao %}
+                                            <div class="form-group">
+                                                {{ field.label_tag }}
+                                                {{ field }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button type="submit">Salvar Alterações</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </table>
             </div>
 
             <div class="paginacao">
@@ -99,9 +107,7 @@
                     <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">«</a>
                 {% endif %}
 
-                <span>
-                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                </span>
+                <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
 
                 {% if page_obj.has_next %}
                     <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}">»</a>
@@ -112,6 +118,13 @@
             <h2>Não há registros de Bombas</h2>
         {% endif %}
 
-
     </div>
+    {% block modal %}
+        {% url 'cadastros:bombas:cadastrar' as cadastrar_url %}
+        {% include 'home_template/partials/modal.html' with modal_id="modalCadastro" titulo="Novo Registro" action_url=cadastrar_url form=form botao_texto="Salvar" %}
+            
+
+    {% endblock modal %}
+
+
 {% endblock %}
