@@ -420,8 +420,8 @@ class RegistroReabastecimentoListarView(
         combustivel_mais_reabastecido = (
             reabastecimentos
             .values('tanque__tipo_combustivel__nome_combustivel')
-            .annotate(total=Count('id'))
-            .order_by('-total')
+            .annotate(reabastecimentos_count=Count('id'))
+            .order_by('-reabastecimentos_count')
             .first()
         )
 
