@@ -11,8 +11,11 @@
 
 
 {% block main %}
-    <div class="campo-pagina-fornecedor">
-        <h2 class="titulo-fornecedor-listagem">Listagem de Fornecedores</h2>
+    <div class="campo-pagina">
+        
+        <div style="display: flex; flex-direction: column; margin: 10px; gap: 20px;">
+            <h2 style="margin-top: 18px;" class="titulo-pagina">Fornecedores</h2>
+        </div>
 
         {% include 'home_template/partials/messages.html' %}
 
@@ -34,12 +37,15 @@
 
             <div class="acoes-buttons">
 
-                <a 
-                    class="novo-registro" 
-                    href="{% url 'cadastros:fornecedores:cadastrar' %}?next={{ request.get_full_path }}"
+            <div class="acoes-buttons">
+                <button 
+                    type="button" 
+                    onclick="abrirModal('modalCadastro')" 
+                    class="novo-registro"
                 >
                     Novo registro
-                </a>
+                </button>
+            </div>
 
             </div>
 
@@ -48,57 +54,80 @@
 
 
         {% if page_obj %}
-            <div class="lista-fornecedor">
-                {% for fornecedor in page_obj %}
-                    <table class="tabela-fornecedor">
-                        <tbody class="tabela-body">
+            <div class="lista">
+                <table class="tabela">
+                    <thead class="tabela-cabecalho">
+                        <tr>
+                            <th>Nome Fantasia</th>
+                            <th>CNPJ</th>
+                            <th>Contato</th>
+                            <th>Telefone</th>
+                            <th>E-mail</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tabela-body">
+                        {% for fornecedor in page_obj %}
                             <tr>
-                                <th>Nome Fantasia</th>
                                 <td>
                                     {{ fornecedor.nome_fantasia }}
                                 </td>
-                            </tr>
-                            <tr>
-                                <th>CNPJ</th>
+
                                 <td>
                                     {{ fornecedor.cnpj }}
                                 </td>
-                            </tr>
-                            <tr>
-                                <th>Contato</th>
+
                                 <td>
                                     {{ fornecedor.contato_principal }}
                                 </td>
-                            </tr>
-                            <tr>
-                                <th>Telefone</th>
+
                                 <td>
                                     {{ fornecedor.telefone }}
                                 </td>
-                            </tr>
-                            <tr>
-                                <th>E-mail</th>
+
                                 <td>
                                     {{ fornecedor.email }}
                                 </td>
-                            </tr>
-                            <tr>
-                                <th>Ações</th>
+
                                 <td class="acoes-buttons">
-                                    <a 
-                                        href="{% url 'cadastros:fornecedores:editar' fornecedor.pk %}?next={{ request.get_full_path }}" 
+                                    <button 
+                                        type="button"
+                                        onclick="abrirModal('modalEditar{{ fornecedor.id }}')"
                                         class="btn atualizar"
                                     >
-                                        Editar
-                                    </a>
-                                    <a
-                                        href="{% url 'cadastros:fornecedores:deletar' fornecedor.pk %}?next{{ request.get_full_path }}"
-                                        class="btn deletar"
-                                    >
-                                        Apagar
-                                    </a>
+                                        <i class="fas fa-edit"></i>
+
+                                    </button>
+
+                                    <form methd="POST" action="{% url 'cadastros:fornecedores:deletar' fornecedor.pk %}?next{{ request.get_full_path }}">
+                                        {% csrf_token %}
+                                        <button
+                                            type="submit"
+                                            class="btn deletar"
+                                        >
+                                            <i class="fas fa-trash"></i>       
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
+                            <div id="modalEditar{{ fornecedor.id }}" class="modal">
+                                <div class="modal-content">
+                                    <span class="close" onclick="fecharModal('modalEditar{{ forenecedor.id }}')">&times;</span>
+                                    <h2>Editar Abastecimento</h2>
+                                    <form method="POST" action="{% url 'cadastros:fornecedores:atualizar' fornecedor.id %}">
+                                            {% csrf_token %}
+                                        <div class="modal-form-grid">
+                                            {% for field in fornecedor.form_edicao %}
+                                                <div class="form-group">
+                                                    {{ field.label_tag }}
+                                                    {{ field }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <button type="submit">Salvar Alterações</button>
+                                    </form>
+                                </div>
+                            </div>
                         </tbody>
                     </table>
                 {% endfor %}
@@ -122,6 +151,11 @@
             <h2>Não há registros de fornecedores</h2>
         {% endif %}
 
-
     </div>
+
+    {% block modal %}
+        {% url 'cadastros:fornecedores:cadastrar' as cadastrar_url %}
+        {% include 'home_template/partials/modal.html' with modal_id="modalCadastro" titulo="Novo Registro" action_url=cadastrar_url form=form botao_texto="Salvar" %}
+
+    {% endblock modal %}
 {% endblock %}
