@@ -287,7 +287,30 @@ class SetorListarView(
 
         context = super().get_context_data(**kwargs)
 
-        context['setor'] = self.get_queryset()
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_logado)
+        else:
+            usuario_funcionario = Funcionario.objects.get(user=usuario_logado)
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel)
+
+        form_cadastro = SetorModelForm(
+            empresa=empresa,
+        )
+
+        setores = self.get_queryset()
+
+        for setor in setores:
+            
+            setor.form_edicao = SetorModelForm(
+                instance=setor,
+                empresa=empresa
+            )
+
+
+        context['page_obj'] = setores 
+        context['form'] = form_cadastro 
 
         return context
 
@@ -510,10 +533,32 @@ class CargoListarView(
         return queryset
 
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
 
-        context['cargo'] = self.get_queryset()
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_logado)
+        else:
+            usuario_funcionario = Funcionario.objects.get(user=usuario_logado)
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel)
+
+        form_cadastro = CargoModelForm(
+            empresa=empresa,
+        )
+
+        cargos = self.get_queryset()
+
+        for cargo in cargos:
+            
+            cargo.form_edicao = CargoModelForm(
+                instance=cargo,
+                empresa=empresa
+            )
+
+
+        context['page_obj'] = cargos 
+        context['form'] = form_cadastro 
 
         return context
 
