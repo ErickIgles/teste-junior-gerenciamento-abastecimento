@@ -15,6 +15,16 @@ class TanqueForm(forms.ModelForm):
         label='Tipo de Combustível'
     )
 
+    status = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(
+            attrs={
+                'class': 'checkbox'
+            }
+        ),
+        label='Status do Tanque'
+    )
+
     class Meta:
 
         model = Tanque
@@ -28,7 +38,7 @@ class TanqueForm(forms.ModelForm):
 
             'identificador_tanque': forms.TextInput(
                 attrs={
-                    'class': 'form-textarea'
+                    'class': 'form-input'
                 }
             ),
             'capacidade_maxima': forms.NumberInput(
