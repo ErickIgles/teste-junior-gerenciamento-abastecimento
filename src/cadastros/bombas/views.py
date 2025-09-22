@@ -116,9 +116,35 @@ class BombaListarView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['bombas'] = self.get_queryset()
-        return context
 
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_logado)
+        else:
+            usuario_funcionario = Funcionario.objects.get(user=usuario_logado)
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel)
+
+        form_cadastro = BombaForm(
+            empresa=empresa,
+        )
+
+        bombas = self.get_queryset()
+
+        for bomba in bombas:
+            
+            bomba.form_edicao = BombaUpdateForm(
+                instance=bomba,
+                empresa=empresa
+            )
+
+            bomba.form_edicao.fields['status'].initial = bomba.ativo
+
+
+        context['page_obj'] = bombas 
+        context['form'] = form_cadastro 
+
+        return context
 
 class BombaAtualizarView(
     LoginRequiredMixin,
