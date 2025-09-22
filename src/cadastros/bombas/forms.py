@@ -103,7 +103,7 @@ class BombaUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Bomba
-        fields = ['nome_bomba', 'tanque']
+        fields = ['nome_bomba', 'tanque', 'status']
 
     def __init__(self, *args, **kwargs):
         self.empresa = kwargs.pop('empresa', None)
@@ -144,9 +144,13 @@ class BombaUpdateForm(forms.ModelForm):
         return tanque
 
     def save(self, commit=True):
-        bomba = self.instance
+        
+        bomba = super().save(commit=False)
         bomba.empresa = self.empresa
-        bomba.ativo = self.cleaned_data.get('status')
+
+        status = self.cleaned_data.get('status')
+        bomba.ativo = status
+
         if commit:
             bomba.save()
-        return bomba
+        return bomba    
