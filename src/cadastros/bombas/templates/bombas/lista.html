@@ -87,12 +87,24 @@
                                 <form method="POST" action="{% url 'cadastros:bombas:atualizar' bomba.id %}">
                                     {% csrf_token %}
                                     <div class="modal-form-grid">
-                                        {% for field in bomba.form_edicao %}
-                                            <div class="form-group">
-                                                {{ field.label_tag }}
-                                                {{ field }}
-                                            </div>
-                                        {% endfor %}
+                                        {% if form_edicao_com_erros and bomba.id == bomba_id_com_erro %}
+                                            {% for field in form_edicao_com_erros %}
+                                                <div class="form-group">
+                                                    {{ field.label_tag }}
+                                                    {{ field }}
+                                                    {% if field.errors %}
+                                                        <div class="error">{{ field.errors }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            {% for field in bomba.form_edicao %}
+                                                <div class="form-group">
+                                                    {{ field.label_tag }}
+                                                    {{ field }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
                                     </div>
                                     <button type="submit">Salvar Alterações</button>
                                 </form>
@@ -126,5 +138,11 @@
 
     {% endblock modal %}
 
-
+    {% if form_edicao_com_erros %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            abrirModal("modalEditar{{ bomba_id_com_erro }}");
+        });
+    </script>
+    {% endif %}
 {% endblock %}
