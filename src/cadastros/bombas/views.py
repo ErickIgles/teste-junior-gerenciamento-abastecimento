@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -195,7 +196,35 @@ class BombaAtualizarView(
             self.request,
             'Erro ao atualizar dados. Confira às informações.'
         )
-        return super().form_invalid(form)
+        
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_logado)
+        else:
+            usuario_funcionario = Funcionario.objects.get(user=usuario_logado)
+            empresa = Empresa.objects.get(
+                usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel
+            )
+
+        bombas = Bomba.objects.select_related(
+            'empresa'
+        ).filter(
+            empresa=empresa
+        )
+
+        for bomba in bombas:
+            bomba.form_edicao = BombaUpdateForm(instance=bomba, empresa=empresa)
+            bomba.form_edicao.fields['status'].initial = bomba.ativo
+
+        context = {
+            "page_obj": bombas,
+            "form": BombaForm(empresa=empresa),
+            "form_edicao_com_erros": form,
+            "bomba_id_com_erro": self.object.id,
+        }
+
+        return render(self.request, "bombas/lista.html", context)
 
     def get_success_url(self):
 
