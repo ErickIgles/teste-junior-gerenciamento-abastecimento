@@ -87,19 +87,26 @@
 }
 
 .tabela{
+    margin-top: 30px;
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 10px;
     gap: 40px
 }
 
+
 .opcao-pdf{
     text-decoration: none;
-    padding: 8px;
     font-weight: bold;
-    background-color: #ffffff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     cursor: pointer;
+    margin-top: 10px;
+    height: 50px;
+    border-radius: 10px;
+    margin-right: 5px;
+    padding: 5px 8px;
+    text-align: center;
+    border: 0.5px solid black;
 }
 
 .status{
