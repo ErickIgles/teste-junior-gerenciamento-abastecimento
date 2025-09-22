@@ -163,9 +163,36 @@ class TanqueListarView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['tanques'] = self.get_queryset()
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_logado)
+        else:
+            usuario_funcionario = Funcionario.objects.get(user=usuario_logado)
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel)
+
+        form_cadastro = TanqueForm(
+            empresa=empresa,
+        )
+
+        tanques = self.get_queryset()
+
+        for tanque in tanques:
+            
+            tanque.form_edicao = TanqueUpdateForm(
+                instance=tanque,
+                empresa=empresa
+            )
+
+            tanque.form_edicao.fields['status'].initial = tanque.ativo
+
+        context['page_obj'] = tanques 
+        context['form'] = form_cadastro
+        
+
 
         return context
+
 
 
 class TanqueAtualizarView(
@@ -357,9 +384,32 @@ class CombustivelListarView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['combustivel'] = self.get_queryset()
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_logado)
+        else:
+            usuario_funcionario = Funcionario.objects.get(user=usuario_logado)
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel)
+
+        form_cadastro = CombustivelForm(
+            empresa=empresa,
+        )
+
+        combustiveis = self.get_queryset()
+
+        for combustivel in combustiveis:
+            combustivel.form_edicao = CombustivelForm(
+                instance=combustivel,
+                empresa=empresa
+            )
+
+        context['page_obj'] = combustiveis 
+        context['form'] = form_cadastro 
+        
 
         return context
+
 
 
 class CombustivelAtualizarView(
