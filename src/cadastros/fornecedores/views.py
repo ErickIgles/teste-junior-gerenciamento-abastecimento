@@ -142,10 +142,33 @@ class FornecedorListarView(
 
         context = super().get_context_data(**kwargs)
 
-        context['fornecedores'] = self.get_queryset()
+        usuario_logado = self.request.user
+
+        if usuario_logado.is_empresa():
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_logado)
+        else:
+            usuario_funcionario = Funcionario.objects.get(user=usuario_logado)
+            empresa = Empresa.objects.get(usuario_responsavel=usuario_funcionario.empresa.usuario_responsavel)
+
+        form_cadastro = FornecedorForm(
+            empresa=empresa,
+        )
+
+        fornecedores= self.get_queryset()
+
+        for fornecedor in fornecedores:
+            
+            fornecedor.form_edicao = FornecedorForm(
+                instance=fornecedor,
+                empresa=empresa
+            )
+
+
+        context['page_obj'] = fornecedores
+        context['form'] = form_cadastro 
+        
 
         return context
-
 
 class FornecedorAtualizarView(
     LoginRequiredMixin,
