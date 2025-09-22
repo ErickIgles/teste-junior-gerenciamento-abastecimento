@@ -19,7 +19,7 @@ class Fornecedor(Base):
         verbose_name="Nome Fantasia"
     )
     cnpj = models.CharField(
-        max_length=14,
+        max_length=18,
         unique=True,
         verbose_name="CNPJ"
     )
