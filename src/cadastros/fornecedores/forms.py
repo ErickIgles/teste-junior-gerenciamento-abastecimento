@@ -29,10 +29,13 @@ class FornecedorForm(forms.ModelForm):
     )
 
     cnpj = forms.CharField(
+        max_length=18,
         widget=forms.TextInput(
             attrs={
                 'class': 'form-input',
-                'placeholder': 'CNPJ'
+                'placeholder': 'CNPJ',
+                'pattern': r'\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2}',
+                'inputmode': 'numeric'
             }
         ),
         label='CNPJ',
@@ -86,8 +89,9 @@ class FornecedorForm(forms.ModelForm):
     observacoes = forms.CharField(
         widget=forms.Textarea(
             attrs={
-                'class': 'form-input',
-                'placeholder': 'Observações'
+                'class': 'form-textarea',
+                'placeholder': 'Observações',
+                'rows':4
             }
         ),
         label='Observações',
