@@ -1,4 +1,45 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+
+  // Abre o modal pelo ID
+  window.abrirModal = function(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+          modal.style.display = "block";
+      }
+  }
+
+  // Fecha o modal pelo ID
+  window.fecharModal = function(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+          modal.style.display = "none";
+      }
+  }
+
+  // Fecha ao clicar no X e fora do modal
+  document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".modal .close").forEach(span => {
+          span.addEventListener("click", () => {
+              const modal = span.closest(".modal");
+              if (modal) {
+                  modal.style.display = "none";
+              }
+          });
+      });
+
+      window.addEventListener("click", event => {
+          if (event.target.classList.contains("modal")) {
+              event.target.style.display = "none";
+          }
+      });
+  });
+
+
+
+
+
+
   const asidebar = document.querySelector('.asidebar');
   const hamburguerBtn = document.getElementById('hamburguer-btn');
   const layout = document.querySelector('.layout');
