@@ -3,6 +3,38 @@
         <nav class="navegacao">
 
             <ul class="navegacao-lista-menu">
+                <li
+                    style="
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        margin-top: 1rem;
+                    "
+                >
+                    <div
+                        style="
+                            background-color: #385572; 
+                            width: 50%;
+                            border-radius: 1rem;
+                            padding: 0.5rem;
+                        "
+                    >
+                        <div style=" display:flex; align-items: center; justify-content: center; margin-top: 10px;">
+                            <img style="width: 65px" src="{% static 'gerenciamento_abastecimento/icons/logo_empresa.png' %}" alt="">
+                        </div>
+
+                        <h2 
+                            style="text-align: center; 
+                            padding: 0px 0px; 
+                            font-size: 18px; 
+                            "
+                        >
+                            <span style="color: black">+</span>
+                            <span style="color: rgb(255, 176, 31);">Posto</span>
+                        </h2>
+                    </div>
+                </li>
+
                 <li>
                     <a 
                         href="{% url 'dashboard:dashboard' %}">
@@ -25,25 +57,25 @@
                                 href="{% url 'cadastros:tanques:listar' %}"
                             >
                                 <i class="fa-solid fa-oil-can"></i>
-                                Tanque
+                                Tanques
                             </a>
                             <a  
                                 href="{% url 'cadastros:bombas:listar' %}"
                             >
                                 <i class="fa-solid fa-gas-pump"></i>
-                                Bomba
+                                Bombas
                             </a>
                             <a 
                                 href="{% url 'cadastros:tanques:listar_combustivel' %}"
                             >
                                 <i class="fa-solid fa-droplet"></i>
-                                Combustivel
+                                Combustíveis
                             </a>
                             <a 
                                 href="{% url 'cadastros:fornecedores:listar' %}"
                             >
                                 <i class="fa-solid fa-handshake"></i>
-                                Fornecedor
+                                Fornecedores
                             </a>
                             <a 
                                 href="{% url 'cadastros:funcionarios:listar' %}"
@@ -55,13 +87,13 @@
                                 href="{% url 'cadastros:empresas:listar_setor' %}"
                             >
                                 <i class="fa-solid fa-diagram-project"></i>
-                                Setor
+                                Setores
                             </a>
                             <a 
                                 href="{% url 'cadastros:empresas:listar_cargo' %}"
                             >
                                 <i class="fa-solid fa-briefcase"></i> 
-                                Cargo
+                                Cargos
                             </a>
                                                         
                         </li>
@@ -81,7 +113,7 @@
                                 href="{% url 'servicos:abastecimento:listar' %}"
                             >
                                 <i class="fa-solid fa-gas-pump"></i>
-                                Saída
+                                Abastecimentos
                             </a>
                         </li>
                         <li>
@@ -89,7 +121,7 @@
                                 href="{% url 'servicos:abastecimento:listar_reabastecimento' %}"
                             >
                                 <i class="fa-solid fa-gas-pump"></i>
-                                Entrada
+                                Reabastecimentos
                             </a>
                         </li>
                     </ul>
@@ -107,14 +139,14 @@
                             <a 
                                 href="{% url 'relatorios:relatorios_abastecimentos' %}">
                                 <i class="fa-solid fa-file-export"></i>
-                                Saida de combustível
+                                Abastecimentos
                             </a>
                         </li>
                         <li>
                             <a 
                                 href="{% url 'relatorios:relatorios_reabastecimentos' %}">
                                 <i class="fa-solid fa-file-export"></i>
-                                Entrada de combustível
+                                Reabastecimentos
                             </a>
                         </li>
                     </ul>
