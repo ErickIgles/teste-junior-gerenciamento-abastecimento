@@ -22,7 +22,7 @@ urlpatterns = [
     path(
         'editar/<int:pk>',
         FornecedorAtualizarView.as_view(),
-        name='editar'
+        name='atualizar'
     ),
     path(
         'deletar/<int:pk>/',
