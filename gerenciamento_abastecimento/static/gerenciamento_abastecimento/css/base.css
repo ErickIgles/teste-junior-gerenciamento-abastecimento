@@ -228,16 +228,15 @@ body {
     width: 100%;
   }
 
-  .asidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    z-index: 999;
-    width: var(--largura-sidebar-mobile);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
+.asidebar {
+  width: var(--largura-sidebar-desktop);
+  background-color: var(--cor-principal);
+  color: var(--cor-texto-principal);
+  box-shadow: 3px 0 6px var(--sombra-leve);
+  overflow-y: auto;   /* libera o scroll vertical */
+  overflow-x: hidden; /* evita scroll horizontal */
+  transition: width 0.3s ease, transform 0.3s ease;
+}
 
   .asidebar:not(.hidden) {
     transform: translateX(0);
