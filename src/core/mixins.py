@@ -19,7 +19,7 @@ class GroupRequiredMixin(AccessMixin):
         if not usuario.is_authenticated:
             return self.handle_no_permission()
 
-        if usuario.is_staff or usuario.empresa():
+        if usuario.is_staff or usuario.is_empresa():
             return super().dispatch(request, *args, **kwargs)
 
 
