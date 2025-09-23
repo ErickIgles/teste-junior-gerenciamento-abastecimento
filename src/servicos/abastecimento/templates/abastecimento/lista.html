@@ -88,9 +88,9 @@
                             <tr>
                                 <td data-label="Responsvel">
                                     {% if abastecimento.funcionario %}
-                                        {{ abastecimento.funcionario.username }}
+                                        {{ abastecimento.funcionario.nome_funcionario }}
                                     {% else %}
-                                        {{ abastecimento.empresa }}
+                                        {{ abastecimento.empresa.nome_fantasia }}
                                     {% endif %}
                                 </td>
 
