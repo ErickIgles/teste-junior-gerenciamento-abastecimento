@@ -6,7 +6,7 @@ from .models import Empresa, Setor, Cargo
 
 
 class EmpresaModelForm(forms.ModelForm):
-    nome_empresa = forms.CharField(
+    razao_social = forms.CharField(
         max_length=255,
         widget=forms.TextInput(
             attrs={
@@ -71,23 +71,23 @@ class EmpresaModelForm(forms.ModelForm):
     class Meta:
         model = Empresa
         fields = [
-            'nome_empresa',
+            'razao_social',
             'cnpj',
             'telefone',
             'email'
         ]
 
-    def clean_nome_empresa(self):
-        nome_empresa = self.cleaned_data.get('nome_empresa')
+    def clean_razao_social(self):
+        razao_social = self.cleaned_data.get('razao_social')
 
         if Empresa.objects.filter(
-            nome_empresa=nome_empresa
+            razao_social=razao_social
         ).exists():
             raise forms.ValidationError(
                 'Há uma empresa cadastrada com esse nome.'
             )
 
-        return nome_empresa
+        return razao_social
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -106,7 +106,7 @@ class EmpresaModelForm(forms.ModelForm):
 
         password2 = self.cleaned_data.get('password2')
 
-        nome_empresa = self.cleaned_data.get('nome_empresa')
+        razao_social = self.cleaned_data.get('razao_social')
 
         if password1 and password2 and password1 != password2:
             self.add_error('password2', 'As senhas não coincidem.')
@@ -114,7 +114,7 @@ class EmpresaModelForm(forms.ModelForm):
         usuario = User.objects.select_related(
             'username'
         ).filter(
-            username=nome_empresa
+            username=razao_social
         )
 
         if usuario.exists():
@@ -126,7 +126,7 @@ class EmpresaModelForm(forms.ModelForm):
         return self.cleaned_data
 
     def save(self, commit=True):
-        nome_empresa = self.cleaned_data.get('nome_empresa')
+        razao_social = self.cleaned_data.get('razao_social')
         cnpj = self.cleaned_data.get('cnpj')
         telefone = self.cleaned_data.get('telefone')
         email = self.cleaned_data.get('email')
@@ -134,12 +134,12 @@ class EmpresaModelForm(forms.ModelForm):
         password = self.cleaned_data.get('password1')
 
         usuario = User.objects.create_user(
-            username=nome_empresa,
+            username=razao_social,
             email=email,
             password=password
         )
         empresa = Empresa(
-            nome_empresa=nome_empresa,
+            razao_social=razao_social,
             cnpj=cnpj,
             telefone=telefone,
             email=email
@@ -155,7 +155,7 @@ class EmpresaModelForm(forms.ModelForm):
 
 class EmpresaUpdateModelForm(forms.ModelForm):
 
-    nome_empresa = forms.CharField(
+    razao_social = forms.CharField(
         max_length=255,
         widget=forms.TextInput(
             attrs={
@@ -189,19 +189,19 @@ class EmpresaUpdateModelForm(forms.ModelForm):
     class Meta:
         model = Empresa
         fields = [
-            'nome_empresa',
+            'razao_social',
             'telefone',
             'email'
         ]
 
-    def clean_nome_empresa(self):
+    def clean_razao_social(self):
 
-        nome_empresa = self.cleaned_data.get('nome_empresa')
+        razao_social = self.cleaned_data.get('razao_social')
 
         usuario_id = self.instance.pk
 
         empresa = Empresa.objects.filter(
-            nome_empresa=nome_empresa
+            razao_social=razao_social
         ).exclude(
             pk=usuario_id
         )
@@ -211,7 +211,7 @@ class EmpresaUpdateModelForm(forms.ModelForm):
                 'Não é possível utilizar esse nome de empresa.'
             )
 
-        return nome_empresa
+        return razao_social
 
     def clean_email(self):
 
@@ -253,7 +253,7 @@ class EmpresaUpdateModelForm(forms.ModelForm):
 
         usuario = self.instance.usuario_responsavel
 
-        usuario.username = self.cleaned_data.get('nome_empresa')
+        usuario.username = self.cleaned_data.get('razao_social')
 
         usuario.email = self.cleaned_data.get('email')
 
@@ -261,7 +261,7 @@ class EmpresaUpdateModelForm(forms.ModelForm):
 
         empresa = self.instance
 
-        empresa.nome_empresa = self.cleaned_data.get('nome_empresa')
+        empresa.razao_social = self.cleaned_data.get('razao_social')
 
         empresa.usuario_responsavel = usuario
 
