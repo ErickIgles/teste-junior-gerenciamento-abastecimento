@@ -1,6 +1,7 @@
 from django import forms
 
 from django.contrib.auth.models import User, Group
+from django.db import transaction
 
 from .models import Funcionario
 from cadastros.empresas.models import Cargo, Setor
@@ -68,7 +69,15 @@ class FuncionarioForm(forms.ModelForm):
 
     class Meta:
         model = Funcionario
-        fields = ['nome_funcionario', 'cargo']
+        fields = [
+            'nome_funcionario',
+            'email',
+            'cargo',
+            'setor',
+            'grupo',
+            'password1',
+            'password2'
+        ]
 
         widgets = {
             'nome_funcionario': forms.TextInput(
@@ -132,25 +141,28 @@ class FuncionarioForm(forms.ModelForm):
 
     def save(self, commit=True):
 
-        usuario = User.objects.create_user(
-            username=self.cleaned_data.get('nome_funcionario'),
-            email=self.cleaned_data.get('email'),
-            password=self.cleaned_data.get('password1')
-        )
+        with transaction.atomic():
 
-        funcionario = Funcionario(
-            nome_funcionario=self.cleaned_data.get('nome_funcionario'),
-            user=usuario,
-            cargo=self.cleaned_data.get('cargo'),
-            empresa=self.empresa
-        )
-        if commit:
-            funcionario.save()
+            usuario = User.objects.create_user(
+                username=self.cleaned_data.get('nome_funcionario'),
+                email=self.cleaned_data.get('email'),
+                password=self.cleaned_data.get('password1')
+            )
 
-            usuario_grupo = self.cleaned_data.get('grupo')
-            usuario.groups.clear()
-            usuario.groups.add(usuario_grupo)
-            usuario.save()
+            funcionario = Funcionario(
+                nome_funcionario=self.cleaned_data.get('nome_funcionario'),
+                user=usuario,
+                setor=self.cleaned_data.get('setor'),
+                cargo=self.cleaned_data.get('cargo'),
+                empresa=self.empresa
+            )
+            if commit:
+                funcionario.save()
+
+                usuario_grupo = self.cleaned_data.get('grupo')
+                usuario.groups.clear()
+                usuario.groups.add(usuario_grupo)
+                usuario.save()
 
         return funcionario
 
@@ -210,9 +222,9 @@ class FuncionarioUpdateForm(forms.ModelForm):
         model = Funcionario
         fields = [
             'nome_funcionario',
-            'cargo',
+            'email',
             'setor',
-            'email'
+            'cargo'
         ]
 
         widgets = {
@@ -234,6 +246,13 @@ class FuncionarioUpdateForm(forms.ModelForm):
             self.fields['setor'].queryset = Setor.objects.filter(
                 empresa=self.empresa
             )
+
+        if self.instance and self.instance.pk:
+
+            user = self.instance.user
+            self.fields['email'].initial = user.email
+            self.fields['grupo'].initial = user.groups.first()
+            self.fields['status'].initial = getattr(self.instance, 'ativo', False)
 
     def clean_nome_funcionario(self):
         nome_funcionario = self.cleaned_data.get('nome_funcionario')
@@ -284,6 +303,8 @@ class FuncionarioUpdateForm(forms.ModelForm):
         funcionario.nome_funcionario = self.cleaned_data.get(
             'nome_funcionario'
         )
+
+        funcionario.setor = self.cleaned_data.get('setor')
 
         funcionario.cargo = self.cleaned_data.get('cargo')
 
