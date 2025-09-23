@@ -2,6 +2,7 @@ asgiref==3.9.1
 Django==5.2.5
 django-filter==25.1
 django-otp==1.6.1
+django-simple-history==3.10.1
 djangorestframework==3.16.1
 dotenv==0.9.9
 pdfkit==1.0.0
