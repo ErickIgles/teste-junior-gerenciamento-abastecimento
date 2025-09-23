@@ -421,6 +421,36 @@
 }
 
 
+.checkbox {
+  appearance: none;       /* remove estilo nativo */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--cor-cinza);
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* Quando marcado */
+.checkbox:checked {
+  background-color: var(--cor-coral);
+  border-color: var(--cor-coral);
+}
+
+/* Ícone de check (pseudo-elemento) */
+.checkbox:checked::after {
+  content: "✔";
+  color: #fff;
+  font-size: 12px;
+  position: absolute;
+  top: 0;
+  left: 3px;
+}
+
 @keyframes fadeIn {
     from {opacity: 0; transform: translateY(-20px);}
     to {opacity: 1; transform: translateY(0);}
