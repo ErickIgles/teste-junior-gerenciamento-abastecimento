@@ -9,7 +9,8 @@ class EmpresaAdmin(admin.ModelAdmin):
 
     list_display = [
         'id',
-        'nome_empresa',
+        'razao_social',
+        'nome_fantasia',
         'cnpj',
         'telefone',
         'email',
@@ -21,22 +22,20 @@ class EmpresaAdmin(admin.ModelAdmin):
 
     list_display_links = [
         'id',
-        'nome_empresa',
+        'razao_social',
         'cnpj'
     ]
 
     ordering = (
         'id',
-        'criado',
     )
 
     list_filter = [
-        'nome_empresa',
+        'razao_social',
         'cnpj',
         'email',
     ]
 
-    search_fields = ('nome_empresa',)
 
 
 @admin.register(Setor)
