@@ -55,7 +55,13 @@ class Empresa(Base):
     )
 
     def __str__(self):
-        return self.nome_fantasia or self.razao_social
+        if self.nome_fantasia:
+            return str(self.nome_fantasia)
+        if self.razao_social:
+            return str(self.razao_social)
+        if self.cnpj:
+            return f"CNPJ {self.cnpj}"
+        return f"Empresa {self.pk}"
 
     class Meta:
         verbose_name = "Empresa"
