@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django_otp',
     'django_otp.plugins.otp_totp',
 
+    'simple_history',
+
     'cadastros.bombas.apps.BombasConfig',
     'cadastros.tanques.apps.TanquesConfig',
     'cadastros.funcionarios.apps.FuncionariosConfig',
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     'autenticacao.apps.AutenticacaoConfig',
     'relatorios.apps.RelatoriosConfig',
     'dashboard.apps.DashboardConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -60,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_otp.middleware.OTPMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'gerenciamento_abastecimento.urls'
