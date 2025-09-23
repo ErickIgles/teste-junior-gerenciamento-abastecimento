@@ -74,8 +74,8 @@
                                     {% endif %}
                                 </td>
                                 <td data-label="email">
-                                    {% if funcionario.email %}
-                                        {{ funcionario.email }}
+                                    {% if funcionario.user.email %}
+                                        {{ funcionario.user.email }}
                                     {% else %}
                                         E-mail não registrado
                                     {% endif %}
