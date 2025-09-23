@@ -1,5 +1,8 @@
-from django import forms
 
+import re
+from django.core.exceptions import ValidationError
+from django import forms
+from django.db import transaction
 
 from django.contrib.auth.models import User, Group
 from .models import Empresa, Setor, Cargo
@@ -11,11 +14,23 @@ class EmpresaModelForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-input',
-                'placeholder': 'Nome da empresa'
+                'placeholder': 'Razão Social'
             }
         ),
-        label='Nome da empresa'
+        label='Razão Social'
     )
+
+    nome_fantasia = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-input',
+                'placeholder': 'Nome Fantasia'
+            }
+        ),
+        label='Nome Fantasia'
+    )
+
     cnpj = forms.CharField(
         max_length=18,
         widget=forms.TextInput(
@@ -26,18 +41,20 @@ class EmpresaModelForm(forms.ModelForm):
                 'inputmode': 'numeric'
             }
         ),
-        label='CNPJ da empresa'
+        label='CNPJ'
     )
+
     telefone = forms.CharField(
         max_length=15,
         widget=forms.TextInput(
             attrs={
                 'class': 'form-input',
-                'placeholder': 'telefone'
+                'placeholder': 'Telefone'
             }
         ),
-        label='Telefone para contato'
+        label='Telefone'
     )
+
     email = forms.EmailField(
         max_length=255,
         widget=forms.EmailInput(
@@ -58,6 +75,7 @@ class EmpresaModelForm(forms.ModelForm):
         ),
         label='Senha'
     )
+
     password2 = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
@@ -72,6 +90,7 @@ class EmpresaModelForm(forms.ModelForm):
         model = Empresa
         fields = [
             'razao_social',
+            'nome_fantasia',
             'cnpj',
             'telefone',
             'email'
@@ -79,78 +98,94 @@ class EmpresaModelForm(forms.ModelForm):
 
     def clean_razao_social(self):
         razao_social = self.cleaned_data.get('razao_social')
-
-        if Empresa.objects.filter(
-            razao_social=razao_social
-        ).exists():
-            raise forms.ValidationError(
-                'Há uma empresa cadastrada com esse nome.'
-            )
-
+        if Empresa.objects.filter(razao_social=razao_social).exists():
+            raise forms.ValidationError('Já existe uma empresa com essa razão social.')
         return razao_social
+
+    def clean_nome_fantasia(self):
+        nome_fantasia = self.cleaned_data.get('nome_fantasia')
+        if Empresa.objects.filter(nome_fantasia=nome_fantasia).exists():
+            raise forms.ValidationError('Já existe uma empresa com esse nome fantasia.')
+        return nome_fantasia
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-
-        if Empresa.objects.filter(
-            email=email
-        ).exists():
-            raise forms.ValidationError(
-                'Há uma empresa cadastrada com esse e-mail.'
-            )
+        if Empresa.objects.filter(email=email).exists():
+            raise forms.ValidationError('Já existe uma empresa com esse e-mail.')
         return email
+    
+    def clean_cnpj(self):
+        cnpj = self.cleaned_data.get('cnpj')
+
+        cnpj_numeros = re.sub(r'\D', '', cnpj or '')
+
+        if len(cnpj_numeros) != 14:
+            raise ValidationError('CNPJ deve conter 14 dígitos.')
+
+        if cnpj_numeros == cnpj_numeros[0] * 14:
+            raise ValidationError('CNPJ inválido.')
+
+        return cnpj
+
+    def clean_telefone(self):
+        telefone = self.cleaned_data.get('telefone')
+
+        telefone_numeros = re.sub(r'\D', '', telefone or '')
+
+        if len(telefone_numeros) not in [10, 11]:
+            raise ValidationError('Telefone deve ter 10 ou 11 dígitos (com DDD).')
+
+        padrao = r'^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$'
+        if not re.match(padrao, telefone):
+            raise ValidationError('Formato de telefone inválido. Ex: (85)99999-8888')
+
+        return telefone
 
     def clean(self):
-
-        password1 = self.cleaned_data.get('password1')
-
-        password2 = self.cleaned_data.get('password2')
-
-        razao_social = self.cleaned_data.get('razao_social')
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        razao_social = cleaned_data.get('razao_social')
 
         if password1 and password2 and password1 != password2:
             self.add_error('password2', 'As senhas não coincidem.')
 
-        usuario = User.objects.select_related(
-            'username'
-        ).filter(
-            username=razao_social
-        )
+        if User.objects.filter(username=razao_social).exists():
+            raise forms.ValidationError('Este nome de usuário já está em uso.')
 
-        if usuario.exists():
-
-            raise forms.ValidationError(
-                'Este nome de usuário já está em uso.'
-            )
-
-        return self.cleaned_data
+        return cleaned_data
 
     def save(self, commit=True):
+        
         razao_social = self.cleaned_data.get('razao_social')
+        nome_fantasia = self.cleaned_data.get('nome_fantasia')
         cnpj = self.cleaned_data.get('cnpj')
         telefone = self.cleaned_data.get('telefone')
         email = self.cleaned_data.get('email')
-
         password = self.cleaned_data.get('password1')
 
-        usuario = User.objects.create_user(
-            username=razao_social,
-            email=email,
-            password=password
-        )
-        empresa = Empresa(
-            razao_social=razao_social,
-            cnpj=cnpj,
-            telefone=telefone,
-            email=email
-        )
+        with transaction.atomic():
 
-        if commit:
-            empresa.usuario_responsavel = usuario
-            empresa.grupo = Group.objects.get(name='administradores')
-            empresa.save()
+            usuario = User.objects.create_user(
+                username=razao_social,
+                email=email,
+                password=password
+            )
 
-        return usuario
+            empresa = Empresa(
+                razao_social=razao_social,
+                nome_fantasia=nome_fantasia,
+                cnpj=cnpj,
+                telefone=telefone,
+                email=email,
+                usuario_responsavel=usuario
+            )
+
+            if commit:
+                empresa.grupo = Group.objects.get(name='administradores')
+                empresa.save()
+
+        return empresa
 
 
 class EmpresaUpdateModelForm(forms.ModelForm):
