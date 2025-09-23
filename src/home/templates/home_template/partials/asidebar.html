@@ -116,41 +116,48 @@
                                 Abastecimentos
                             </a>
                         </li>
-                        <li>
-                            <a 
-                                href="{% url 'servicos:abastecimento:listar_reabastecimento' %}"
-                            >
-                                <i class="fa-solid fa-gas-pump"></i>
-                                Reabastecimentos
-                            </a>
-                        </li>
-                    </ul>
-                </li>
 
-                <li>
-                    <a
-                        class="button"
-                    >
-                        <i class="fa-solid fa-chart-line"></i> 
-                        Relatórios
-                    </a>
-                    <ul class="submenu">
-                        <li>
-                            <a 
-                                href="{% url 'relatorios:relatorios_abastecimentos' %}">
-                                <i class="fa-solid fa-file-export"></i>
-                                Abastecimentos
-                            </a>
-                        </li>
-                        <li>
-                            <a 
-                                href="{% url 'relatorios:relatorios_reabastecimentos' %}">
-                                <i class="fa-solid fa-file-export"></i>
-                                Reabastecimentos
-                            </a>
-                        </li>
+                        {% if request.user.is_empresa %}
+
+                            <li>
+                                <a 
+                                    href="{% url 'servicos:abastecimento:listar_reabastecimento' %}"
+                                >
+                                    <i class="fa-solid fa-gas-pump"></i>
+                                    Reabastecimentos
+                                </a>
+                            </li>
+
+                        {% endif %}
                     </ul>
                 </li>
+                
+                {% if request.user.is_empresa %}
+                    <li>
+                        <a
+                            class="button"
+                        >
+                            <i class="fa-solid fa-chart-line"></i> 
+                            Relatórios
+                        </a>
+                        <ul class="submenu">
+                            <li>
+                                <a 
+                                    href="{% url 'relatorios:relatorios_abastecimentos' %}">
+                                    <i class="fa-solid fa-file-export"></i>
+                                    Abastecimentos
+                                </a>
+                            </li>
+                            <li>
+                                <a 
+                                    href="{% url 'relatorios:relatorios_reabastecimentos' %}">
+                                    <i class="fa-solid fa-file-export"></i>
+                                    Reabastecimentos
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
     </aside>
