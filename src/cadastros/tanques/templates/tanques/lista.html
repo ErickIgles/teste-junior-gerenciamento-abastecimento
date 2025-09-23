@@ -85,7 +85,7 @@
                             <div id="modalEditar{{ tanque.id }}" class="modal">
                                 <div class="modal-content">
                                     <span class="close" onclick="fecharModal('modalEditar{{ tanque.id }}')">&times;</span>
-                                    <h2>Editar Abastecimento</h2>
+                                    <h2>Editar Tanque</h2>
                                     <form method="POST" action="{% url 'cadastros:tanques:atualizar' tanque.id %}">
                                             {% csrf_token %}
                                         <div class="modal-form-grid">
