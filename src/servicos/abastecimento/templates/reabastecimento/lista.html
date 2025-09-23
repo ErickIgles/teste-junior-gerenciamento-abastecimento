@@ -95,11 +95,11 @@
                                 <td>
                                     {% if reabastecimento.funcionario %}
                                         
-                                        {{ reabastecimento.funcionario }}
+                                        {{ reabastecimento.funcionario.nome_funcionario }}
                                     
                                     {% else %}
 
-                                        {{ reabastecimento.empresa }}
+                                        {{ reabastecimento.empresa.nome_fantasia }}
                                     
                                     {% endif %}
                                 </td>
